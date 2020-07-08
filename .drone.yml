@@ -1,23 +1,9 @@
 ---
 kind: pipeline
-name: alpine-3-12
+name: test
 
 steps:
-  - name: restore-cache
-    image: meltwater/drone-cache:v1
-    pull: always
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "Cargo.toml" }}_{{ arch }}_{{ os }}'
-      archive_format: "gzip"
-      mount:
-        - "target"
-    volumes:
-      - name: cache
-        path: /tmp/cache
-  
-  - name: build-and-test
+  - name: test
     image: alpine:3.12
     pull: always
     environment:
@@ -28,27 +14,7 @@ steps:
       - apk add --no-cache cargo git
       - git log -n1
       - cargo -V
-      - cargo build
       - cargo test
-  
-  - name: rebuild-cache
-    image: meltwater/drone-cache:v1
-    pull: always
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: '{{ .Repo.Name }}_{{ checksum "Cargo.toml" }}_{{ arch }}_{{ os }}'
-      archive_format: "gzip"
-      mount:
-        - "target"
-    volumes:
-      - name: cache
-        path: /tmp/cache
-
-volumes:
-  - name: cache
-    host:
-      path: /var/lib/cache
 
 ---
 kind: pipeline
@@ -64,6 +30,6 @@ steps:
 
 ---
 kind: signature
-hmac: f0891a41a3fd3e191bcb41717d5705b381bf9549faa6c0acf6db5ddee0c7745f
+hmac: ea8579dc903633ff16a4a2afbd26baf593a25359dff47c336a1993fd9e28f182
 
 ...
