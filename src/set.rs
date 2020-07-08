@@ -200,3 +200,63 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 }
+
+impl<T: Ord + PartialEq> AATreeSet<T> {
+	/// Returns the smallest element of the set that is greater or equal to `x`.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.smallest_geq_than(&41).is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.smallest_geq_than(&41), Some(&42));
+	/// ```
+	pub fn smallest_geq_than(&self, x: &T) -> Option<&T> {
+		self.tree.traverse(|content, sub| match sub {
+			Some(TraverseStep::Value(None)) if content > x => TraverseStep::Value(Some(content)),
+			Some(sub) => sub,
+			None => {
+				if content < x {
+					TraverseStep::Right
+				} else if content > x {
+					TraverseStep::Left
+				} else {
+					TraverseStep::Value(Some(content))
+				}
+			},
+		})
+	}
+
+	/// Returns the largest element of the set that is smaller or equal to `x`.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.largest_leq_than(&43).is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.largest_leq_than(&43), Some(&42));
+	/// ```
+	pub fn largest_leq_than(&self, x: &T) -> Option<&T> {
+		self.tree.traverse(|content, sub| match sub {
+			Some(TraverseStep::Value(None)) if content < x => TraverseStep::Value(Some(content)),
+			Some(sub) => sub,
+			None => {
+				if content > x {
+					TraverseStep::Left
+				} else if content < x {
+					TraverseStep::Right
+				} else {
+					TraverseStep::Value(Some(content))
+				}
+			},
+		})
+	}
+}
