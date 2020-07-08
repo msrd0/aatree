@@ -1,0 +1,68 @@
+---
+kind: pipeline
+name: alpine-3-12
+
+steps:
+  - name: restore-cache
+    image: meltwater/drone-cache:v1
+    pull: always
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: '{{ .Repo.Name }}_{{ checksum "Cargo.toml" }}_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - "target"
+    volumes:
+      - name: cache
+        path: /tmp/cache
+  
+  - name: build-and-test
+    image: alpine:3.12
+    pull: always
+    environment:
+      CARGO_HOME: target/cargo
+      RUST_BACKTRACE: 1
+      RUST_LOG: debug
+    commands:
+      - apk add --no-cache cargo
+      - cargo -V
+      - cargo build
+      - cargo test
+  
+  - name: rebuild-cache
+    image: meltwater/drone-cache:v1
+    pull: always
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: '{{ .Repo.Name }}_{{ checksum "Cargo.toml" }}_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - "target"
+    volumes:
+      - name: cache
+        path: /tmp/cache
+
+volumes:
+  - name: cache
+    host:
+      path: /var/lib/cache
+
+---
+kind: pipeline
+name: rustfmt
+
+steps:
+  - name: rustfmt
+    image: iamsauravsharma/rust-fmt:nightly-alpine
+    pull: always
+    commands:
+      - cargo fmt -- -V
+      - cargo fmt -- --check -l
+
+---
+kind: signature
+hmac: f0891a41a3fd3e191bcb41717d5705b381bf9549faa6c0acf6db5ddee0c7745f
+
+...

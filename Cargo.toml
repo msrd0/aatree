@@ -1,0 +1,8 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+name = "aatree"
+version = "0.1.0"
+authors = ["Dominic Meiser <git@msrd0.de>"]
+edition = "2018"
+license = "Apache-2.0"
