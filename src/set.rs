@@ -1,6 +1,6 @@
 use crate::{
 	iter::{AAIntoIter, AAIter},
-	tree::AATree
+	tree::{AATree, TraverseStep}
 };
 
 /// A set based on an AA-Tree. An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
@@ -123,5 +123,36 @@ impl<T> AATreeSet<T> {
 	/// Creates an iterator over this set that visits the values in ascending order.
 	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
 		self.into_iter()
+	}
+}
+
+impl<T: Ord + PartialEq> AATreeSet<T> {
+	/// Returns `true` if the set contains an element with the given value.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// set.insert(43);
+	/// assert_eq!(set.contains(&42), false);
+	/// set.insert(42);
+	/// assert_eq!(set.contains(&42), true);
+	/// ```
+	pub fn contains(&self, x: &T) -> bool {
+		self.tree
+			.traverse(|content, sub| match sub {
+				Some(sub) => sub,
+				None => {
+					if content == x {
+						TraverseStep::Value(Some(()))
+					} else if content < x {
+						TraverseStep::Right
+					} else {
+						TraverseStep::Left
+					}
+				},
+			})
+			.is_some()
 	}
 }
