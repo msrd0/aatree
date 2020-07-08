@@ -2,6 +2,7 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	tree::{AATree, TraverseStep}
 };
+use core::iter::FromIterator;
 
 /// A set based on an AA-Tree. An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
 /// with a simplified self-balancing logic that should benefit performance. See [`AATreeMap`]'s documentation
@@ -123,6 +124,19 @@ impl<T> AATreeSet<T> {
 	/// Creates an iterator over this set that visits the values in ascending order.
 	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
 		self.into_iter()
+	}
+}
+
+impl<T: Ord> FromIterator<T> for AATreeSet<T> {
+	fn from_iter<I>(iter: I) -> Self
+	where
+		I: IntoIterator<Item = T>
+	{
+		let mut set = Self::new();
+		for value in iter {
+			set.insert(value);
+		}
+		set
 	}
 }
 
