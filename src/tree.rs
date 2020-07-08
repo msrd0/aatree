@@ -18,10 +18,12 @@ impl<T> Default for AATree<T> {
 
 impl<T: Ord> AATree<T> {
 	/// Add a value to this tree. If the value already exists in the tree, nothing
-	/// is inserted.
-	pub fn insert(&mut self, value: T) {
+	/// is inserted and `false` is returned.
+	pub fn insert(&mut self, value: T) -> bool {
 		let root = std::mem::replace(&mut self.root, AANode::Nil);
-		self.root = root.insert(value);
+		let (root, inserted) = root.insert(value);
+		self.root = root;
+		inserted
 	}
 }
 
@@ -165,15 +167,20 @@ impl<T> AANode<T> {
 
 impl<T: Ord> AANode<T> {
 	/// Insert a new node with `content` into the tree. If a node with this value already exist,
-	/// nothing will be inserted.
-	fn insert(self, content: T) -> Self {
-		self.bst_insert(content).skew().split()
+	/// nothing will be inserted. Returns a pair of the new node and a boolean whether a new node
+	/// was inserted.
+	fn insert(self, content: T) -> (Self, bool) {
+		let (mut node, inserted) = self.bst_insert(content);
+		if inserted {
+			node = node.skew().split();
+		}
+		(node, inserted)
 	}
 
 	/// Simple unbalanced BST insert.
-	fn bst_insert(self, new: T) -> Self {
+	fn bst_insert(self, new: T) -> (Self, bool) {
 		match self {
-			Self::Nil => Self::new(new),
+			Self::Nil => (Self::new(new), true),
 			Self::Node {
 				level,
 				content,
@@ -181,28 +188,37 @@ impl<T: Ord> AANode<T> {
 				right_child
 			} => {
 				if new < content {
-					let left_child = Box::new(left_child.insert(new));
-					Self::Node {
-						level,
-						content,
-						left_child,
-						right_child
-					}
+					let (left_child, inserted) = left_child.insert(new);
+					(
+						Self::Node {
+							level,
+							content,
+							left_child: Box::new(left_child),
+							right_child
+						},
+						inserted
+					)
 				} else if new > content {
-					let right_child = Box::new(right_child.insert(new));
-					Self::Node {
-						level,
-						content,
-						left_child,
-						right_child
-					}
+					let (right_child, inserted) = right_child.insert(new);
+					(
+						Self::Node {
+							level,
+							content,
+							left_child,
+							right_child: Box::new(right_child)
+						},
+						inserted
+					)
 				} else {
-					Self::Node {
-						level,
-						content,
-						left_child,
-						right_child
-					}
+					(
+						Self::Node {
+							level,
+							content,
+							left_child,
+							right_child
+						},
+						false
+					)
 				}
 			},
 		}
@@ -326,7 +342,7 @@ mod test {
 	fn test_insert_greater() {
 		let mut root = tree!();
 		for content in ['A', 'B', 'C', 'D', 'E', 'F', 'G'].iter() {
-			root = root.insert(*content);
+			root = root.insert(*content).0;
 		}
 		let expected = tree!('D' => [3, ('B' => [2, 'A', 'C']), ('F' => [2, 'E', 'G'])]);
 		assert_eq!(root, expected);
@@ -336,7 +352,7 @@ mod test {
 	fn test_insert_smaller() {
 		let mut root = tree!();
 		for content in ['Z', 'Y', 'X', 'W', 'V'].iter() {
-			root = root.insert(*content);
+			root = root.insert(*content).0;
 		}
 		let expected = tree!('W' => [2, 'V', ('Y' => [2, 'X', 'Z'])]);
 		assert_eq!(root, expected);
@@ -346,7 +362,7 @@ mod test {
 	fn test_insert_multiple() {
 		let mut root = tree!();
 		for content in ['A', 'A'].iter() {
-			root = root.insert(*content);
+			root = root.insert(*content).0;
 		}
 		let expected = tree!('A');
 		assert_eq!(root, expected);
