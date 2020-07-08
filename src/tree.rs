@@ -1,7 +1,7 @@
 /// An AA Tree.
 #[derive(Clone, Debug)]
 pub struct AATree<T> {
-	root: AANode<T>
+	pub(super) root: AANode<T>
 }
 
 impl<T> AATree<T> {
@@ -28,7 +28,7 @@ impl<T: Ord> AATree<T> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-enum AANode<T> {
+pub(super) enum AANode<T> {
 	Nil,
 	Node {
 		level: u8,
@@ -54,7 +54,7 @@ impl<T> AANode<T> {
 		}
 	}
 
-	fn level(&self) -> u8 {
+	pub(super) fn level(&self) -> u8 {
 		match self {
 			Self::Nil => 0,
 			Self::Node { level, .. } => *level

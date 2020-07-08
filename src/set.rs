@@ -1,4 +1,7 @@
-use crate::tree::AATree;
+use crate::{
+	iter::{AAIntoIter, AAIter},
+	tree::AATree
+};
 
 /// A set based on an AA-Tree. An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
 /// with a simplified self-balancing logic that should benefit performance. See [`AATreeMap`]'s documentation
@@ -33,9 +36,10 @@ use crate::tree::AATree;
 /// //books.remove("The Odyssey");
 ///
 /// // Iterate over everything.
-/// //for book in &books {
-/// //	println!("{}", book);
-/// 	//}
+/// for book in &books {
+/// 	println!("{}", book);
+/// }
+/// # assert_eq!(books.into_iter().collect::<Vec<_>>(), vec!["A Dance With Dragons", "The Great Gatsby", "The Odyssey", "To Kill a Mockingbird"]);
 /// ```
 ///
 ///  [`AATreeMap`]: struct.AATreeMap.html
@@ -94,5 +98,30 @@ impl<T: Ord> AATreeSet<T> {
 			self.len += 1;
 		}
 		inserted
+	}
+}
+
+impl<T> IntoIterator for AATreeSet<T> {
+	type Item = T;
+	type IntoIter = AAIntoIter<T>;
+
+	fn into_iter(self) -> AAIntoIter<T> {
+		AAIntoIter::new(self.tree.root, self.len)
+	}
+}
+
+impl<'a, T> IntoIterator for &'a AATreeSet<T> {
+	type Item = &'a T;
+	type IntoIter = AAIter<'a, T>;
+
+	fn into_iter(self) -> AAIter<'a, T> {
+		AAIter::new(&self.tree.root, self.len)
+	}
+}
+
+impl<T> AATreeSet<T> {
+	/// Creates an iterator over this set that visits the values in ascending order.
+	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
+		self.into_iter()
 	}
 }
