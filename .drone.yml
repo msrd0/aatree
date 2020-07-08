@@ -25,7 +25,8 @@ steps:
       RUST_BACKTRACE: 1
       RUST_LOG: debug
     commands:
-      - apk add --no-cache cargo
+      - apk add --no-cache cargo git
+      - git log -n1
       - cargo -V
       - cargo build
       - cargo test
