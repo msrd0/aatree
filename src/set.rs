@@ -156,3 +156,47 @@ impl<T: Ord + PartialEq> AATreeSet<T> {
 			.is_some()
 	}
 }
+
+impl<T: Ord> AATreeSet<T> {
+	/// Returns the smallest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.smallest().is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.smallest(), Some(&40));
+	/// ```
+	pub fn smallest(&self) -> Option<&T> {
+		self.tree.traverse(|content, sub| match sub {
+			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
+			Some(sub) => sub,
+			None => TraverseStep::Left
+		})
+	}
+
+	/// Returns the largest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.largest().is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.largest(), Some(&44));
+	/// ```
+	pub fn largest(&self) -> Option<&T> {
+		self.tree.traverse(|content, sub| match sub {
+			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
+			Some(sub) => sub,
+			None => TraverseStep::Right
+		})
+	}
+}

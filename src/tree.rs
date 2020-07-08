@@ -47,9 +47,9 @@ impl<T> AATree<T> {
 	///  2. While going back up, with `(content, Some(res))`, where `res` is the result from
 	///     the fully traversed subgraph. The callback must produce a `Value` result, a
 	///     traversal (returning `Left` or `Right`) is a logic error and will be ignored.
-	pub fn traverse<F, R>(&self, callback: F) -> Option<R>
+	pub fn traverse<'a, F, R>(&'a self, callback: F) -> Option<R>
 	where
-		F: Fn(&T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
+		F: Fn(&'a T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
 	{
 		let res = self.root.traverse(callback);
 		match res {
@@ -202,9 +202,9 @@ impl<T> AANode<T> {
 	/// Traverse the current node, calling the callback with `(content, None)` while going down and
 	/// with `(content, Some(res))` when going up, where `res` is the result obtained from the lower
 	/// subtree.
-	fn traverse<F, R>(&self, callback: F) -> TraverseStep<R>
+	fn traverse<'a, F, R>(&'a self, callback: F) -> TraverseStep<R>
 	where
-		F: Fn(&T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
+		F: Fn(&'a T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
 	{
 		match self {
 			Self::Nil => TraverseStep::Value(None),
