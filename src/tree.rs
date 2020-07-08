@@ -90,6 +90,55 @@ impl<T> AANode<T> {
 			}
 		}
 	}
+
+	/// ```none
+	///   S --> R --> X          R
+	///  /     /          =>    / \
+	/// A     B                T   X
+	///                       / \
+	///                      A   B
+	/// ```
+	fn split(self) -> Self {
+		match self {
+			Self::Node {
+				level,
+				content,
+				left_child: a,
+				right_child: r
+			} if !matches!(*r, Self::Nil) => Self::split_impl(level, content, a, r),
+			_ => self
+		}
+	}
+
+	fn split_impl(level: u8, content: T, a: Box<Self>, r: Box<Self>) -> Self {
+		match *r {
+			Self::Node {
+				level: r_level,
+				content: r_content,
+				left_child: b,
+				right_child: x
+			} if level == x.level() => {
+				let t = Self::Node {
+					level,
+					content,
+					left_child: a,
+					right_child: b
+				};
+				Self::Node {
+					level: r_level + 1,
+					content: r_content,
+					left_child: Box::new(t),
+					right_child: x
+				}
+			},
+			_ => Self::Node {
+				level,
+				content,
+				left_child: a,
+				right_child: r
+			}
+		}
+	}
 }
 
 #[cfg(test)]
@@ -127,6 +176,8 @@ mod test {
 		};
 	}
 
+	// ### TEST SKEW ###
+
 	#[test]
 	fn test_skew_nil() {
 		let root: AANode<char> = tree!();
@@ -161,5 +212,43 @@ mod test {
 		let skewed = root.skew();
 		let expected = tree!('L' => [2, 'A', ('T' => [2, 'B', 'R'])]);
 		assert_eq!(skewed, expected);
+	}
+
+	// ### TEST SPLIT ###
+
+	#[test]
+	fn test_split_nil() {
+		let root: AANode<char> = tree!();
+		println!("Input: {:?}", root);
+		let splitted = root.split();
+		let expected = tree!();
+		assert_eq!(splitted, expected);
+	}
+
+	#[test]
+	fn test_split_leaf() {
+		let root = tree!('T');
+		println!("Input: {:?}", root);
+		let splitted = root.split();
+		let expected = tree!('T');
+		assert_eq!(splitted, expected);
+	}
+
+	#[test]
+	fn test_split_good_tree() {
+		let root = tree!('T' => [2, 'A', ('R' => [2, 'B', 'X'])]);
+		println!("Input: {:?}", root);
+		let splitted = root.split();
+		let expected = tree!('T' => [2, 'A', ('R' => [2, 'B', 'X'])]);
+		assert_eq!(splitted, expected);
+	}
+
+	#[test]
+	fn test_split_bad_tree() {
+		let root = tree!('T' => [2, 'A', ('R' => [2, 'B', ('X' => [2, 'Y', 'Z'])])]);
+		println!("Input: {:?}", root);
+		let splitted = root.split();
+		let expected = tree!('R' => [3, ('T' => [2, 'A', 'B']), ('X' => [2, 'Y', 'Z'])]);
+		assert_eq!(splitted, expected);
 	}
 }
