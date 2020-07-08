@@ -3,7 +3,7 @@ pub(crate) struct AATree<T> {
 	root: AANode<T>
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub(crate) enum AANode<T> {
 	Nil,
 	Node {
@@ -63,18 +63,12 @@ impl<T> AANode<T> {
 
 	fn skew_impl(level: u8, content: T, l: Box<Self>, r: Box<Self>) -> Self {
 		match *l {
-			Self::Nil => Self::Node {
-				level,
-				content,
-				left_child: l,
-				right_child: r
-			},
 			Self::Node {
 				level: l_level,
 				content: l_content,
 				left_child: a,
 				right_child: b
-			} => {
+			} if l_level == level => {
 				let t = Self::Node {
 					level,
 					content,
@@ -87,6 +81,12 @@ impl<T> AANode<T> {
 					left_child: a,
 					right_child: Box::new(t)
 				}
+			},
+			_ => Self::Node {
+				level,
+				content,
+				left_child: l,
+				right_child: r
 			}
 		}
 	}
@@ -100,25 +100,27 @@ mod test {
 		() => {
 			AANode::Nil
 		};
+		(Nil) => {
+			AANode::Nil
+		};
 		($content:expr) => {
 			AANode::new($content)
 		};
-		($content:expr => [$left:tt, $right:tt]) => {
+		($content:expr => [$level:expr, $left:tt, $right:tt]) => {
 			{
 				let _left = tree!(@internal $left);
 				let _right = tree!(@internal $right);
 				// TODO properly compute the level
-				let _level = _left.level() + 1;
 				AANode::Node {
-					level: _level,
+					level: $level,
 					content: $content,
 					left_child: Box::new(_left),
 					right_child: Box::new(_right)
 				}
 			}
 		};
-		(@internal ($content:expr => [$left:tt, $right:tt])) => {
-			tree!($content => [$left, $right])
+		(@internal ($content:expr => [$level:expr, $left:tt, $right:tt])) => {
+			tree!($content => [$level, $left, $right])
 		};
 		(@internal $inner:tt) => {
 			tree!($inner)
@@ -126,9 +128,38 @@ mod test {
 	}
 
 	#[test]
-	fn test_skew() {
-		let root = tree!('T' => [('L' => ['A', 'B']), 'R']);
+	fn test_skew_nil() {
+		let root: AANode<char> = tree!();
+		println!("Input: {:?}", root);
 		let skewed = root.skew();
-		assert_eq!(skewed.content(), Some(&'L'));
+		let expected = tree!();
+		assert_eq!(skewed, expected);
+	}
+
+	#[test]
+	fn test_skew_leaf() {
+		let root = tree!('T');
+		println!("Input: {:?}", root);
+		let skewed = root.skew();
+		let expected = tree!('T');
+		assert_eq!(skewed, expected);
+	}
+
+	#[test]
+	fn test_skew_simple() {
+		let root = tree!('T' => [2, ('L' => [2, Nil, Nil]), 'R']);
+		println!("Input: {:?}", root);
+		let skewed = root.skew();
+		let expected = tree!('L' => [2, Nil, ('T' => [2, Nil, 'R'])]);
+		assert_eq!(skewed, expected);
+	}
+
+	#[test]
+	fn test_skew_full() {
+		let root = tree!('T' => [2, ('L' => [2, 'A', 'B']), 'R']);
+		println!("Input: {:?}", root);
+		let skewed = root.skew();
+		let expected = tree!('L' => [2, 'A', ('T' => [2, 'B', 'R'])]);
+		assert_eq!(skewed, expected);
 	}
 }
