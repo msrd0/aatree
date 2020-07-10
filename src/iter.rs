@@ -1,4 +1,4 @@
-use super::tree::AANode;
+use super::node::AANode;
 use std::iter::FusedIterator;
 
 /// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
