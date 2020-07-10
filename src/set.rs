@@ -1,6 +1,6 @@
 use crate::{
 	iter::{AAIntoIter, AAIter},
-	tree::{AATree, TraverseStep}
+	tree::{AATree, TraverseStep, TreeType}
 };
 use core::iter::FromIterator;
 
@@ -46,12 +46,18 @@ use core::iter::FromIterator;
 ///  [`AATreeMap`]: struct.AATreeMap.html
 ///  [`BTreeSet`]: https://doc.rust-lang.org/std/collections/struct.BTreeSet.html
 #[derive(Clone, Debug)]
-pub struct AATreeSet<T> {
+pub struct AATreeSet<T: TreeType> {
 	tree: AATree<T>,
 	len: usize
 }
 
-impl<T> AATreeSet<T> {
+impl<T: TreeType> Default for AATreeSet<T> {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
+impl<T: TreeType> AATreeSet<T> {
 	/// Construct a new, empty AA-Tree based set.
 	pub fn new() -> Self {
 		Self {
@@ -69,15 +75,7 @@ impl<T> AATreeSet<T> {
 	pub fn is_empty(&self) -> bool {
 		self.len == 0
 	}
-}
 
-impl<T> Default for AATreeSet<T> {
-	fn default() -> Self {
-		Self::new()
-	}
-}
-
-impl<T: Ord> AATreeSet<T> {
 	/// Adds a value to the set.
 	///
 	/// If the set did already contain this value, the entry is not updated, and
@@ -100,47 +98,12 @@ impl<T: Ord> AATreeSet<T> {
 		}
 		inserted
 	}
-}
 
-impl<T> IntoIterator for AATreeSet<T> {
-	type Item = T;
-	type IntoIter = AAIntoIter<T>;
-
-	fn into_iter(self) -> AAIntoIter<T> {
-		AAIntoIter::new(self.tree.root, self.len)
-	}
-}
-
-impl<'a, T> IntoIterator for &'a AATreeSet<T> {
-	type Item = &'a T;
-	type IntoIter = AAIter<'a, T>;
-
-	fn into_iter(self) -> AAIter<'a, T> {
-		AAIter::new(&self.tree.root, self.len)
-	}
-}
-
-impl<T> AATreeSet<T> {
 	/// Creates an iterator over this set that visits the values in ascending order.
 	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
 		self.into_iter()
 	}
-}
 
-impl<T: Ord> FromIterator<T> for AATreeSet<T> {
-	fn from_iter<I>(iter: I) -> Self
-	where
-		I: IntoIterator<Item = T>
-	{
-		let mut set = Self::new();
-		for value in iter {
-			set.insert(value);
-		}
-		set
-	}
-}
-
-impl<T: Ord + PartialEq> AATreeSet<T> {
 	/// Returns `true` if the set contains an element with the given value.
 	///
 	/// # Example
@@ -169,9 +132,7 @@ impl<T: Ord + PartialEq> AATreeSet<T> {
 			})
 			.is_some()
 	}
-}
 
-impl<T: Ord> AATreeSet<T> {
 	/// Returns the smallest element of the set.
 	///
 	/// # Example
@@ -213,9 +174,7 @@ impl<T: Ord> AATreeSet<T> {
 			None => TraverseStep::Right
 		})
 	}
-}
 
-impl<T: Ord + PartialEq> AATreeSet<T> {
 	/// Returns the smallest element of the set that is greater or equal to `x`.
 	///
 	/// # Example
@@ -272,5 +231,36 @@ impl<T: Ord + PartialEq> AATreeSet<T> {
 				}
 			},
 		})
+	}
+}
+
+impl<T: TreeType> FromIterator<T> for AATreeSet<T> {
+	fn from_iter<I>(iter: I) -> Self
+	where
+		I: IntoIterator<Item = T>
+	{
+		let mut set = Self::new();
+		for value in iter {
+			set.insert(value);
+		}
+		set
+	}
+}
+
+impl<T: TreeType> IntoIterator for AATreeSet<T> {
+	type Item = T;
+	type IntoIter = AAIntoIter<T>;
+
+	fn into_iter(self) -> AAIntoIter<T> {
+		AAIntoIter::new(self.tree.root, self.len)
+	}
+}
+
+impl<'a, T: TreeType> IntoIterator for &'a AATreeSet<T> {
+	type Item = &'a T;
+	type IntoIter = AAIter<'a, T>;
+
+	fn into_iter(self) -> AAIter<'a, T> {
+		AAIter::new(&self.tree.root, self.len)
 	}
 }

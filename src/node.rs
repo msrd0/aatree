@@ -1,7 +1,7 @@
-use super::tree::TraverseStep;
+use super::tree::{TraverseStep, TreeType};
 
 #[derive(Clone, Debug, PartialEq)]
-pub(super) enum AANode<T> {
+pub(super) enum AANode<T: TreeType> {
 	Nil,
 	Node {
 		level: u8,
@@ -11,13 +11,13 @@ pub(super) enum AANode<T> {
 	}
 }
 
-impl<T> Default for AANode<T> {
+impl<T: TreeType> Default for AANode<T> {
 	fn default() -> Self {
 		Self::Nil
 	}
 }
 
-impl<T> AANode<T> {
+impl<T: TreeType> AANode<T> {
 	pub(super) fn new(content: T) -> Self {
 		Self::Node {
 			level: 1,
@@ -167,9 +167,7 @@ impl<T> AANode<T> {
 			}
 		}
 	}
-}
 
-impl<T: Ord> AANode<T> {
 	/// Insert a new node with `content` into the tree. If a node with this value already exist,
 	/// nothing will be inserted. Returns a pair of the new node and a boolean whether a new node
 	/// was inserted.
@@ -227,9 +225,7 @@ impl<T: Ord> AANode<T> {
 			},
 		}
 	}
-}
 
-impl<T: Ord + PartialEq> AANode<T> {
 	/// Removes a node with the specified content from this tree and returns its content.
 	pub(super) fn remove(self, to_remove: &T) -> (Self, Option<T>) {
 		let (node, removed) = match self {
