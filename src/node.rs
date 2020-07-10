@@ -272,7 +272,7 @@ impl<T: TreeType> AANode<T> {
 				content,
 				left_child,
 				right_child
-			} if &content < to_remove => {
+			} if &content > to_remove => {
 				let (left, value) = left_child.remove(to_remove);
 				(
 					Self::Node {
