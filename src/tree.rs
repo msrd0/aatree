@@ -32,6 +32,16 @@ impl<T: Ord> AATree<T> {
 	}
 }
 
+impl<T: Ord + PartialEq> AATree<T> {
+	/// Remove a value from this tree. If the value was found, it will be returned.
+	pub fn remove(&mut self, value: &T) -> Option<T> {
+		let root = std::mem::replace(&mut self.root, AANode::Nil);
+		let (root, removed) = root.remove(value);
+		self.root = root;
+		removed
+	}
+}
+
 #[derive(Debug)]
 pub enum TraverseStep<R> {
 	Left,
@@ -96,11 +106,12 @@ impl<T> AANode<T> {
 		}
 	}
 
-	fn content(&self) -> Option<&T> {
+	/// Update the level of this node. **Panic** if the node is `Nil`.
+	fn set_level(&mut self, level: u8) {
 		match self {
-			Self::Nil => None,
-			Self::Node { content, .. } => Some(content)
-		}
+			Self::Nil => panic!("Cannot change level of Nil"),
+			Self::Node { level: l, .. } => std::mem::replace(l, level)
+		};
 	}
 
 	/// ```none
@@ -290,6 +301,200 @@ impl<T: Ord> AANode<T> {
 	}
 }
 
+impl<T: Ord + PartialEq> AANode<T> {
+	/// Removes a node with the specified content from this tree and returns its content.
+	fn remove(self, to_remove: &T) -> (Self, Option<T>) {
+		let (node, removed) = match self {
+			Self::Nil => (self, None),
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} if &content == to_remove => {
+				// for leaves, return the right child
+				if level == 1 {
+					(*right_child, Some(content))
+				}
+				// if we don't have a left child, use the successor
+				else if left_child.level() == 0 {
+					let (right, successor) = right_child.remove_successor();
+					(
+						Self::Node {
+							level,
+							content: successor.unwrap(),
+							left_child,
+							right_child: Box::new(right)
+						},
+						Some(content)
+					)
+				}
+				// else we can use the predecessor
+				else {
+					let (left, predecessor) = left_child.remove_predecessor();
+					(
+						Self::Node {
+							level,
+							content: predecessor.unwrap(),
+							left_child: Box::new(left),
+							right_child
+						},
+						Some(content)
+					)
+				}
+			},
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} if &content < to_remove => {
+				let (left, value) = left_child.remove(to_remove);
+				(
+					Self::Node {
+						level,
+						content,
+						left_child: Box::new(left),
+						right_child
+					},
+					value
+				)
+			},
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} => {
+				let (right, value) = right_child.remove(to_remove);
+				(
+					Self::Node {
+						level,
+						content,
+						left_child,
+						right_child: Box::new(right)
+					},
+					value
+				)
+			}
+		};
+		(node.remove_cleanup(), removed)
+	}
+
+	/// Removes the successor (smallest node) of the parent of this node and return it.
+	fn remove_successor(self) -> (Self, Option<T>) {
+		let (node, successor) = match self {
+			Self::Nil => (self, None),
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} => {
+				let (left, successor) = left_child.remove_successor();
+				if let Some(successor) = successor {
+					(
+						Self::Node {
+							level,
+							content,
+							left_child: Box::new(left),
+							right_child
+						},
+						Some(successor)
+					)
+				} else {
+					(*right_child, Some(content))
+				}
+			}
+		};
+		(node.remove_cleanup(), successor)
+	}
+
+	/// Removes the predecessor (largest node) of the parent of this node and return it.
+	fn remove_predecessor(self) -> (Self, Option<T>) {
+		let (node, predecessor) = match self {
+			Self::Nil => (self, None),
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} => {
+				let (right, predecessor) = right_child.remove_predecessor();
+				if let Some(predecessor) = predecessor {
+					(
+						Self::Node {
+							level,
+							content,
+							left_child,
+							right_child: Box::new(right)
+						},
+						Some(predecessor)
+					)
+				} else {
+					(*left_child, Some(content))
+				}
+			}
+		};
+		(node.remove_cleanup(), predecessor)
+	}
+
+	/// Run fixes necessary after removing/replacing `self` or one of the child nodes to retain
+	/// the AA tree properties.
+	fn remove_cleanup(self) -> Self {
+		match self {
+			Self::Nil => self,
+			Self::Node {
+				mut level,
+				content,
+				left_child,
+				mut right_child
+			} => {
+				// decrease the level if necessary
+				let expected = left_child.level().min(right_child.level()) + 1;
+				if expected < level {
+					level = expected;
+					if expected < right_child.level() {
+						right_child.set_level(expected);
+					}
+				}
+				let mut node = Self::Node {
+					level,
+					content,
+					left_child,
+					right_child
+				};
+
+				// rebalance the tree by applying 3x skew and 2x split
+				node = node.skew();
+				match &mut node {
+					Self::Nil => unreachable!(),
+					Self::Node { right_child, .. } => {
+						let mut right = std::mem::replace(right_child.as_mut(), Self::Nil);
+						right = right.skew();
+						if let Self::Node { right_child, .. } = &mut right {
+							let mut right_grandchild = std::mem::replace(right_child.as_mut(), Self::Nil);
+							right_grandchild = right_grandchild.skew();
+							std::mem::replace(right_child.as_mut(), right_grandchild);
+						}
+						std::mem::replace(right_child.as_mut(), right);
+					}
+				};
+				node = node.split();
+				match &mut node {
+					Self::Nil => unreachable!(),
+					Self::Node { right_child, .. } => {
+						let mut right = std::mem::replace(right_child.as_mut(), Self::Nil);
+						right = right.split();
+						std::mem::replace(right_child.as_mut(), right);
+					}
+				};
+				node
+			}
+		}
+	}
+}
+
 #[cfg(test)]
 mod test {
 	use super::*;
@@ -308,7 +513,6 @@ mod test {
 			{
 				let _left = tree!(@internal $left);
 				let _right = tree!(@internal $right);
-				// TODO properly compute the level
 				AANode::Node {
 					level: $level,
 					content: $content,
@@ -431,5 +635,40 @@ mod test {
 		}
 		let expected = tree!('A');
 		assert_eq!(root, expected);
+	}
+
+	// ### TEST REMOVE ###
+
+	#[test]
+	fn test_remove_successor() {
+		let root = tree!('B' => [1, Nil, 'C']);
+		println!("Input:  `{:?}`", root);
+		let (tree, removed) = root.remove(&'B');
+		let expected = tree!('C');
+		assert_eq!(removed, Some('B'));
+		assert_eq!(tree, expected);
+	}
+
+	#[test]
+	fn test_remove_predecessor() {
+		let root = tree!('B' => [2, 'A', 'C']);
+		println!("Input:  `{:?}`", root);
+		let (tree, removed) = root.remove(&'B');
+		let expected = tree!('A' => [1, Nil, 'C']);
+		assert_eq!(removed, Some('B'));
+		assert_eq!(tree, expected);
+	}
+
+	#[test]
+	fn test_remove_complex() {
+		// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf
+		let root =
+			tree!(30 => [3, (15 => [2, 5, 20]), (70 => [3, (50 => [2, 35, (60 => [2, 55, 65])]), (85 => [2, 80, 90])])]);
+		println!("Input:  `{:?}`", root);
+		let (tree, removed) = root.remove(&5);
+		let expected =
+			tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
+		assert_eq!(removed, Some(5));
+		assert_eq!(tree, expected);
 	}
 }
