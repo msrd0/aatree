@@ -9,3 +9,15 @@ license = "Apache-2.0"
 
 [dependencies]
 log = "0.4.8"
+
+[dev-dependencies]
+criterion = "0.3.3"
+paste = "0.1.18"
+
+[[bench]]
+name = "contains"
+harness = false
+
+[[bench]]
+name = "insert"
+harness = false
