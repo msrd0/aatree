@@ -419,7 +419,7 @@ impl<T: TreeType> AANode<T> {
 	}
 }
 
-#[cfg(test)]
+#[cfg(all(test, not(feature = "benchmark")))]
 mod test {
 	use super::*;
 

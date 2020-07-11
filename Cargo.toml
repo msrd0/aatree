@@ -9,10 +9,13 @@ license = "Apache-2.0"
 
 [dependencies]
 log = "0.4.8"
+# BENCHMARK DEPENDENCIES
+criterion = { version = "0.3.3", optional = true }
+paste = { version = "0.1.18", optional = true }
 
-[dev-dependencies]
-criterion = "0.3.3"
-paste = "0.1.18"
+[features]
+default = []
+benchmark = ["criterion", "paste"]
 
 [[bench]]
 name = "contains"
