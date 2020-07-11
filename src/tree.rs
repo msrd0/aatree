@@ -53,10 +53,7 @@ impl<T: TreeType> AATree<T> {
 	/// Add a value to this tree. If the value already exists in the tree, nothing
 	/// is inserted and `false` is returned.
 	pub fn insert(&mut self, value: T) -> bool {
-		let root = std::mem::replace(&mut self.root, AANode::Nil);
-		let (root, inserted) = root.insert(value);
-		self.root = root;
-		inserted
+		self.root.insert(value)
 	}
 
 	/// Remove a value from this tree. If the value was found, it will be returned.

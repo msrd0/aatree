@@ -171,58 +171,28 @@ impl<T: TreeType> AANode<T> {
 	/// Insert a new node with `content` into the tree. If a node with this value already exist,
 	/// nothing will be inserted. Returns a pair of the new node and a boolean whether a new node
 	/// was inserted.
-	pub(super) fn insert(self, content: T) -> (Self, bool) {
-		let (mut node, inserted) = self.bst_insert(content);
+	pub(super) fn insert(&mut self, content: T) -> bool {
+		let inserted = self.bst_insert(content);
 		if inserted {
+			let mut node = std::mem::replace(self, Self::Nil);
 			node = node.skew().split();
+			std::mem::replace(self, node);
 		}
-		(node, inserted)
+		inserted
 	}
 
 	/// Simple unbalanced BST insert.
-	fn bst_insert(self, new: T) -> (Self, bool) {
+	fn bst_insert(&mut self, new: T) -> bool {
 		match self {
-			Self::Nil => (Self::new(new), true),
-			Self::Node {
-				level,
-				content,
-				left_child,
-				right_child
-			} => {
-				if new < content {
-					let (left_child, inserted) = left_child.insert(new);
-					(
-						Self::Node {
-							level,
-							content,
-							left_child: Box::new(left_child),
-							right_child
-						},
-						inserted
-					)
-				} else if new > content {
-					let (right_child, inserted) = right_child.insert(new);
-					(
-						Self::Node {
-							level,
-							content,
-							left_child,
-							right_child: Box::new(right_child)
-						},
-						inserted
-					)
-				} else {
-					(
-						Self::Node {
-							level,
-							content,
-							left_child,
-							right_child
-						},
-						false
-					)
-				}
+			Self::Nil => {
+				std::mem::replace(self, Self::new(new));
+				true
 			},
+			Self::Node { content, left_child, .. } if &new < content => left_child.insert(new),
+			Self::Node {
+				content, right_child, ..
+			} if &new > content => right_child.insert(new),
+			_ => false
 		}
 	}
 
@@ -535,7 +505,7 @@ mod test {
 	fn test_insert_greater() {
 		let mut root = tree!();
 		for content in ['A', 'B', 'C', 'D', 'E', 'F', 'G'].iter() {
-			root = root.insert(*content).0;
+			assert!(root.insert(*content));
 		}
 		let expected = tree!('D' => [3, ('B' => [2, 'A', 'C']), ('F' => [2, 'E', 'G'])]);
 		assert_eq!(root, expected);
@@ -545,7 +515,7 @@ mod test {
 	fn test_insert_smaller() {
 		let mut root = tree!();
 		for content in ['Z', 'Y', 'X', 'W', 'V'].iter() {
-			root = root.insert(*content).0;
+			assert!(root.insert(*content));
 		}
 		let expected = tree!('W' => [2, 'V', ('Y' => [2, 'X', 'Z'])]);
 		assert_eq!(root, expected);
@@ -555,7 +525,7 @@ mod test {
 	fn test_insert_multiple() {
 		let mut root = tree!();
 		for content in ['A', 'A'].iter() {
-			root = root.insert(*content).0;
+			root.insert(*content);
 		}
 		let expected = tree!('A');
 		assert_eq!(root, expected);
