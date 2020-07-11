@@ -47,44 +47,35 @@ impl<T: TreeType> AANode<T> {
 	///  / \      \     =>  /      / \
 	/// A   B      R       A      B   R
 	/// ```
-	fn skew(self) -> Self {
-		match self {
+	fn skew(mut self) -> Self {
+		match &mut self {
 			Self::Nil => self,
 			Self::Node {
-				level,
-				content,
-				left_child: l,
-				right_child: r
-			} => Self::skew_impl(level, content, l, r)
-		}
-	}
-
-	fn skew_impl(level: u8, content: T, l: Box<Self>, r: Box<Self>) -> Self {
-		match *l {
-			Self::Node {
-				level: l_level,
-				content: l_content,
-				left_child: a,
-				right_child: b
-			} if l_level == level => {
-				let t = Self::Node {
-					level,
-					content,
-					left_child: b,
-					right_child: r
+				level, left_child: l, ..
+			} => {
+				// if level = l.level, remove the B node from L
+				let b_node = match l.as_mut() {
+					Self::Node {
+						level: l_level,
+						right_child: b,
+						..
+					} if level == l_level => std::mem::replace(b.as_mut(), Self::Nil),
+					_ => return self
 				};
-				Self::Node {
-					level: l_level,
-					content: l_content,
-					left_child: a,
-					right_child: Box::new(t)
-				}
-			},
-			_ => Self::Node {
-				level,
-				content,
-				left_child: l,
-				right_child: r
+
+				// add the B node as our left child, removing L
+				let mut l_node = std::mem::replace(l.as_mut(), b_node);
+
+				// add our node T as the right child of L
+				match &mut l_node {
+					Self::Nil => unreachable!(),
+					Self::Node { right_child: t, .. } => {
+						std::mem::replace(t.as_mut(), self);
+					}
+				};
+
+				// L is our new node
+				l_node
 			}
 		}
 	}
@@ -96,44 +87,40 @@ impl<T: TreeType> AANode<T> {
 	///                       / \
 	///                      A   B
 	/// ```
-	fn split(self) -> Self {
-		match self {
+	fn split(mut self) -> Self {
+		match &mut self {
+			Self::Nil => self,
 			Self::Node {
-				level,
-				content,
-				left_child: a,
-				right_child: r
-			} if !matches!(*r, Self::Nil) => Self::split_impl(level, content, a, r),
-			_ => self
-		}
-	}
-
-	fn split_impl(level: u8, content: T, a: Box<Self>, r: Box<Self>) -> Self {
-		match *r {
-			Self::Node {
-				level: r_level,
-				content: r_content,
-				left_child: b,
-				right_child: x
-			} if level == x.level() => {
-				let t = Self::Node {
-					level,
-					content,
-					left_child: a,
-					right_child: b
+				level, right_child: r, ..
+			} => {
+				// remove the B node if R and X are not Nil
+				let b_node = match r.as_mut() {
+					Self::Node {
+						left_child: b,
+						right_child: x,
+						..
+					} if &x.level() == level => std::mem::replace(b.as_mut(), Self::Nil),
+					_ => return self
 				};
-				Self::Node {
-					level: r_level + 1,
-					content: r_content,
-					left_child: Box::new(t),
-					right_child: x
+
+				// attach the B node to our node, removing R
+				let mut r_node = std::mem::replace(r.as_mut(), b_node);
+
+				// attach our node to R and increment its level
+				match &mut r_node {
+					Self::Nil => unreachable!(),
+					Self::Node {
+						level: r_level,
+						left_child: t,
+						..
+					} => {
+						std::mem::replace(r_level, *r_level + 1);
+						std::mem::replace(t.as_mut(), self);
+					}
 				}
-			},
-			_ => Self::Node {
-				level,
-				content,
-				left_child: a,
-				right_child: r
+
+				// R is our new node
+				r_node
 			}
 		}
 	}
