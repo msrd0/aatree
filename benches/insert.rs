@@ -1,14 +1,6 @@
 use aatree::AATreeSet;
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use std::collections::BTreeSet;
-
-#[derive(Default)]
-struct Vec<T>(std::vec::Vec<T>);
-impl<T> Vec<T> {
-	fn insert(&mut self, elem: T) {
-		self.0.push(elem);
-	}
-}
 
 macro_rules! benchmark {
 	($ty:ty, $amount:expr, asc) => {
@@ -26,38 +18,32 @@ macro_rules! benchmark {
 				}
 				container
 			}
-			fn [<bench_ $ty:lower _insert_ $amount _ $order>](c: &mut Criterion) {
-				c.bench_function(stringify!([<$ty:lower _insert_ $amount _ $order>]), |b| b.iter([<$ty:lower _insert_ $amount _ $order>]));
+		}
+	};
+	($group:literal = [$(($name:literal: $ty:ty, $amount:expr, $order:ident)),+]) => {
+		$(benchmark!($ty, $amount, $order);)+
+		paste::item! {
+			fn [<bench_ $group:lower>](c: &mut Criterion) {
+				let mut g = c.benchmark_group($group);
+				$(g.bench_function(BenchmarkId::new(format!("{}_{}", $name, stringify!($order)), $amount), |b| b.iter([<$ty:lower _insert_ $amount _ $order>]));)+
+				g.finish();
 			}
 		}
 	};
 }
 
-benchmark!(AATreeSet, 1000, asc);
-benchmark!(AATreeSet, 1000, desc);
-benchmark!(BTreeSet, 1000, asc);
-benchmark!(BTreeSet, 1000, desc);
-benchmark!(Vec, 1000, asc);
+benchmark!(
+	"Insert" = [
+		("AATree": AATreeSet, 10000, asc),
+		("AATree": AATreeSet, 10000, desc),
+		("AATree": AATreeSet, 100000, asc),
+		("AATree": AATreeSet, 100000, desc),
+		("BTree": BTreeSet, 10000, asc),
+		("BTree": BTreeSet, 10000, desc),
+		("BTree": BTreeSet, 100000, asc),
+		("BTree": BTreeSet, 100000, desc)
+	]
+);
 
-benchmark!(AATreeSet, 100000, asc);
-benchmark!(AATreeSet, 100000, desc);
-benchmark!(BTreeSet, 100000, asc);
-benchmark!(BTreeSet, 100000, desc);
-benchmark!(Vec, 100000, asc);
-
-fn criterion_benchmark(c: &mut Criterion) {
-	bench_aatreeset_insert_1000_asc(c);
-	bench_aatreeset_insert_1000_desc(c);
-	bench_btreeset_insert_1000_asc(c);
-	bench_btreeset_insert_1000_desc(c);
-	bench_vec_insert_1000_asc(c);
-
-	bench_aatreeset_insert_100000_asc(c);
-	bench_aatreeset_insert_100000_desc(c);
-	bench_btreeset_insert_100000_asc(c);
-	bench_btreeset_insert_100000_desc(c);
-	bench_vec_insert_100000_asc(c);
-}
-
-criterion_group!(benches, criterion_benchmark);
+criterion_group!(benches, bench_insert);
 criterion_main!(benches);
