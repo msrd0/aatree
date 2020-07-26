@@ -1,14 +1,14 @@
-use super::{node::AANode, tree::TreeType};
+use super::node::AANode;
 use std::iter::FusedIterator;
 
 /// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
 #[derive(Debug)]
-pub struct AAIter<'a, T: TreeType> {
+pub struct AAIter<'a, T> {
 	stack: Vec<(bool, &'a AANode<T>)>,
 	len: usize
 }
 
-impl<'a, T: TreeType> AAIter<'a, T> {
+impl<'a, T> AAIter<'a, T> {
 	pub(super) fn new(root: &'a AANode<T>, len: usize) -> Self {
 		let mut stack = Vec::with_capacity(root.level() as usize * 2 + 1);
 		stack.push((false, root));
@@ -16,7 +16,7 @@ impl<'a, T: TreeType> AAIter<'a, T> {
 	}
 }
 
-impl<'a, T: TreeType> Iterator for AAIter<'a, T> {
+impl<'a, T> Iterator for AAIter<'a, T> {
 	type Item = &'a T;
 
 	fn next(&mut self) -> Option<&'a T> {
@@ -52,18 +52,18 @@ impl<'a, T: TreeType> Iterator for AAIter<'a, T> {
 	}
 }
 
-impl<T: TreeType> ExactSizeIterator for AAIter<'_, T> {}
+impl<T> ExactSizeIterator for AAIter<'_, T> {}
 
-impl<T: TreeType> FusedIterator for AAIter<'_, T> {}
+impl<T> FusedIterator for AAIter<'_, T> {}
 
 /// The iterator produces from an AATree-based data structure when turned into an iterator.
 #[derive(Debug)]
-pub struct AAIntoIter<T: TreeType> {
+pub struct AAIntoIter<T> {
 	stack: Vec<AANode<T>>,
 	len: usize
 }
 
-impl<T: TreeType> AAIntoIter<T> {
+impl<T> AAIntoIter<T> {
 	pub(super) fn new(root: AANode<T>, len: usize) -> Self {
 		let mut stack = Vec::with_capacity(root.level() as usize * 2 + 1);
 		stack.push(root);
@@ -71,7 +71,7 @@ impl<T: TreeType> AAIntoIter<T> {
 	}
 }
 
-impl<T: TreeType> Iterator for AAIntoIter<T> {
+impl<T> Iterator for AAIntoIter<T> {
 	type Item = T;
 
 	fn next(&mut self) -> Option<T> {
@@ -118,6 +118,6 @@ impl<T: TreeType> Iterator for AAIntoIter<T> {
 	}
 }
 
-impl<T: TreeType> ExactSizeIterator for AAIntoIter<T> {}
+impl<T> ExactSizeIterator for AAIntoIter<T> {}
 
-impl<T: TreeType> FusedIterator for AAIntoIter<T> {}
+impl<T> FusedIterator for AAIntoIter<T> {}

@@ -1,6 +1,6 @@
 use crate::{
 	iter::{AAIntoIter, AAIter},
-	tree::{AATree, TraverseStep, TreeType}
+	node::{AANode, TraverseStep}
 };
 use core::iter::FromIterator;
 
@@ -46,22 +46,22 @@ use core::iter::FromIterator;
 ///  [`AATreeMap`]: struct.AATreeMap.html
 ///  [`BTreeSet`]: https://doc.rust-lang.org/std/collections/struct.BTreeSet.html
 #[derive(Clone, Debug)]
-pub struct AATreeSet<T: TreeType> {
-	tree: AATree<T>,
+pub struct AATreeSet<T> {
+	root: AANode<T>,
 	len: usize
 }
 
-impl<T: TreeType> Default for AATreeSet<T> {
+impl<T> Default for AATreeSet<T> {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl<T: TreeType> AATreeSet<T> {
+impl<T> AATreeSet<T> {
 	/// Construct a new, empty AA-Tree based set.
 	pub fn new() -> Self {
 		Self {
-			tree: AATree::new(),
+			root: AANode::new(),
 			len: 0
 		}
 	}
@@ -76,6 +76,13 @@ impl<T: TreeType> AATreeSet<T> {
 		self.len == 0
 	}
 
+	/// Creates an iterator over this set that visits the values in ascending order.
+	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
+		self.into_iter()
+	}
+}
+
+impl<T: Ord> AATreeSet<T> {
 	/// Adds a value to the set.
 	///
 	/// If the set did already contain this value, the entry is not updated, and
@@ -92,45 +99,11 @@ impl<T: TreeType> AATreeSet<T> {
 	/// assert_eq!(set.len(), 1);
 	/// ```
 	pub fn insert(&mut self, value: T) -> bool {
-		let inserted = self.tree.insert(value);
+		let inserted = self.root.insert(value);
 		if inserted {
 			self.len += 1;
 		}
 		inserted
-	}
-
-	/// Creates an iterator over this set that visits the values in ascending order.
-	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
-		self.into_iter()
-	}
-
-	/// Returns `true` if the set contains an element with the given value.
-	///
-	/// # Example
-	/// ```rust
-	/// use aatree::AATreeSet;
-	///
-	/// let mut set = AATreeSet::new();
-	/// set.insert(43);
-	/// assert_eq!(set.contains(&42), false);
-	/// set.insert(42);
-	/// assert_eq!(set.contains(&42), true);
-	/// ```
-	pub fn contains(&self, x: &T) -> bool {
-		self.tree
-			.traverse(|content, sub| match sub {
-				Some(sub) => sub,
-				None => {
-					if content == x {
-						TraverseStep::Value(Some(()))
-					} else if content < x {
-						TraverseStep::Right
-					} else {
-						TraverseStep::Left
-					}
-				},
-			})
-			.is_some()
 	}
 
 	/// Returns the smallest element of the set.
@@ -147,7 +120,7 @@ impl<T: TreeType> AATreeSet<T> {
 	/// assert_eq!(set.smallest(), Some(&40));
 	/// ```
 	pub fn smallest(&self) -> Option<&T> {
-		self.tree.traverse(|content, sub| match sub {
+		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
 			None => TraverseStep::Left
@@ -168,11 +141,42 @@ impl<T: TreeType> AATreeSet<T> {
 	/// assert_eq!(set.largest(), Some(&44));
 	/// ```
 	pub fn largest(&self) -> Option<&T> {
-		self.tree.traverse(|content, sub| match sub {
+		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
 			None => TraverseStep::Right
 		})
+	}
+}
+
+impl<T: Eq + Ord> AATreeSet<T> {
+	/// Returns `true` if the set contains an element with the given value.
+	///
+	/// # Example
+	/// ```rust
+	/// use aatree::AATreeSet;
+	///
+	/// let mut set = AATreeSet::new();
+	/// set.insert(43);
+	/// assert_eq!(set.contains(&42), false);
+	/// set.insert(42);
+	/// assert_eq!(set.contains(&42), true);
+	/// ```
+	pub fn contains(&self, x: &T) -> bool {
+		self.root
+			.traverse(|content, sub| match sub {
+				Some(sub) => sub,
+				None => {
+					if content == x {
+						TraverseStep::Value(Some(()))
+					} else if content < x {
+						TraverseStep::Right
+					} else {
+						TraverseStep::Left
+					}
+				},
+			})
+			.is_some()
 	}
 
 	/// Returns the smallest element of the set that is greater or equal to `x`.
@@ -189,7 +193,7 @@ impl<T: TreeType> AATreeSet<T> {
 	/// assert_eq!(set.smallest_geq_than(&41), Some(&42));
 	/// ```
 	pub fn smallest_geq_than(&self, x: &T) -> Option<&T> {
-		self.tree.traverse(|content, sub| match sub {
+		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) if content > x => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
 			None => {
@@ -218,7 +222,7 @@ impl<T: TreeType> AATreeSet<T> {
 	/// assert_eq!(set.largest_leq_than(&43), Some(&42));
 	/// ```
 	pub fn largest_leq_than(&self, x: &T) -> Option<&T> {
-		self.tree.traverse(|content, sub| match sub {
+		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) if content < x => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
 			None => {
@@ -234,7 +238,7 @@ impl<T: TreeType> AATreeSet<T> {
 	}
 }
 
-impl<T: TreeType> FromIterator<T> for AATreeSet<T> {
+impl<T: Ord> FromIterator<T> for AATreeSet<T> {
 	fn from_iter<I>(iter: I) -> Self
 	where
 		I: IntoIterator<Item = T>
@@ -247,20 +251,20 @@ impl<T: TreeType> FromIterator<T> for AATreeSet<T> {
 	}
 }
 
-impl<T: TreeType> IntoIterator for AATreeSet<T> {
+impl<T> IntoIterator for AATreeSet<T> {
 	type Item = T;
 	type IntoIter = AAIntoIter<T>;
 
 	fn into_iter(self) -> AAIntoIter<T> {
-		AAIntoIter::new(self.tree.root, self.len)
+		AAIntoIter::new(self.root, self.len)
 	}
 }
 
-impl<'a, T: TreeType> IntoIterator for &'a AATreeSet<T> {
+impl<'a, T> IntoIterator for &'a AATreeSet<T> {
 	type Item = &'a T;
 	type IntoIter = AAIter<'a, T>;
 
 	fn into_iter(self) -> AAIter<'a, T> {
-		AAIter::new(&self.tree.root, self.len)
+		AAIter::new(&self.root, self.len)
 	}
 }

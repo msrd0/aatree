@@ -6,9 +6,7 @@
 extern crate log;
 
 pub mod iter;
-pub mod tree;
+pub mod node;
 
-mod node;
 mod set;
-
 pub use set::*;
