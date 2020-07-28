@@ -147,9 +147,7 @@ impl<T: Ord> AATreeSet<T> {
 			None => TraverseStep::Right
 		})
 	}
-}
 
-impl<T: Eq + Ord> AATreeSet<T> {
 	/// Returns `true` if the set contains an element with the given value.
 	///
 	/// # Example
