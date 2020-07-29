@@ -23,6 +23,9 @@ steps:
       username: drone
       password:
         from_secret: matrix_password
+    when:
+      status:
+        - failure
 
 ---
 kind: pipeline
@@ -43,9 +46,12 @@ steps:
       username: drone
       password:
         from_secret: matrix_password
+    when:
+      status:
+        - failure
 
 ---
 kind: signature
-hmac: 4e1954552370c65b2feacfb00b9e6bef289fb5a8c6ae80db785adfcc7f41a9c9
+hmac: 1988bdaa8a11eeb344a928c7609f7e084c8fba259f6c8122e110eb371ee511f4
 
 ...
