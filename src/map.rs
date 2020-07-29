@@ -109,7 +109,7 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	}
 
 	// TODO duplicated from set
-	pub fn contains_key(&self, k: &K) {
+	pub fn contains_key(&self, k: &K) -> bool {
 		self.root
 			.traverse(|content, sub| match sub {
 				Some(sub) => sub,
