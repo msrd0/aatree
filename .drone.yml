@@ -19,7 +19,7 @@ steps:
     image: plugins/matrix
     settings:
       homeserver: https://synapse.matrix.msrd0.de
-      roomid: "#aatree:msrd0.de"
+      roomid: "SGqhOjASPrkaVyOdux:msrd0.de"
       username: drone
       password:
         from_secret: matrix_password
@@ -39,13 +39,13 @@ steps:
     image: plugins/matrix
     settings:
       homeserver: https://synapse.matrix.msrd0.de
-      roomid: "#aatree:msrd0.de"
+      roomid: "SGqhOjASPrkaVyOdux:msrd0.de"
       username: drone
       password:
         from_secret: matrix_password
 
 ---
 kind: signature
-hmac: 23d721af38594d533cdd40159932a262cb3154a790ceaae28f4ff5695138a607
+hmac: 4e1954552370c65b2feacfb00b9e6bef289fb5a8c6ae80db785adfcc7f41a9c9
 
 ...
