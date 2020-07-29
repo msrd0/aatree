@@ -47,6 +47,14 @@ impl<T> Skew for Box<AANode<T>> {
 	}
 }
 
+impl<Inner: Skew> Skew for Option<Inner> {
+	type Node = Option<Inner::Node>;
+
+	fn skew(self) -> Self::Node {
+		self.map(|inner| inner.skew())
+	}
+}
+
 trait Split {
 	type Node;
 	fn split(self) -> Self::Node;
@@ -68,14 +76,17 @@ impl<T> Split for Box<AANode<T>> {
 			None => return self
 		};
 
-		// remove the B node from R if all are on the same level
-		let b = match r.left.take() {
-			Some(b) if b.right.as_ref().map(|x| x.level).unwrap_or(0) == self.level => b,
-			_ => return self
-		};
+		// if X is not at our level, reassemble the tree and return it
+		if r.right.as_ref().map(|x| x.level).unwrap_or(0) != self.level {
+			self.right = Some(r);
+			return self;
+		}
+
+		// remove the B node from R
+		let b = r.left.take();
 
 		// place B as our new right child
-		self.right = Some(b);
+		self.right = b;
 
 		// attach our node (T) to R and increase the level of R
 		r.left = Some(self);
@@ -86,30 +97,38 @@ impl<T> Split for Box<AANode<T>> {
 	}
 }
 
+impl<Inner: Split> Split for Option<Inner> {
+	type Node = Option<Inner::Node>;
+
+	fn split(self) -> Self::Node {
+		self.map(|inner| inner.split())
+	}
+}
+
 #[cfg(all(test, not(feature = "benchmark")))]
 mod test {
 	use super::*;
 
 	macro_rules! tree {
 		() => {
-			AANode::Nil
+			None
 		};
 		(Nil) => {
-			AANode::Nil
+			None
 		};
 		($content:expr) => {
-			AANode::from($content)
+			Some(Box::new(AANode::from($content)))
 		};
 		($content:expr => [$level:expr, $left:tt, $right:tt]) => {
 			{
 				let _left = tree!(@internal $left);
 				let _right = tree!(@internal $right);
-				AANode::Node {
+				Some(Box::new(AANode {
 					level: $level,
 					content: $content,
-					left_child: Box::new(_left),
-					right_child: Box::new(_right)
-				}
+					left: _left,
+					right: _right
+				}))
 			}
 		};
 		(@internal ($content:expr => [$level:expr, $left:tt, $right:tt])) => {
@@ -120,12 +139,20 @@ mod test {
 		};
 	}
 
+	type Tree = Option<Box<AANode<char>>>;
+
+	macro_rules! input {
+		($tree:ident) => {
+			println!(" Input: `{:?}`", $tree);
+		};
+	}
+
 	// ### TEST SKEW ###
 
 	#[test]
 	fn test_skew_nil() {
-		let root: AANode<char> = tree!();
-		println!("Input: {:?}", root);
+		let root: Tree = tree!();
+		input!(root);
 		let skewed = root.skew();
 		let expected = tree!();
 		assert_eq!(skewed, expected);
@@ -134,7 +161,7 @@ mod test {
 	#[test]
 	fn test_skew_leaf() {
 		let root = tree!('T');
-		println!("Input: {:?}", root);
+		input!(root);
 		let skewed = root.skew();
 		let expected = tree!('T');
 		assert_eq!(skewed, expected);
@@ -142,8 +169,8 @@ mod test {
 
 	#[test]
 	fn test_skew_simple() {
-		let root = tree!('T' => [2, ('L' => [2, Nil, Nil]), 'R']);
-		println!("Input: {:?}", root);
+		let root: Tree = tree!('T' => [2, ('L' => [2, Nil, Nil]), 'R']);
+		input!(root);
 		let skewed = root.skew();
 		let expected = tree!('L' => [2, Nil, ('T' => [2, Nil, 'R'])]);
 		assert_eq!(skewed, expected);
@@ -152,7 +179,7 @@ mod test {
 	#[test]
 	fn test_skew_full() {
 		let root = tree!('T' => [2, ('L' => [2, 'A', 'B']), 'R']);
-		println!("Input: {:?}", root);
+		input!(root);
 		let skewed = root.skew();
 		let expected = tree!('L' => [2, 'A', ('T' => [2, 'B', 'R'])]);
 		assert_eq!(skewed, expected);
@@ -162,8 +189,8 @@ mod test {
 
 	#[test]
 	fn test_split_nil() {
-		let root: AANode<char> = tree!();
-		println!("Input: {:?}", root);
+		let root: Tree = tree!();
+		input!(root);
 		let splitted = root.split();
 		let expected = tree!();
 		assert_eq!(splitted, expected);
@@ -172,7 +199,7 @@ mod test {
 	#[test]
 	fn test_split_leaf() {
 		let root = tree!('T');
-		println!("Input: {:?}", root);
+		input!(root);
 		let splitted = root.split();
 		let expected = tree!('T');
 		assert_eq!(splitted, expected);
@@ -181,7 +208,7 @@ mod test {
 	#[test]
 	fn test_split_good_tree() {
 		let root = tree!('T' => [2, 'A', ('R' => [2, 'B', 'X'])]);
-		println!("Input: {:?}", root);
+		input!(root);
 		let splitted = root.split();
 		let expected = tree!('T' => [2, 'A', ('R' => [2, 'B', 'X'])]);
 		assert_eq!(splitted, expected);
@@ -190,76 +217,77 @@ mod test {
 	#[test]
 	fn test_split_bad_tree() {
 		let root = tree!('T' => [2, 'A', ('R' => [2, 'B', ('X' => [2, 'Y', 'Z'])])]);
-		println!("Input: {:?}", root);
+		input!(root);
 		let splitted = root.split();
 		let expected = tree!('R' => [3, ('T' => [2, 'A', 'B']), ('X' => [2, 'Y', 'Z'])]);
 		assert_eq!(splitted, expected);
 	}
 
 	// ### TEST INSERT ###
-
-	#[test]
-	fn test_insert_greater() {
-		let mut root = tree!();
-		for content in ['A', 'B', 'C', 'D', 'E', 'F', 'G'].iter() {
-			assert!(root.insert(*content));
+	/*
+		#[test]
+		fn test_insert_greater() {
+			let mut root = tree!();
+			for content in ['A', 'B', 'C', 'D', 'E', 'F', 'G'].iter() {
+				assert!(root.insert(*content));
+			}
+			let expected = tree!('D' => [3, ('B' => [2, 'A', 'C']), ('F' => [2, 'E', 'G'])]);
+			assert_eq!(root, expected);
 		}
-		let expected = tree!('D' => [3, ('B' => [2, 'A', 'C']), ('F' => [2, 'E', 'G'])]);
-		assert_eq!(root, expected);
-	}
 
-	#[test]
-	fn test_insert_smaller() {
-		let mut root = tree!();
-		for content in ['Z', 'Y', 'X', 'W', 'V'].iter() {
-			assert!(root.insert(*content));
+		#[test]
+		fn test_insert_smaller() {
+			let mut root = tree!();
+			for content in ['Z', 'Y', 'X', 'W', 'V'].iter() {
+				assert!(root.insert(*content));
+			}
+			let expected = tree!('W' => [2, 'V', ('Y' => [2, 'X', 'Z'])]);
+			assert_eq!(root, expected);
 		}
-		let expected = tree!('W' => [2, 'V', ('Y' => [2, 'X', 'Z'])]);
-		assert_eq!(root, expected);
-	}
 
-	#[test]
-	fn test_insert_multiple() {
-		let mut root = tree!();
-		for content in ['A', 'A'].iter() {
-			root.insert(*content);
+		#[test]
+		fn test_insert_multiple() {
+			let mut root = tree!();
+			for content in ['A', 'A'].iter() {
+				root.insert(*content);
+			}
+			let expected = tree!('A');
+			assert_eq!(root, expected);
 		}
-		let expected = tree!('A');
-		assert_eq!(root, expected);
-	}
 
-	// ### TEST REMOVE ###
+		// ### TEST REMOVE ###
 
-	#[test]
-	fn test_remove_successor() {
-		let mut root = tree!('B' => [1, Nil, 'C']);
-		println!("Input:  `{:?}`", root);
-		let removed = root.remove(&'B');
-		let expected = tree!('C');
-		assert_eq!(removed, Some('B'));
-		assert_eq!(root, expected);
-	}
+		#[test]
+		fn test_remove_successor() {
+			let mut root = tree!('B' => [1, Nil, 'C']);
+			println!("Input:  `{:?}`", root);
+			let removed = root.remove(&'B');
+			let expected = tree!('C');
+			assert_eq!(removed, Some('B'));
+			assert_eq!(root, expected);
+		}
 
-	#[test]
-	fn test_remove_predecessor() {
-		let mut root = tree!('B' => [2, 'A', 'C']);
-		println!("Input:  `{:?}`", root);
-		let removed = root.remove(&'B');
-		let expected = tree!('A' => [1, Nil, 'C']);
-		assert_eq!(removed, Some('B'));
-		assert_eq!(root, expected);
-	}
+		#[test]
+		fn test_remove_predecessor() {
+			let mut root = tree!('B' => [2, 'A', 'C']);
+			println!("Input:  `{:?}`", root);
+			let removed = root.remove(&'B');
+			let expected = tree!('A' => [1, Nil, 'C']);
+			assert_eq!(removed, Some('B'));
+			assert_eq!(root, expected);
+		}
 
-	#[test]
-	fn test_remove_complex() {
-		// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf
-		let mut root =
-			tree!(30 => [3, (15 => [2, 5, 20]), (70 => [3, (50 => [2, 35, (60 => [2, 55, 65])]), (85 => [2, 80, 90])])]);
-		println!("Input:  `{:?}`", root);
-		let removed = root.remove(&5);
-		let expected =
-			tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
-		assert_eq!(removed, Some(5));
-		assert_eq!(root, expected);
-	}
+		#[test]
+		fn test_remove_complex() {
+			// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf
+			let mut root =
+				tree!(30 => [3, (15 => [2, 5, 20]), (70 => [3, (50 => [2, 35, (60 => [2, 55, 65])]), (85 => [2, 80, 90])])]);
+			println!("Input:  `{:?}`", root);
+			let removed = root.remove(&5);
+			let expected =
+				tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
+			assert_eq!(removed, Some(5));
+			assert_eq!(root, expected);
+		}
+	*/
 }
