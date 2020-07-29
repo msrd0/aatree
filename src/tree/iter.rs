@@ -1,7 +1,7 @@
-use super::node::AANode;
+use super::tree::AATree;
 use std::iter::FusedIterator;
 
-/// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
+/// The iterator produced from an reference of an AATree-based data structure when turned into an iterator.
 #[derive(Debug)]
 pub struct AAIter<'a, T> {
 	stack: Vec<(bool, &'a AANode<T>)>,

@@ -1,59 +1,29 @@
-mod insert;
-pub use insert::*;
-
-mod remove;
-pub use remove::*;
-
-mod traverse;
-pub use traverse::*;
-
 #[derive(Clone, Debug, PartialEq)]
-pub enum AANode<T> {
-	Nil,
-	Node {
-		level: u8,
-		content: T,
-		left_child: Box<AANode<T>>,
-		right_child: Box<AANode<T>>
-	}
-}
-
-impl<T> Default for AANode<T> {
-	fn default() -> Self {
-		Self::Nil
-	}
+pub(super) struct AANode<T> {
+	level: u8,
+	content: T,
+	left: Option<Box<AANode<T>>>,
+	right: Option<Box<AANode<T>>>
 }
 
 impl<T> From<T> for AANode<T> {
 	fn from(content: T) -> Self {
-		Self::Node {
+		Self {
 			level: 1,
 			content,
-			left_child: Box::new(Self::Nil),
-			right_child: Box::new(Self::Nil)
+			left: None,
+			right: None
 		}
 	}
 }
 
-impl<T> AANode<T> {
-	pub fn new() -> Self {
-		Self::default()
-	}
+trait Skew {
+	type Node;
+	fn skew(self) -> Self::Node;
+}
 
-	pub(super) fn level(&self) -> u8 {
-		match self {
-			Self::Nil => 0,
-			Self::Node { level, .. } => *level
-		}
-	}
-
-	/// Update the level of this node. **Panic** if the node is `Nil`.
-	fn set_level(&mut self, level: u8) {
-		match self {
-			Self::Nil => panic!("Cannot change level of Nil"),
-			Self::Node { level: l, .. } => std::mem::replace(l, level)
-		};
-	}
+impl<T> Skew for Box<AANode<T>> {
+	type Node = Self;
 
 	/// ```none
 	///   L <--- S           S ---> T
@@ -61,37 +31,29 @@ impl<T> AANode<T> {
 	/// A   B      R       A      B   R
 	/// ```
 	fn skew(mut self) -> Self {
-		match &mut self {
-			Self::Nil => self,
-			Self::Node {
-				level, left_child: l, ..
-			} => {
-				// if level = l.level, remove the B node from L
-				let b_node = match l.as_mut() {
-					Self::Node {
-						level: l_level,
-						right_child: b,
-						..
-					} if level == l_level => std::mem::replace(b.as_mut(), Self::Nil),
-					_ => return self
-				};
+		let mut l = match self.left {
+			Some(l) if l.level == self.level => l,
+			_ => return self
+		};
 
-				// add the B node as our left child, removing L
-				let mut l_node = std::mem::replace(l.as_mut(), b_node);
-
-				// add our node T as the right child of L
-				match &mut l_node {
-					Self::Nil => unreachable!(),
-					Self::Node { right_child: t, .. } => {
-						**t = self;
-					}
-				};
-
-				// L is our new node
-				l_node
-			}
-		}
+		// take the B node from L
+		let b = l.right.take();
+		// place B as our left child, removing L
+		self.left = b;
+		// add our node (T) as the right child of L
+		l.right = Some(self);
+		// the new node is L
+		l
 	}
+}
+
+trait Split {
+	type Node;
+	fn split(self) -> Self::Node;
+}
+
+impl<T> Split for Box<AANode<T>> {
+	type Node = Self;
 
 	/// ```none
 	///   S --> R --> X          R
@@ -101,41 +63,26 @@ impl<T> AANode<T> {
 	///                      A   B
 	/// ```
 	fn split(mut self) -> Self {
-		match &mut self {
-			Self::Nil => self,
-			Self::Node {
-				level, right_child: r, ..
-			} => {
-				// remove the B node if R and X are not Nil
-				let b_node = match r.as_mut() {
-					Self::Node {
-						left_child: b,
-						right_child: x,
-						..
-					} if &x.level() == level => std::mem::replace(b.as_mut(), Self::Nil),
-					_ => return self
-				};
+		let mut r = match self.right.take() {
+			Some(r) => r,
+			None => return self
+		};
 
-				// attach the B node to our node, removing R
-				let mut r_node = std::mem::replace(r.as_mut(), b_node);
+		// remove the B node from R if all are on the same level
+		let b = match r.left.take() {
+			Some(b) if b.right.as_ref().map(|x| x.level).unwrap_or(0) == self.level => b,
+			_ => return self
+		};
 
-				// attach our node to R and increment its level
-				match &mut r_node {
-					Self::Nil => unreachable!(),
-					Self::Node {
-						level: r_level,
-						left_child: t,
-						..
-					} => {
-						*r_level += 1;
-						**t = self;
-					}
-				}
+		// place B as our new right child
+		self.right = Some(b);
 
-				// R is our new node
-				r_node
-			}
-		}
+		// attach our node (T) to R and increase the level of R
+		r.left = Some(self);
+		r.level += 1;
+
+		// R is the new node
+		r
 	}
 }
 
