@@ -3,6 +3,7 @@
 [![Build Status](https://drone.msrd0.eu/api/badges/msrd0/aatree/status.svg)](https://drone.msrd0.eu/msrd0/aatree)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![MSRV](https://img.shields.io/badge/rustc-1.44+-orange.svg)](https://blog.rust-lang.org/2020/06/04/Rust-1.44.0.html)
+[![Chat](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/#aatree:msrd0.de)
 
 This crate implements an AA Tree in Rust. An AA Tree is basically a Red-Black Tree that disallows right children to be red. This results for less complexity in the implementation. For further details on the data structure, see https://en.wikipedia.org/wiki/AA_tree for more information on the data structure.
 
