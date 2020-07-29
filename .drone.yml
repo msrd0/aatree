@@ -15,6 +15,14 @@ steps:
       - git log -n1
       - cargo -V
       - cargo test
+  - name: notify
+    image: plugins/matrix
+    settings:
+      homeserver: https://synapse.matrix.msrd0.de
+      roomid: "#aatree:msrd0.de"
+      username: drone
+      password:
+        from_secret: matrix_password
 
 ---
 kind: pipeline
@@ -27,9 +35,17 @@ steps:
     commands:
       - cargo fmt -- -V
       - cargo fmt -- --check -l
+  - name: notify
+    image: plugins/matrix
+    settings:
+      homeserver: https://synapse.matrix.msrd0.de
+      roomid: "#aatree:msrd0.de"
+      username: drone
+      password:
+        from_secret: matrix_password
 
 ---
 kind: signature
-hmac: ea8579dc903633ff16a4a2afbd26baf593a25359dff47c336a1993fd9e28f182
+hmac: 23d721af38594d533cdd40159932a262cb3154a790ceaae28f4ff5695138a607
 
 ...
