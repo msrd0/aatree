@@ -11,7 +11,7 @@ license = "Apache-2.0"
 log = "0.4.8"
 # BENCHMARK DEPENDENCIES
 criterion = { version = "0.3.3", optional = true }
-paste = { version = "0.1.18", optional = true }
+paste = { version = "1.0.2", optional = true }
 
 [features]
 default = []
