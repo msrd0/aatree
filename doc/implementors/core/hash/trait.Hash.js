@@ -1,0 +1,12 @@
+(function() {var implementors = {};
+implementors["bstr"] = [{"text":"impl Hash for BStr","synthetic":false,"types":[]},{"text":"impl Hash for BString","synthetic":false,"types":[]}];
+implementors["byteorder"] = [{"text":"impl Hash for BigEndian","synthetic":false,"types":[]},{"text":"impl Hash for LittleEndian","synthetic":false,"types":[]}];
+implementors["criterion"] = [{"text":"impl Hash for BenchmarkId","synthetic":false,"types":[]},{"text":"impl Hash for BatchSize","synthetic":false,"types":[]}];
+implementors["crossbeam_utils"] = [{"text":"impl&lt;T:&nbsp;Hash&gt; Hash for CachePadded&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["either"] = [{"text":"impl&lt;L:&nbsp;Hash, R:&nbsp;Hash&gt; Hash for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
+implementors["itertools"] = [{"text":"impl&lt;A:&nbsp;Hash, B:&nbsp;Hash&gt; Hash for EitherOrBoth&lt;A, B&gt;","synthetic":false,"types":[]}];
+implementors["log"] = [{"text":"impl Hash for Level","synthetic":false,"types":[]},{"text":"impl Hash for LevelFilter","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Hash for Metadata&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Hash for MetadataBuilder&lt;'a&gt;","synthetic":false,"types":[]}];
+implementors["proc_macro2"] = [{"text":"impl Hash for Ident","synthetic":false,"types":[]}];
+implementors["same_file"] = [{"text":"impl Hash for Handle","synthetic":false,"types":[]}];
+implementors["syn"] = [{"text":"impl Hash for Member","synthetic":false,"types":[]},{"text":"impl Hash for Index","synthetic":false,"types":[]},{"text":"impl Hash for Lifetime","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

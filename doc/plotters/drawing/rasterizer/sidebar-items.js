@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["draw_circle",""],["draw_line",""],["draw_rect",""],["fill_polygon",""],["polygonize",""]]});

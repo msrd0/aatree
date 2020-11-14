@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["fitting_range","Build a range that fits the data"]],"mod":[["float",""]],"struct":[["Quartiles","The quartiles"]]});

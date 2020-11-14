@@ -1,0 +1,1534 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/plotters-0.2.15/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../plotters/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">/*!
+
+# Plotters - A Rust drawing library focus on data plotting for both WASM and native applications  🦀📈🚀
+
+&lt;a href=&quot;https://crates.io/crates/plotters&quot;&gt;
+    &lt;img style=&quot;display: inline!important&quot; src=&quot;https://img.shields.io/crates/v/plotters.svg&quot;&gt;&lt;/img&gt;
+&lt;/a&gt;
+&lt;a href=&quot;https://docs.rs/plotters&quot;&gt;
+    &lt;img style=&quot;display: inline!important&quot; src=&quot;https://docs.rs/plotters/badge.svg&quot;&gt;&lt;/img&gt;
+&lt;/a&gt;
+&lt;a href=&quot;https://plotters-rs.github.io/rustdoc/plotters/&quot;&gt;
+    &lt;img style=&quot;display: inline! important&quot; src=&quot;https://img.shields.io/badge/docs-development-lightgrey.svg&quot;&gt;&lt;/img&gt;
+&lt;/a&gt;
+&lt;a href=&quot;https://travis-ci.org/38/plotters&quot;&gt;
+    &lt;img style=&quot;display: inline! important&quot; src=&quot;https://travis-ci.org/38/plotters.svg?branch=master&quot;&gt;&lt;/img&gt;
+&lt;/a&gt;
+&lt;a href=&quot;https://codecov.io/gh/38/plotters&quot;&gt;
+    &lt;img style=&quot;display: inline! important&quot; src=&quot;https://codecov.io/gh/38/plotters/branch/master/graph/badge.svg&quot; /&gt;
+&lt;/a&gt;
+
+Plotters is drawing library designed for rendering figures, plots, and charts, in pure rust. Plotters supports various types of back-ends,
+including bitmap, vector graph, piston window, GTK/Cairo and WebAssembly.
+
+- A new Plotters Developer&#39;s Guide is working in progress. The preview version is available at [here](https://plotters-rs.github.io/book).
+- To try Plotters with interactive Jupyter notebook, or view [here](https://plotters-rs.github.io/plotters-doc-data/evcxr-jupyter-integration.html) for the static HTML version.
+- To view the WASM example, go to this [link](https://plumberserver.com/plotters-wasm-demo/index.html)
+- Currently we have all the internal code ready for console plotting, but a console based backend is still not ready. See [this example](https://github.com/38/plotters/blob/master/examples/console.rs) for how to plotting on Console with a customized backend.
+
+## Gallery
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/sample.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/sample.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Multiple Plot
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/chart.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/stock.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/stock.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Candlestick Plot
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/stock.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/histogram.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/histogram.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+       Histogram
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/histogram.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/0.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/0.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Simple Chart
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/console-2.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/console-2.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Plotting the Console
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/mandelbrot.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/mandelbrot.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Mandelbrot set
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/mandelbrot.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/evcxr_animation.gif&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/evcxr_animation.gif&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Jupyter Support
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/plotters-piston.gif&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/plotters-piston.gif&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Real-time Rendering
+        &lt;a href=&quot;https://github.com/38/plotters/tree/master/examples/piston-demo&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/normal-dist.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/normal-dist.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Histogram with Scatter
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/normal-dist.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/twoscale.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/twoscale.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Dual Y-Axis Example
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/two-scales.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/matshow.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/matshow.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        The Matplotlib Matshow Example
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/matshow.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/sierpinski.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/sierpinski.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        The Sierpinski Carpet
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/sierpinski.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/normal-dist2.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/normal-dist2.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        The 1D Gaussian Distribution
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/nomal-dist2.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/errorbar.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/errorbar.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        The 1D Gaussian Distribution
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/errorbar.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/slc-temp.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/slc-temp.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Monthly Time Coordinate
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/slc-temp.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/area-chart.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/area-chart.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Monthly Time Coordinate
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/area-chart.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/snowflake.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/snowflake.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Koch Snowflake
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/snowflake.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/animation.gif&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/animation.gif&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Koch Snowflake Animation
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/animation.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/console.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/console.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Drawing on a Console
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/console.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/blit-bitmap.png&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/blit-bitmap.png&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Drawing bitmap on chart
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/blit-bitmap.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;galleryItem&quot;&gt;
+    &lt;a href=&quot;https://plotters-rs.github.io/plotters-doc-data/boxplot.svg&quot;&gt;
+        &lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/boxplot.svg&quot; class=&quot;galleryItem&quot;&gt;&lt;/img&gt;
+    &lt;/a&gt;
+    &lt;div class=&quot;galleryText&quot;&gt;
+        Drawing bitmap on chart
+        &lt;a href=&quot;https://github.com/38/plotters/blob/master/examples/boxplot.rs&quot;&gt;[code]&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+
+## Table of Contents
+  * [Gallery](#gallery)
+  * [Quick Start](#quick-start)
+  * [Trying with Jupyter evcxr Kernel Interactively](#trying-with-jupyter-evcxr-kernel-interactively)
+  * [Interactive Tutorial with Jupyter Notebook](#interactive-tutorial-with-jupyter-notebook)
+  * [Plotting in Rust](#plotting-in-rust)
+  * [Plotting on HTML5 canvas with WASM Backend](#plotting-on-html5-canvas-with-wasm-backend)
+  * [What types of figure are supported?](#what-types-of-figure-are-supported)
+  * [Concepts by examples](#concepts-by-examples)
+    + [Drawing Back-ends](#drawing-backends)
+    + [Drawing Area](#drawing-area)
+    + [Elements](#elements)
+    + [Composable Elements](#composable-elements)
+    + [Chart Context](#chart-context)
+  * [Misc](#misc)
+    + [Development Version](#development-version)
+    + [Reducing Depending Libraries &amp;&amp; Turning Off Backends](#reducing-depending-libraries--turning-off-backends)
+    + [List of Features](#list-of-features)
+  * [FAQ List](#faq-list)
+
+## Quick Start
+
+To use Plotters, you can simply add Plotters into your `Cargo.toml`
+```toml
+[dependencies]
+plotters = &quot;^0.2.15&quot;
+```
+
+And the following code draws a quadratic function. `src/main.rs`,
+
+```rust
+use plotters::prelude::*;
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let root = BitMapBackend::new(&quot;plotters-doc-data/0.png&quot;, (640, 480)).into_drawing_area();
+    root.fill(&amp;WHITE)?;
+    let mut chart = ChartBuilder::on(&amp;root)
+        .caption(&quot;y=x^2&quot;, (&quot;sans-serif&quot;, 50).into_font())
+        .margin(5)
+        .x_label_area_size(30)
+        .y_label_area_size(30)
+        .build_ranged(-1f32..1f32, -0.1f32..1f32)?;
+
+    chart.configure_mesh().draw()?;
+
+    chart
+        .draw_series(LineSeries::new(
+            (-50..=50).map(|x| x as f32 / 50.0).map(|x| (x, x * x)),
+            &amp;RED,
+        ))?
+        .label(&quot;y = x^2&quot;)
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &amp;RED));
+
+    chart
+        .configure_series_labels()
+        .background_style(&amp;WHITE.mix(0.8))
+        .border_style(&amp;BLACK)
+        .draw()?;
+
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/0.png)
+
+
+## Trying with Jupyter evcxr Kernel Interactively
+
+Plotters now supports integrate with `evcxr` and is able to interactively drawing plots in Jupyter Notebook.
+The feature `evcxr` should be enabled when including Plotters to Jupyter Notebook.
+
+The following code shows a minimal example of this.
+
+```text
+:dep plotters = { git = &quot;https://github.com/38/plotters&quot;, default_features = false, features = [&quot;evcxr&quot;] }
+extern crate plotters;
+use plotters::prelude::*;
+
+let figure = evcxr_figure((640, 480), |root| {
+    root.fill(&amp;WHITE);
+    let mut chart = ChartBuilder::on(&amp;root)
+        .caption(&quot;y=x^2&quot;, (&quot;Arial&quot;, 50).into_font())
+        .margin(5)
+        .x_label_area_size(30)
+        .y_label_area_size(30)
+        .build_ranged(-1f32..1f32, -0.1f32..1f32)?;
+
+    chart.configure_mesh().draw()?;
+
+    chart.draw_series(LineSeries::new(
+        (-50..=50).map(|x| x as f32 / 50.0).map(|x| (x, x * x)),
+        &amp;RED,
+    )).unwrap()
+        .label(&quot;y = x^2&quot;)
+        .legend(|(x,y)| PathElement::new(vec![(x,y), (x + 20,y)], &amp;RED));
+
+    chart.configure_series_labels()
+        .background_style(&amp;WHITE.mix(0.8))
+        .border_style(&amp;BLACK)
+        .draw()?;
+    Ok(())
+});
+figure
+```
+
+&lt;img src=&quot;https://plotters-rs.github.io/plotters-doc-data/evcxr_animation.gif&quot; width=&quot;450px&quot;&gt;&lt;/img&gt;
+
+## Interactive Tutorial with Jupyter Notebook
+
+*This tutorial is now working in progress and isn&#39;t complete*
+
+Thanks to the evcxr, now we have an interactive tutorial for Plotters!
+To use the interactive notebook, you must have Jupyter and evcxr installed on your computer.
+Follow the instruction on [this page](https://github.com/google/evcxr/tree/master/evcxr_jupyter) below to install it.
+
+After that, you should be able to start your Jupyter server locally and load the tutorial!
+
+```bash
+git clone https://github.com/38/plotters-doc-data
+cd plotteres-doc-data
+jupyter notebook
+```
+
+And select the notebook called `evcxr-jupyter-integration.ipynb`.
+
+Also, there&#39;s a static HTML version of this notebook available at the [this location](https://plumberserver.com/plotters-docs/evcxr-jupyter-integration.html)
+
+## Plotting in Rust
+
+Rust is a perfect language for data visualization. Although there are many mature visualization libraries in many different languages.
+But Rust is one of the best languages fits the need.
+
+* **Easy to use** Rust has a very good iterator system built into the standard library. With the help of iterators,
+Plotting in Rust can be as easy as most of the high-level programming languages. The Rust based plotting library
+can be very easy to use.
+
+* **Fast** If you need rendering a figure with trillions of data points,
+Rust is a good choice. Rust&#39;s performance allows you to combine data processing step
+and rendering step into a single application. When plotting in high-level programming languages,
+e.g. Javascript or Python, data points must be down-sampled before feeding into the plotting
+program because of the performance considerations. Rust is fast enough to do the data processing and visualization
+within a single program. You can also integrate the
+figure rendering code into your application handling a huge amount of data and visualize it in real-time.
+
+* **WebAssembly Support** Rust is one of few the language with the best WASM support. Plotting in Rust could be
+very useful for visualization on a web page and would have a huge performance improvement comparing to Javascript.
+
+## Plotting on HTML5 canvas with WASM Backend
+
+Plotters currently supports backend that uses the HTML5 canvas. To use the WASM support, you can simply use
+`CanvasBackend` instead of other backend and all other API remains the same!
+
+There&#39;s a small demo for Plotters + WASM under `examples/wasm-demo` directory of this repo.
+To play with the deployed version, follow this [link](https://plumberserver.com/plotters-wasm-demo/index.html).
+
+
+## What types of figure are supported?
+
+Plotters is not limited to any specific type of figure.
+You can create your own types of figures easily with the Plotters API.
+
+But Plotters provides some builtin figure types for convenience.
+Currently, we support line series, point series, candlestick series, and histogram.
+And the library is designed to be able to render multiple figure into a single image.
+But Plotter is aimed to be a platform that is fully extendable to support any other types of figure.
+
+## Concepts by examples
+
+### Drawing Back-ends
+Plotters can use different drawing back-ends, including SVG, BitMap, and even real-time rendering. For example, a bitmap drawing backend.
+
+```rust
+use plotters::prelude::*;
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    // Create a 800*600 bitmap and start drawing
+    let mut backend = BitMapBackend::new(&quot;plotters-doc-data/1.png&quot;, (300, 200));
+    // And if we want SVG backend
+    // let backend = SVGBackend::new(&quot;output.svg&quot;, (800, 600));
+    backend.draw_rect((50, 50), (200, 150), &amp;RED, true)?;
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/1.png)
+
+### Drawing Area
+Plotters uses a concept called drawing area for layout purpose.
+Plotters support multiple integrating into a single image.
+This is done by creating sub-drawing-areas.
+
+Besides that, the drawing area also allows the customized coordinate system, by doing so, the coordinate mapping is done by the drawing area automatically.
+
+```rust
+use plotters::prelude::*;
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let root_drawing_area =
+        BitMapBackend::new(&quot;plotters-doc-data/2.png&quot;, (300, 200)).into_drawing_area();
+    // And we can split the drawing area into 3x3 grid
+    let child_drawing_areas = root_drawing_area.split_evenly((3, 3));
+    // Then we fill the drawing area with different color
+    for (area, color) in child_drawing_areas.into_iter().zip(0..) {
+        area.fill(&amp;Palette99::pick(color))?;
+    }
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/2.png)
+
+### Elements
+
+In Plotters, elements are build blocks of figures. All elements are able to draw on a drawing area.
+There are different types of built-in elements, like lines, texts, circles, etc.
+You can also define your own element in the application code.
+
+You may also combine existing elements to build a complex element.
+
+To learn more about the element system, please read the [element module documentation](./element/index.html).
+
+```rust
+use plotters::prelude::*;
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let root = BitMapBackend::new(&quot;plotters-doc-data/3.png&quot;, (300, 200)).into_drawing_area();
+    root.fill(&amp;WHITE)?;
+    // Draw an circle on the drawing area
+    root.draw(&amp;Circle::new(
+        (100, 100),
+        50,
+        Into::&lt;ShapeStyle&gt;::into(&amp;GREEN).filled(),
+    ))?;
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/3.png)
+
+### Composable Elements
+
+Besides the built-in elements, elements can be composed into a logic group we called composed elements.
+When composing new elements, the upper-left corner is given in the target coordinate, and a new pixel-based
+coordinate which has the upper-left corner defined as `(0,0)` is used for further element composition purpose.
+
+For example, we can have an element which includes a dot and its coordinate.
+
+```rust
+use plotters::prelude::*;
+
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let root = BitMapBackend::new(&quot;plotters-doc-data/4.png&quot;, (640, 480)).into_drawing_area();
+
+    root.fill(&amp;RGBColor(240, 200, 200))?;
+
+    let root = root.apply_coord_spec(RangedCoord::&lt;RangedCoordf32, RangedCoordf32&gt;::new(
+        0f32..1f32,
+        0f32..1f32,
+        (0..640, 0..480),
+    ));
+
+    let dot_and_label = |x: f32, y: f32| {
+        return EmptyElement::at((x, y))
+            + Circle::new((0, 0), 3, ShapeStyle::from(&amp;BLACK).filled())
+            + Text::new(
+                format!(&quot;({:.2},{:.2})&quot;, x, y),
+                (10, 0),
+                (&quot;sans-serif&quot;, 15.0).into_font(),
+            );
+    };
+
+    root.draw(&amp;dot_and_label(0.5, 0.6))?;
+    root.draw(&amp;dot_and_label(0.25, 0.33))?;
+    root.draw(&amp;dot_and_label(0.8, 0.8))?;
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/4.png)
+
+### Chart Context
+
+In order to draw a chart, Plotters need a data object built on top of the drawing area called `ChartContext`.
+The chart context defines even higher level constructs compare to the drawing area.
+For example, you can define the label areas, meshes, and put a data series onto the drawing area with the help
+of the chart context object.
+
+```rust
+use plotters::prelude::*;
+fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let root = BitMapBackend::new(&quot;plotters-doc-data/5.png&quot;, (640, 480)).into_drawing_area();
+    root.fill(&amp;WHITE);
+    let root = root.margin(10, 10, 10, 10);
+    // After this point, we should be able to draw construct a chart context
+    let mut chart = ChartBuilder::on(&amp;root)
+        // Set the caption of the chart
+        .caption(&quot;This is our first plot&quot;, (&quot;sans-serif&quot;, 40).into_font())
+        // Set the size of the label region
+        .x_label_area_size(20)
+        .y_label_area_size(40)
+        // Finally attach a coordinate on the drawing area and make a chart context
+        .build_ranged(0f32..10f32, 0f32..10f32)?;
+
+    // Then we can draw a mesh
+    chart
+        .configure_mesh()
+        // We can customize the maximum number of labels allowed for each axis
+        .x_labels(5)
+        .y_labels(5)
+        // We can also change the format of the label text
+        .y_label_formatter(&amp;|x| format!(&quot;{:.3}&quot;, x))
+        .draw()?;
+
+    // And we can draw something in the drawing area
+    chart.draw_series(LineSeries::new(
+        vec![(0.0, 0.0), (5.0, 5.0), (8.0, 7.0)],
+        &amp;RED,
+    ))?;
+    // Similarly, we can draw point series
+    chart.draw_series(PointSeries::of_element(
+        vec![(0.0, 0.0), (5.0, 5.0), (8.0, 7.0)],
+        5,
+        &amp;RED,
+        &amp;|c, s, st| {
+            return EmptyElement::at(c)    // We want to construct a composed element on-the-fly
+            + Circle::new((0,0),s,st.filled()) // At this point, the new pixel coordinate is established
+            + Text::new(format!(&quot;{:?}&quot;, c), (10, 0), (&quot;sans-serif&quot;, 10).into_font());
+        },
+    ))?;
+    Ok(())
+}
+```
+
+![](https://plotters-rs.github.io/plotters-doc-data/5.png)
+
+## Misc
+
+### Development Version
+
+To use the latest development version, pull https://github.com/38/plotters.git. In `Cargo.toml`
+
+```toml
+[dependencies]
+plotters = { git = &quot;https://github.com/38/plotters.git&quot; }
+```
+
+### Reducing Depending Libraries &amp;&amp; Turning Off Backends
+Plotters now supports use features to control the backend dependencies. By default, `BitMapBackend` and `SVGBackend` are supported,
+use `default_features = false` in the dependency description in `Cargo.toml` and you can cherry-pick the backend implementations.
+
+- `svg` Enable the `SVGBackend`
+- `bitmap` Enable the `BitMapBackend`
+
+For example, the following dependency description would avoid compiling with bitmap support:
+
+```toml
+[dependencies]
+plotters = { git = &quot;https://github.com/38/plotters.git&quot;, default_features = false, features = [&quot;svg&quot;] }
+```
+
+The library also allows consumers to make use of the [`Palette`](https://crates.io/crates/palette/) crate&#39;s color types by default.
+This behavior can also be turned off by setting `default_features = false`.
+
+### List of Features
+
+This is the full list of features that is defined by `Plotters` crate.
+Use `default_features = false` to disable those default enabled features,
+and then you should be able to cherry-pick what features you want to include into `Plotters` crate.
+By doing so, you can minimize the number of dependencies down to only `itertools` and compile time is less than 6s.
+
+The following list is a complete list of features that can be opt in and out.
+
+- Drawing backends related features
+
+| Name    |  Description | Additional Dependency |Default?|
+|---------|--------------|--------|------------|
+| image\_encoder  | Allow `BitMapBackend` save the result to bitmap files | image, rusttype, font-kit | Yes |
+| svg     | Enable `SVGBackend` Support | None | Yes |
+| gif\_backend| Opt-in GIF animation Rendering support for `BitMapBackend`, implies `bitmap` enabled | gif | Yes |
+| piston | Enable `PistonWindowBackend` | piston\_window, rusttype, font-kit | No |
+| cairo | Enable `CairoBackend` | cairo-rs, rusttype, font-kit | No |
+
+- Font manipulation features
+
+| Name    |  Description | Additional Dependency |Default?|
+|---------|--------------|--------|------------|
+| ttf | Allows TrueType font support | rusttype, font-kit | Yes |
+
+- Coordinate features
+
+| Name    |  Description | Additional Dependency |Default?|
+|---------|--------------|--------|------------|
+| datetime | Eanble the date and time coordinate support | chrono | Yes |
+
+- Element, series and util functions
+
+| Name    |  Description | Additional Dependency |Default?|
+|---------|--------------|--------|------------|
+| errorbar | The errorbar element support | None | Yes |
+| candlestick | The candlestick element support | None | Yes |
+| boxplot | The boxplot element support | None | Yes |
+| area\_series | The area series support | None | Yes |
+| line\_series | The line series support | None | Yes |
+| histogram | The histogram series support | None | Yes |
+| point\_series| The point series support | None | Yes |
+
+- Misc
+
+| Name    |  Description | Additional Dependency |Default?|
+|---------|--------------|--------|------------|
+| deprecated\_items | This feature allows use of deprecated items which is going to be removed in the future | None | Yes |
+| debug | Enable the code used for debugging | None | No |
+
+
+## FAQ List
+
+* Why does the WASM example break on my machine ?
+
+    The WASM example requires using `wasm32` target to build. Using `cargo build` is likely to use the default target
+    which in most of the case is any of the x86 target. Thus you need add `--target=wasm32-unknown-unknown` in the cargo
+    parameter list  to build it.
+
+* How to draw text/circle/point/rectangle/... on the top of chart ?
+
+    As you may realized, Plotters is a drawing library rather than a traditional data plotting library,
+    you have the freedom to draw anything you want on the drawing area.
+    Use `DrawingArea::draw` to draw any element on the drawing area.
+
+
+&lt;style&gt;
+    img {
+            display: block;
+            margin: 0 auto;
+            max-width: 500px;
+    }
+    .galleryItem {
+            width: 250px;
+            display: inline-block;
+    }
+    .galleryImg {
+            max-width: 100%;
+    }
+    .galleryText {
+            text-align: center;
+    }
+&lt;/style&gt;
+
+
+*/</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chart</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">coord</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">data</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">drawing</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">element</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">series</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">style</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;evcxr&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">evcxr</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">drawing</span>::<span class="ident">create_mocked_drawing_area</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;palette_ext&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">palette</span>;
+
+<span class="doccomment">/// The module imports the most commonly used types and modules in Plotters</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">chart</span>::{<span class="ident">ChartBuilder</span>, <span class="ident">ChartContext</span>, <span class="ident">LabelAreaPosition</span>, <span class="ident">SeriesLabelPosition</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">coord</span>::{
+        <span class="ident">Category</span>, <span class="ident">CoordTranslate</span>, <span class="ident">GroupBy</span>, <span class="ident">IntoCentric</span>, <span class="ident">IntoPartialAxis</span>, <span class="ident">LogCoord</span>, <span class="ident">LogRange</span>,
+        <span class="ident">LogScalable</span>, <span class="ident">Ranged</span>, <span class="ident">RangedCoord</span>, <span class="ident">RangedCoordf32</span>, <span class="ident">RangedCoordf64</span>, <span class="ident">RangedCoordi32</span>,
+        <span class="ident">RangedCoordi64</span>, <span class="ident">RangedCoordu32</span>, <span class="ident">RangedCoordu64</span>, <span class="ident">ToGroupByRange</span>,
+    };
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">coord</span>::{<span class="ident">make_partial_axis</span>, <span class="ident">RangedDate</span>, <span class="ident">RangedDateTime</span>, <span class="ident">RangedDuration</span>};
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">drawing</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;area_series&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">series</span>::<span class="ident">AreaSeries</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;histogram&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">series</span>::<span class="ident">Histogram</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;line_series&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">series</span>::<span class="ident">LineSeries</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;point_series&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">series</span>::<span class="ident">PointSeries</span>;
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">style</span>::{
+        <span class="ident">AsRelative</span>, <span class="ident">Color</span>, <span class="ident">FontDesc</span>, <span class="ident">FontFamily</span>, <span class="ident">FontStyle</span>, <span class="ident">FontTransform</span>, <span class="ident">HSLColor</span>, <span class="ident">IntoFont</span>,
+        <span class="ident">Palette</span>, <span class="ident">Palette100</span>, <span class="ident">Palette99</span>, <span class="ident">Palette9999</span>, <span class="ident">PaletteColor</span>, <span class="ident">RGBColor</span>, <span class="ident">ShapeStyle</span>,
+        <span class="ident">SimpleColor</span>, <span class="ident">TextStyle</span>,
+    };
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">style</span>::{<span class="ident">BLACK</span>, <span class="ident">BLUE</span>, <span class="ident">CYAN</span>, <span class="ident">GREEN</span>, <span class="ident">MAGENTA</span>, <span class="ident">RED</span>, <span class="ident">TRANSPARENT</span>, <span class="ident">WHITE</span>, <span class="ident">YELLOW</span>};
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::{
+        <span class="ident">Circle</span>, <span class="ident">Cross</span>, <span class="ident">DynElement</span>, <span class="ident">EmptyElement</span>, <span class="ident">IntoDynElement</span>, <span class="ident">MultiLineText</span>, <span class="ident">PathElement</span>, <span class="ident">Pixel</span>,
+        <span class="ident">Polygon</span>, <span class="ident">Rectangle</span>, <span class="ident">Text</span>, <span class="ident">TriangleMarker</span>,
+    };
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;boxplot&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::<span class="ident">Boxplot</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;candlestick&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::<span class="ident">CandleStick</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;errorbar&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::<span class="ident">ErrorBar</span>;
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitmap&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::<span class="ident">BitMapElement</span>;
+
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">data</span>::<span class="ident">Quartiles</span>;
+
+    <span class="comment">// TODO: This should be deprecated and completely removed</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deprecated_items&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">element</span>::<span class="ident">Path</span>;
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">type_alias_bounds</span>)]</span>
+    <span class="doccomment">/// The type used to returns a drawing operation that can be failed</span>
+    <span class="doccomment">/// - `T`: The return type</span>
+    <span class="doccomment">/// - `D`: The drawing backend type</span>
+    <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DrawResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span>: <span class="ident">DrawingBackend</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">crate</span>::<span class="ident">drawing</span>::<span class="ident">DrawingAreaErrorKind</span><span class="op">&lt;</span><span class="ident">D</span>::<span class="ident">ErrorType</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;evcxr&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">evcxr</span>::<span class="ident">evcxr_figure</span>;
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "plotters";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -1,0 +1,12 @@
+(function() {var implementors = {};
+implementors["aatree"] = [{"text":"impl&lt;K:&nbsp;Ord, V&gt; Ord for AATreeMapEntry&lt;K, V&gt;","synthetic":false,"types":[]}];
+implementors["bstr"] = [{"text":"impl Ord for BString","synthetic":false,"types":[]},{"text":"impl Ord for BStr","synthetic":false,"types":[]}];
+implementors["byteorder"] = [{"text":"impl Ord for BigEndian","synthetic":false,"types":[]},{"text":"impl Ord for LittleEndian","synthetic":false,"types":[]}];
+implementors["crossbeam_epoch"] = [{"text":"impl&lt;T:&nbsp;?Sized + Pointable, '_&gt; Ord for Shared&lt;'_, T&gt;","synthetic":false,"types":[]}];
+implementors["either"] = [{"text":"impl&lt;L:&nbsp;Ord, R:&nbsp;Ord&gt; Ord for Either&lt;L, R&gt;","synthetic":false,"types":[]}];
+implementors["log"] = [{"text":"impl Ord for Level","synthetic":false,"types":[]},{"text":"impl Ord for LevelFilter","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Ord for Metadata&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Ord for MetadataBuilder&lt;'a&gt;","synthetic":false,"types":[]}];
+implementors["proc_macro2"] = [{"text":"impl Ord for Ident","synthetic":false,"types":[]}];
+implementors["regex_syntax"] = [{"text":"impl Ord for Span","synthetic":false,"types":[]},{"text":"impl Ord for Position","synthetic":false,"types":[]},{"text":"impl Ord for Literal","synthetic":false,"types":[]},{"text":"impl Ord for ClassUnicodeRange","synthetic":false,"types":[]},{"text":"impl Ord for ClassBytesRange","synthetic":false,"types":[]},{"text":"impl Ord for Utf8Sequence","synthetic":false,"types":[]},{"text":"impl Ord for Utf8Range","synthetic":false,"types":[]}];
+implementors["serde_cbor"] = [{"text":"impl Ord for Value","synthetic":false,"types":[]}];
+implementors["syn"] = [{"text":"impl Ord for Lifetime","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

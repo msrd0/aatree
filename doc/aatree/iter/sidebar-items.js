@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AAIntoIter","The iterator produces from an AATree-based data structure when turned into an iterator."],["AAIter","The iterator produces from an reference of an AATree-based data structure when turned into an iterator."]]});
