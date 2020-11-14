@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@beta
-      - run: cargo doc --workspace --all-features
+      - run: cargo doc
       - name: Push changes to gh-pages
         run: |
           git config user.email "${{ github.actor }}@users.noreply.github.com"
