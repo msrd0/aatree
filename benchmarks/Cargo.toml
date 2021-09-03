@@ -1,0 +1,23 @@
+# -*- eval: (cargo-minor-mode 1) -*-
+
+[package]
+name = "aatree-benchmarks"
+version = "0.0.0"
+publish = false
+edition = "2018"
+license = "Apache-2.0"
+
+[dependencies]
+aatree = { path = ".." }
+
+[dev-dependencies]
+criterion = "0.3.3"
+paste = "1.0"
+
+[[bench]]
+name = "contains"
+harness = false
+
+[[bench]]
+name = "insert"
+harness = false

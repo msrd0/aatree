@@ -1,5 +1,8 @@
 # -*- eval: (cargo-minor-mode 1) -*-
 
+[workspace]
+members = [".", "./benchmarks"]
+
 [package]
 name = "aatree"
 version = "0.1.0"
@@ -9,18 +12,3 @@ license = "Apache-2.0"
 
 [dependencies]
 log = "0.4.8"
-# BENCHMARK DEPENDENCIES
-criterion = { version = "0.3.3", optional = true }
-paste = { version = "1.0.2", optional = true }
-
-[features]
-default = []
-benchmark = ["criterion", "paste"]
-
-[[bench]]
-name = "contains"
-harness = false
-
-[[bench]]
-name = "insert"
-harness = false
