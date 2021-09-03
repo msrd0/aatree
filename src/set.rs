@@ -2,11 +2,11 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
-use core::iter::FromIterator;
+use core::{borrow::Borrow, iter::FromIterator};
 
-/// A set based on an AA-Tree. An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
-/// with a simplified self-balancing logic that should benefit performance. See [`AATreeMap`]'s documentation
-/// for a detailed discussion of this collection's performance benefits and drawbacks.
+/// A set based on an AA-Tree.
+///
+/// See [`AATreeMap`]'s documentation for a detailed discussion of this collection's performance benefits and drawbacks.
 ///
 /// It is a logic error for an item to be modified in such a way that the item's ordering relative to any
 /// other item, as determined by the `Ord` trait, changes while it is in the set. This is normally only possible
@@ -28,10 +28,10 @@ use core::iter::FromIterator;
 /// books.insert("The Great Gatsby");
 ///
 /// // Check for a specific one
-/// //if !books.contains("The Winds of Winter") {
-/// //	println!("We have {} books, but The Winds of Winter ain't one.", books.len());
-/// 	//}
-/// // else { assert!(false) }
+/// if !books.contains("The Winds of Winter") {
+/// 	println!("We have {} books, but The Winds of Winter ain't one.", books.len());
+/// }
+/// # else { assert!(false) }
 ///
 /// // Remove a book.
 /// //books.remove("The Odyssey");
@@ -160,11 +160,16 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(42);
 	/// assert_eq!(set.contains(&42), true);
 	/// ```
-	pub fn contains(&self, x: &T) -> bool {
+	pub fn contains<Q>(&self, x: &Q) -> bool
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
 		self.root
 			.traverse(|content, sub| match sub {
 				Some(sub) => sub,
 				None => {
+					let content = content.borrow();
 					if content == x {
 						TraverseStep::Value(Some(()))
 					} else if content < x {
@@ -172,7 +177,7 @@ impl<T: Ord> AATreeSet<T> {
 					} else {
 						TraverseStep::Left
 					}
-				},
+				}
 			})
 			.is_some()
 	}
@@ -190,19 +195,26 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(40);
 	/// assert_eq!(set.smallest_geq_than(&41), Some(&42));
 	/// ```
-	pub fn smallest_geq_than(&self, x: &T) -> Option<&T> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content > x => TraverseStep::Value(Some(content)),
-			Some(sub) => sub,
-			None => {
-				if content < x {
-					TraverseStep::Right
-				} else if content > x {
-					TraverseStep::Left
-				} else {
-					TraverseStep::Value(Some(content))
-				}
-			},
+	pub fn smallest_geq_than<Q>(&self, x: &Q) -> Option<&T>
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse(|content, sub| {
+			let c = content.borrow();
+			match sub {
+				Some(TraverseStep::Value(None)) if c > x => TraverseStep::Value(Some(content)),
+				Some(sub) => sub,
+				None => {
+					if c < x {
+						TraverseStep::Right
+					} else if c > x {
+						TraverseStep::Left
+					} else {
+						TraverseStep::Value(Some(content))
+					}
+				},
+			}
 		})
 	}
 
@@ -219,19 +231,26 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(40);
 	/// assert_eq!(set.largest_leq_than(&43), Some(&42));
 	/// ```
-	pub fn largest_leq_than(&self, x: &T) -> Option<&T> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content < x => TraverseStep::Value(Some(content)),
-			Some(sub) => sub,
-			None => {
-				if content > x {
-					TraverseStep::Left
-				} else if content < x {
-					TraverseStep::Right
-				} else {
-					TraverseStep::Value(Some(content))
-				}
-			},
+	pub fn largest_leq_than<Q>(&self, x: &Q) -> Option<&T>
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse(|content, sub| {
+			let c = content.borrow();
+			match sub {
+				Some(TraverseStep::Value(None)) if c < x => TraverseStep::Value(Some(content)),
+				Some(sub) => sub,
+				None => {
+					if c > x {
+						TraverseStep::Left
+					} else if c < x {
+						TraverseStep::Right
+					} else {
+						TraverseStep::Value(Some(content))
+					}
+				},
+			}
 		})
 	}
 }
