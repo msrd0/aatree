@@ -1,6 +1,0 @@
-(function() {var implementors = {};
-implementors["bstr"] = [{"text":"impl&lt;'a, 'de: 'a&gt; Deserialize&lt;'de&gt; for &amp;'a BStr","synthetic":false,"types":[]},{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for BString","synthetic":false,"types":[]}];
-implementors["criterion"] = [{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for Throughput","synthetic":false,"types":[]}];
-implementors["serde_cbor"] = [{"text":"impl&lt;'de, T:&nbsp;Deserialize&lt;'de&gt;&gt; Deserialize&lt;'de&gt; for Tagged&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for Value","synthetic":false,"types":[]}];
-implementors["serde_json"] = [{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for Map&lt;String, Value&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for Value","synthetic":false,"types":[]},{"text":"impl&lt;'de&gt; Deserialize&lt;'de&gt; for Number","synthetic":false,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

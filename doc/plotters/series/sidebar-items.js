@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["AreaSeries","An area series is similar to a line series but use a filled polygon"],["LineSeries","The line series object, which takes an iterator of points in guest coordinate system and creates the element rendering the line plot"]]});
