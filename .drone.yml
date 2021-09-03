@@ -33,9 +33,14 @@ name: rustfmt
 
 steps:
   - name: rustfmt
-    image: iamsauravsharma/rust-fmt:nightly-alpine
+    image: alpine:3.14
     pull: always
     commands:
+      - apk add rustup
+      - rustup-init -qy --default-host x86_64-unknown-linux-musl --default-toolchain none </dev/null
+      - source $CARGO_HOME/env
+      - rustup toolchain install nightly --profile minimal --component rustfmt
+      - cargo -V
       - cargo fmt -- -V
       - cargo fmt -- --check -l
   - name: notify
@@ -52,6 +57,6 @@ steps:
 
 ---
 kind: signature
-hmac: 1988bdaa8a11eeb344a928c7609f7e084c8fba259f6c8122e110eb371ee511f4
+hmac: 3becec13ca531a6670440326bfd2f4abdc47deebc87490d243431981830416ab
 
 ...
