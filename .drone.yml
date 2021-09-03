@@ -32,8 +32,9 @@ kind: pipeline
 name: rustfmt
 
 steps:
+  # DO NOT UPDATE TO ALPINE 3.14 - it uses known broken rustup
   - name: rustfmt
-    image: alpine:3.14
+    image: alpine:3.13
     pull: always
     commands:
       - apk add rustup
@@ -60,6 +61,6 @@ environment:
 
 ---
 kind: signature
-hmac: 5a30f2beb54c6584598a27a6ec1cc990775f176ba275436e7c899ff197977060
+hmac: 531bb4b513ce37a8c82b3b93ecf50ff708ed3c6d488beb3a8fdc9041369f7b01
 
 ...
