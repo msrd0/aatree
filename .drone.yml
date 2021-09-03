@@ -55,8 +55,11 @@ steps:
       status:
         - failure
 
+environment:
+  CARGO_HOME: target/cargo
+
 ---
 kind: signature
-hmac: 3becec13ca531a6670440326bfd2f4abdc47deebc87490d243431981830416ab
+hmac: 5a30f2beb54c6584598a27a6ec1cc990775f176ba275436e7c899ff197977060
 
 ...
