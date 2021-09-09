@@ -1,8 +1,6 @@
 use super::AANode;
 
-/// This type specifies the requested step for [`traverse`].
-///
-///  [`traverse`]: struct.AATree.html#method.traverse
+/// This type specifies the requested step for [`traverse`](AANode::traverse).
 #[derive(Debug)]
 pub enum TraverseStep<R> {
 	Left,

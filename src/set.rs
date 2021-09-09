@@ -47,8 +47,8 @@ use core::{
 /// # assert_eq!(books.into_iter().collect::<Vec<_>>(), vec!["A Dance With Dragons", "The Great Gatsby", "The Odyssey", "To Kill a Mockingbird"]);
 /// ```
 ///
-///  [`AATreeMap`]: struct.AATreeMap.html
-///  [`BTreeSet`]: https://doc.rust-lang.org/std/collections/struct.BTreeSet.html
+///  [`AATreeMap`]: crate::AATreeMap
+///  [`BTreeSet`]: std::collections::BTreeSet
 #[derive(Clone)]
 pub struct AATreeSet<T> {
 	root: AANode<T>,
@@ -108,8 +108,7 @@ impl<T: Ord> AATreeSet<T> {
 	/// # Example
 	///
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// set.insert(42);
 	/// set.insert(42);
@@ -127,8 +126,7 @@ impl<T: Ord> AATreeSet<T> {
 	///
 	/// # Example
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// assert!(set.smallest().is_none());
 	/// set.insert(42);
@@ -148,8 +146,7 @@ impl<T: Ord> AATreeSet<T> {
 	///
 	/// # Example
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// assert!(set.largest().is_none());
 	/// set.insert(42);
@@ -169,8 +166,7 @@ impl<T: Ord> AATreeSet<T> {
 	///
 	/// # Example
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// set.insert(43);
 	/// assert_eq!(set.contains(&42), false);
@@ -203,8 +199,7 @@ impl<T: Ord> AATreeSet<T> {
 	///
 	/// # Example
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// assert!(set.smallest_geq_than(&41).is_none());
 	/// set.insert(42);
@@ -239,8 +234,7 @@ impl<T: Ord> AATreeSet<T> {
 	///
 	/// # Example
 	/// ```rust
-	/// use aatree::AATreeSet;
-	///
+	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
 	/// assert!(set.largest_leq_than(&43).is_none());
 	/// set.insert(42);

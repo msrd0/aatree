@@ -9,13 +9,13 @@ use core::{
 	iter::FromIterator
 };
 
+/// An entry in an [`AATreeMap`]. This type is used with iterators returned by [`AATreeMap`].
 #[derive(Clone, Copy, Debug)]
-pub struct AATreeMapEntry<K, V> {
-	key: K,
-	value: V
+#[non_exhaustive] // prevent initialization
+pub struct Entry<K, V> {
+	pub key: K,
+	pub value: V
 }
-
-type Entry<K, V> = AATreeMapEntry<K, V>;
 
 impl<K: PartialEq, V> PartialEq for Entry<K, V> {
 	fn eq(&self, other: &Self) -> bool {

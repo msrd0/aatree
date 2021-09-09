@@ -1,3 +1,5 @@
+//! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
+
 use super::node::AANode;
 use std::iter::FusedIterator;
 

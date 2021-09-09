@@ -1,3 +1,6 @@
+//! Low-level implementation of an AA tree. You shouldn't have to use this directly; instead, use
+//! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
+
 mod insert;
 pub use insert::*;
 
@@ -47,7 +50,7 @@ impl<T> AANode<T> {
 		}
 	}
 
-	/// Update the level of this node. **Panic** if the node is `Nil`.
+	/// Update the level of this node. **Panic** if the node is [`Nil`](Self::Nil).
 	fn set_level(&mut self, level: u8) {
 		match self {
 			Self::Nil => panic!("Cannot change level of Nil"),
