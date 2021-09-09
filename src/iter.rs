@@ -1,7 +1,8 @@
 //! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
 use super::node::AANode;
-use std::iter::FusedIterator;
+use alloc::{boxed::Box, vec::Vec};
+use core::iter::FusedIterator;
 
 /// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
 #[derive(Debug)]

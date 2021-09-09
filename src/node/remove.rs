@@ -1,9 +1,11 @@
 use super::AANode;
+use alloc::boxed::Box;
+use core::mem;
 
 impl<T: Eq + Ord> AANode<T> {
 	/// Remove a value from this tree. If the value was found, it will be returned.
 	pub fn remove(&mut self, value: &T) -> Option<T> {
-		let root = std::mem::replace(self, Self::Nil);
+		let root = mem::replace(self, Self::Nil);
 		let (root, removed) = root.remove_impl(value);
 		*self = root;
 		removed
@@ -177,10 +179,10 @@ impl<T: Eq + Ord> AANode<T> {
 				match &mut node {
 					Self::Nil => unreachable!(),
 					Self::Node { right_child, .. } => {
-						let mut right = std::mem::replace(right_child.as_mut(), Self::Nil);
+						let mut right = mem::replace(right_child.as_mut(), Self::Nil);
 						right = right.skew();
 						if let Self::Node { right_child, .. } = &mut right {
-							let mut right_grandchild = std::mem::replace(right_child.as_mut(), Self::Nil);
+							let mut right_grandchild = mem::replace(right_child.as_mut(), Self::Nil);
 							right_grandchild = right_grandchild.skew();
 							**right_child = right_grandchild;
 						}
@@ -191,7 +193,7 @@ impl<T: Eq + Ord> AANode<T> {
 				match &mut node {
 					Self::Nil => unreachable!(),
 					Self::Node { right_child, .. } => {
-						let mut right = std::mem::replace(right_child.as_mut(), Self::Nil);
+						let mut right = mem::replace(right_child.as_mut(), Self::Nil);
 						right = right.split();
 						**right_child = right;
 					}

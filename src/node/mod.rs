@@ -1,6 +1,9 @@
 //! Low-level implementation of an AA tree. You shouldn't have to use this directly; instead, use
 //! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
+use alloc::boxed::Box;
+use core::mem;
+
 mod insert;
 pub use insert::*;
 
@@ -54,7 +57,7 @@ impl<T> AANode<T> {
 	fn set_level(&mut self, level: u8) {
 		match self {
 			Self::Nil => panic!("Cannot change level of Nil"),
-			Self::Node { level: l, .. } => std::mem::replace(l, level)
+			Self::Node { level: l, .. } => mem::replace(l, level)
 		};
 	}
 
@@ -75,12 +78,12 @@ impl<T> AANode<T> {
 						level: l_level,
 						right_child: b,
 						..
-					} if level == l_level => std::mem::replace(b.as_mut(), Self::Nil),
+					} if level == l_level => mem::replace(b.as_mut(), Self::Nil),
 					_ => return self
 				};
 
 				// add the B node as our left child, removing L
-				let mut l_node = std::mem::replace(l.as_mut(), b_node);
+				let mut l_node = mem::replace(l.as_mut(), b_node);
 
 				// add our node T as the right child of L
 				match &mut l_node {
@@ -115,12 +118,12 @@ impl<T> AANode<T> {
 						left_child: b,
 						right_child: x,
 						..
-					} if &x.level() == level => std::mem::replace(b.as_mut(), Self::Nil),
+					} if &x.level() == level => mem::replace(b.as_mut(), Self::Nil),
 					_ => return self
 				};
 
 				// attach the B node to our node, removing R
-				let mut r_node = std::mem::replace(r.as_mut(), b_node);
+				let mut r_node = mem::replace(r.as_mut(), b_node);
 
 				// attach our node to R and increment its level
 				match &mut r_node {

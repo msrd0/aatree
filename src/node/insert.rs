@@ -1,4 +1,5 @@
 use super::AANode;
+use core::mem;
 
 impl<T: Ord> AANode<T> {
 	/// Insert a new node with `content` into the tree. If a node with this value already exist,
@@ -6,7 +7,7 @@ impl<T: Ord> AANode<T> {
 	pub fn insert(&mut self, content: T) -> bool {
 		let inserted = self.bst_insert(content);
 		if inserted {
-			let mut node = std::mem::replace(self, Self::Nil);
+			let mut node = mem::replace(self, Self::Nil);
 			node = node.skew().split();
 			*self = node;
 		}
