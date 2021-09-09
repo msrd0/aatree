@@ -1,6 +1,6 @@
 # AA Tree
 
-[![Build Status](https://drone.msrd0.eu/api/badges/msrd0/aatree/status.svg)](https://drone.msrd0.eu/msrd0/aatree)
+[![Build Status](https://github.com/msrd0/aatree/actions/workflows/rust.yml/badge.svg)](https://github.com/msrd0/aatree/actions/workflows/rust.yml)
 [![Documentation](https://img.shields.io/badge/docs-main-blue.svg)](https://msrd0.github.io/aatree/doc/aatree/index.html)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![MSRV](https://img.shields.io/badge/rustc-1.44+-orange.svg)](https://blog.rust-lang.org/2020/06/04/Rust-1.44.0.html)

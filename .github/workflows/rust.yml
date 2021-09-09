@@ -1,15 +1,38 @@
-name: Documentation
+name: Rust
+
 on:
   push:
-    branches: [master]
+    branches: [main]
+  pull_request:
 
 jobs:
-  doc:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@beta
-      - run: cargo doc
+      - uses: dtolnay/rust-toolchain@1.44.0
+      - run: cargo test --workspace --all-features
+        env:
+          RUST_BACKTRACE=1
+  
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+  
+  doc:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo doc --workspace --all-features --no-deps
+        with:
+          RUSTDOCFLAGS: "--default-theme ayu"
       - name: Push changes to gh-pages
         run: |
           git config user.email "${{ github.actor }}@users.noreply.github.com"
