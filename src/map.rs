@@ -2,7 +2,12 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
-use core::{borrow::Borrow, cmp::Ordering, iter::FromIterator};
+use core::{
+	borrow::Borrow,
+	cmp::Ordering,
+	fmt::{self, Debug},
+	iter::FromIterator
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct AATreeMapEntry<K, V> {
@@ -44,7 +49,7 @@ impl<K: Ord, V> Ord for Entry<K, V> {
 	}
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct AATreeMap<K, V> {
 	root: AANode<Entry<K, V>>,
 	len: usize
@@ -53,6 +58,21 @@ pub struct AATreeMap<K, V> {
 impl<K, V> Default for AATreeMap<K, V> {
 	fn default() -> Self {
 		Self::new()
+	}
+}
+
+impl<K: Debug, V: Debug> Debug for AATreeMap<K, V> {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		f.write_str("{")?;
+		for (i, e) in self.iter().enumerate() {
+			if i > 0 {
+				f.write_str(", ")?;
+			}
+			e.key.fmt(f)?;
+			f.write_str(": ")?;
+			e.value.fmt(f)?;
+		}
+		f.write_str("}")
 	}
 }
 

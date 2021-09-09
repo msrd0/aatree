@@ -2,7 +2,11 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
-use core::{borrow::Borrow, iter::FromIterator};
+use core::{
+	borrow::Borrow,
+	fmt::{self, Debug},
+	iter::FromIterator
+};
 
 /// A set based on an AA-Tree.
 ///
@@ -45,7 +49,7 @@ use core::{borrow::Borrow, iter::FromIterator};
 ///
 ///  [`AATreeMap`]: struct.AATreeMap.html
 ///  [`BTreeSet`]: https://doc.rust-lang.org/std/collections/struct.BTreeSet.html
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct AATreeSet<T> {
 	root: AANode<T>,
 	len: usize
@@ -54,6 +58,19 @@ pub struct AATreeSet<T> {
 impl<T> Default for AATreeSet<T> {
 	fn default() -> Self {
 		Self::new()
+	}
+}
+
+impl<T: Debug> Debug for AATreeSet<T> {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		f.write_str("[")?;
+		for (i, v) in self.iter().enumerate() {
+			if i > 0 {
+				f.write_str(", ")?;
+			}
+			v.fmt(f)?;
+		}
+		f.write_str("]")
 	}
 }
 
