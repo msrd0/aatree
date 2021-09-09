@@ -1,10 +1,14 @@
 use super::AANode;
 use alloc::boxed::Box;
-use core::mem;
+use core::{borrow::Borrow, mem};
 
 impl<T: Eq + Ord> AANode<T> {
 	/// Remove a value from this tree. If the value was found, it will be returned.
-	pub fn remove(&mut self, value: &T) -> Option<T> {
+	pub fn remove<Q>(&mut self, value: &Q) -> Option<T>
+	where
+		T: Borrow<Q>,
+		Q: Ord + ?Sized
+	{
 		let root = mem::replace(self, Self::Nil);
 		let (root, removed) = root.remove_impl(value);
 		*self = root;
@@ -12,7 +16,11 @@ impl<T: Eq + Ord> AANode<T> {
 	}
 
 	/// Removes a node with the specified content from this tree and returns its content.
-	pub(super) fn remove_impl(self, to_remove: &T) -> (Self, Option<T>) {
+	pub(super) fn remove_impl<Q>(self, to_remove: &Q) -> (Self, Option<T>)
+	where
+		T: Borrow<Q>,
+		Q: Ord + ?Sized
+	{
 		let (node, removed) = match self {
 			Self::Nil => (self, None),
 			Self::Node {
@@ -20,7 +28,7 @@ impl<T: Eq + Ord> AANode<T> {
 				content,
 				left_child,
 				right_child
-			} if &content == to_remove => {
+			} if content.borrow() == to_remove => {
 				// for leaves, return the right child
 				if level == 1 {
 					(*right_child, Some(content))
@@ -57,7 +65,7 @@ impl<T: Eq + Ord> AANode<T> {
 				content,
 				left_child,
 				right_child
-			} if &content > to_remove => {
+			} if content.borrow() > to_remove => {
 				let (left, value) = left_child.remove_impl(to_remove);
 				(
 					Self::Node {

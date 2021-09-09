@@ -38,13 +38,13 @@ use core::{
 /// # else { assert!(false) }
 ///
 /// // Remove a book.
-/// //books.remove("The Odyssey");
+/// books.remove("The Odyssey");
 ///
 /// // Iterate over everything.
 /// for book in &books {
 /// 	println!("{}", book);
 /// }
-/// # assert_eq!(books.into_iter().collect::<Vec<_>>(), vec!["A Dance With Dragons", "The Great Gatsby", "The Odyssey", "To Kill a Mockingbird"]);
+/// # assert_eq!(books.into_iter().collect::<Vec<_>>(), vec!["A Dance With Dragons", "The Great Gatsby", "To Kill a Mockingbird"]);
 /// ```
 ///
 ///  [`AATreeMap`]: crate::AATreeMap
@@ -263,6 +263,24 @@ impl<T: Ord> AATreeSet<T> {
 				},
 			}
 		})
+	}
+
+	/// Removes a value from the set, and returns `true` if it was removed.
+	pub fn remove<Q>(&mut self, x: &Q) -> bool
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.remove(x).is_some()
+	}
+
+	/// Removes a value from the set, and returns the value that was removed.
+	pub fn take<Q>(&mut self, x: &Q) -> Option<T>
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.remove(x)
 	}
 }
 
