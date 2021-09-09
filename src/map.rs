@@ -90,10 +90,21 @@ impl<K: Ord, V> AATreeMap<K, V> {
 		inserted
 	}
 
-	pub fn get<Q>(&self, key: Q) -> Option<&V>
+	/// Returns a reference to the value corresponding to the key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// assert_eq!(map.get(&1), Some(&"a"));
+	/// assert_eq!(map.get(&2), None);
+	/// ```
+	pub fn get<Q>(&self, key: &Q) -> Option<&V>
 	where
 		K: Borrow<Q>,
-		Q: Ord
+		Q: Ord + ?Sized
 	{
 		self.root.traverse(|content, sub| match sub {
 			Some(sub) => sub,
@@ -105,10 +116,22 @@ impl<K: Ord, V> AATreeMap<K, V> {
 		})
 	}
 
-	pub fn get_mut<Q>(&mut self, key: Q) -> Option<&mut V>
+	/// Returns a mutable reference to the value corresponding to the key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// assert_eq!(map.get(&1), Some(&"a"));
+	/// *map.get_mut(&1).unwrap() = "b";
+	/// assert_eq!(map.get(&1), Some(&"b"));
+	/// ```
+	pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
 	where
 		K: Borrow<Q>,
-		Q: Ord
+		Q: Ord + ?Sized
 	{
 		self.root.traverse_mut(|content| match key.cmp(content.key.borrow()) {
 			Ordering::Equal => TraverseStep::Value(Some(&mut content.value)),
