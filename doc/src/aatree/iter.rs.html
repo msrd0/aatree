@@ -125,11 +125,13 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::node::AANode</span>;
-<span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">vec::Vec</span>};
+<span class="kw">use</span> <span class="ident">core::iter::FusedIterator</span>;
 
 <span class="doccomment">/// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

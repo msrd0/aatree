@@ -20,6 +20,7 @@
 <span id="18">18</span>
 <span id="19">19</span>
 </pre><pre class="rust">
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">test</span>), <span class="ident">no_std</span>)]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">elided_lifetimes_in_paths</span>, <span class="ident">unreachable_pub</span>)]</span>
 
@@ -28,8 +29,7 @@
 <span class="doccomment">//! An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree</span>
 <span class="doccomment">//! with a simplified self-balancing logic that should benefit performance.</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iter</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">node</span>;

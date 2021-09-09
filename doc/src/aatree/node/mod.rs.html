@@ -321,9 +321,15 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Low-level implementation of an AA tree. You shouldn&#39;t have to use this directly; instead, use</span>
 <span class="doccomment">//! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
+
+<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
 
 <span class="kw">mod</span> <span class="ident">insert</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">insert</span>::<span class="kw-2">*</span>;
@@ -378,7 +384,7 @@
 	<span class="kw">fn</span> <span class="ident">set_level</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">u8</span>) {
 		<span class="kw">match</span> <span class="self">self</span> {
 			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Cannot change level of Nil&quot;</span>),
-			<span class="self">Self</span><span class="ident">::Node</span> { <span class="ident">level</span>: <span class="ident">l</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std::mem::replace</span>(<span class="ident">l</span>, <span class="ident">level</span>)
+			<span class="self">Self</span><span class="ident">::Node</span> { <span class="ident">level</span>: <span class="ident">l</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mem::replace</span>(<span class="ident">l</span>, <span class="ident">level</span>)
 		};
 	}
 
@@ -399,12 +405,12 @@
 						<span class="ident">level</span>: <span class="ident">l_level</span>,
 						<span class="ident">right_child</span>: <span class="ident">b</span>,
 						..
-					} <span class="kw">if</span> <span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="ident">l_level</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std::mem::replace</span>(<span class="ident">b</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>),
+					} <span class="kw">if</span> <span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="ident">l_level</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mem::replace</span>(<span class="ident">b</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>),
 					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>
 				};
 
 				<span class="comment">// add the B node as our left child, removing L</span>
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l_node</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="ident">l</span>.<span class="ident">as_mut</span>(), <span class="ident">b_node</span>);
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l_node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">l</span>.<span class="ident">as_mut</span>(), <span class="ident">b_node</span>);
 
 				<span class="comment">// add our node T as the right child of L</span>
 				<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">l_node</span> {
@@ -439,12 +445,12 @@
 						<span class="ident">left_child</span>: <span class="ident">b</span>,
 						<span class="ident">right_child</span>: <span class="ident">x</span>,
 						..
-					} <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">level</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">level</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">std::mem::replace</span>(<span class="ident">b</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>),
+					} <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">level</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">level</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">mem::replace</span>(<span class="ident">b</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>),
 					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>
 				};
 
 				<span class="comment">// attach the B node to our node, removing R</span>
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r_node</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="ident">r</span>.<span class="ident">as_mut</span>(), <span class="ident">b_node</span>);
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r_node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">r</span>.<span class="ident">as_mut</span>(), <span class="ident">b_node</span>);
 
 				<span class="comment">// attach our node to R and increment its level</span>
 				<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r_node</span> {

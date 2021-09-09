@@ -30,8 +30,10 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::AANode</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Insert a new node with `content` into the tree. If a node with this value already exist,</span>
@@ -39,7 +41,7 @@
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">let</span> <span class="ident">inserted</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bst_insert</span>(<span class="ident">content</span>);
 		<span class="kw">if</span> <span class="ident">inserted</span> {
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Nil</span>);
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Nil</span>);
 			<span class="ident">node</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">skew</span>().<span class="ident">split</span>();
 			<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">node</span>;
 		}
