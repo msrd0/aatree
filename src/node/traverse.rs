@@ -26,7 +26,7 @@ impl<T> AANode<T> {
 		match res {
 			TraverseStep::Value(v) => v,
 			_ => {
-				error!("Recursive traversal attempt detected and prohibited");
+				error!("Recursive traversal detected and prohibited");
 				None
 			}
 		}
@@ -58,6 +58,46 @@ impl<T> AANode<T> {
 					error!("Recursive traversal detected and prohibited");
 				}
 				res
+			}
+		}
+	}
+
+	/// Traverse the tree, allowing for mutation of the nodes that are being traversed.
+	///
+	/// **It is a logic error to mutate the nodes in a way that changes their order with
+	/// respect to the other nodes in the tree.**
+	pub(crate) fn traverse_mut<'a, F, R>(&'a mut self, callback: F) -> Option<R>
+	where
+		F: Fn(&'a mut T) -> TraverseStep<R> + Copy
+	{
+		let res = self.traverse_mut_impl(callback);
+		match res {
+			TraverseStep::Value(v) => v,
+			_ => {
+				error!("Recursive traversal detected and prohibited");
+				None
+			}
+		}
+	}
+
+	fn traverse_mut_impl<'a, F, R>(&'a mut self, callback: F) -> TraverseStep<R>
+	where
+		F: Fn(&'a mut T) -> TraverseStep<R> + Copy
+	{
+		match self {
+			Self::Nil => TraverseStep::Value(None),
+			Self::Node {
+				content,
+				left_child,
+				right_child,
+				..
+			} => {
+				let step = callback(content);
+				match step {
+					TraverseStep::Left => left_child.traverse_mut_impl(callback),
+					TraverseStep::Right => right_child.traverse_mut_impl(callback),
+					TraverseStep::Value(_) => step
+				}
 			}
 		}
 	}

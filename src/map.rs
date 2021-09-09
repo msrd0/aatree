@@ -2,7 +2,7 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
-use core::iter::FromIterator;
+use core::{borrow::Borrow, cmp::Ordering, iter::FromIterator};
 
 #[derive(Clone, Copy, Debug)]
 pub struct AATreeMapEntry<K, V> {
@@ -88,6 +88,33 @@ impl<K: Ord, V> AATreeMap<K, V> {
 			self.len += 1;
 		}
 		inserted
+	}
+
+	pub fn get<Q>(&self, key: Q) -> Option<&V>
+	where
+		K: Borrow<Q>,
+		Q: Ord
+	{
+		self.root.traverse(|content, sub| match sub {
+			Some(sub) => sub,
+			None => match key.cmp(content.key.borrow()) {
+				Ordering::Equal => TraverseStep::Value(Some(&content.value)),
+				Ordering::Less => TraverseStep::Left,
+				Ordering::Greater => TraverseStep::Right
+			}
+		})
+	}
+
+	pub fn get_mut<Q>(&mut self, key: Q) -> Option<&mut V>
+	where
+		K: Borrow<Q>,
+		Q: Ord
+	{
+		self.root.traverse_mut(|content| match key.cmp(content.key.borrow()) {
+			Ordering::Equal => TraverseStep::Value(Some(&mut content.value)),
+			Ordering::Less => TraverseStep::Left,
+			Ordering::Greater => TraverseStep::Right
+		})
 	}
 
 	// TODO duplicated from set
