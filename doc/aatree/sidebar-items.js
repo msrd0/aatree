@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["iter",""],["node",""]],"struct":[["AATreeMap",""],["AATreeMapEntry",""],["AATreeSet","A set based on an AA-Tree."]]});
+initSidebarItems({"mod":[["iter","Iterator implementations for `AATreeSet` and `AATreeMap`."],["node","Low-level implementation of an AA tree. You shouldn’t have to use this directly; instead, use the implementations in `AATreeSet` and `AATreeMap`."]],"struct":[["AATreeMap",""],["AATreeSet","A set based on an AA-Tree."],["Entry","An entry in an [`AATreeMap`]. This type is used with iterators returned by [`AATreeMap`]."]]});
