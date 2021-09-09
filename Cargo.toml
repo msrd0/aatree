@@ -10,5 +10,8 @@ authors = ["Dominic Meiser <git@msrd0.de>"]
 edition = "2018"
 license = "Apache-2.0"
 
+[features]
+default = ["log"]
+
 [dependencies]
-log = "0.4.8"
+log = { version = "0.4.8", optional = true }

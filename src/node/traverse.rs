@@ -8,6 +8,14 @@ pub enum TraverseStep<R> {
 	Value(Option<R>)
 }
 
+#[cfg(feature = "log")]
+fn error_recursive() {
+	log::error!("Recursive traversal detected and prohibited");
+}
+
+#[cfg(not(feature = "log"))]
+fn error_recursive() {}
+
 impl<T> AANode<T> {
 	/// Traverse the tree looking for a specific value. The `callback` is called as follows:
 	///  1. While going down, with `(content, None)` as the input. The callback may return
@@ -24,7 +32,7 @@ impl<T> AANode<T> {
 		match res {
 			TraverseStep::Value(v) => v,
 			_ => {
-				error!("Recursive traversal detected and prohibited");
+				error_recursive();
 				None
 			}
 		}
@@ -53,7 +61,7 @@ impl<T> AANode<T> {
 				};
 				let res = callback(content, Some(res));
 				if matches!(res, TraverseStep::Left | TraverseStep::Right) {
-					error!("Recursive traversal detected and prohibited");
+					error_recursive();
 				}
 				res
 			}
@@ -72,7 +80,7 @@ impl<T> AANode<T> {
 		match res {
 			TraverseStep::Value(v) => v,
 			_ => {
-				error!("Recursive traversal detected and prohibited");
+				error_recursive();
 				None
 			}
 		}
