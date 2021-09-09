@@ -13,7 +13,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.44.0
       - run: cargo test --workspace --all-features
         env:
-          RUST_BACKTRACE=1
+          RUST_BACKTRACE: 1
   
   rustfmt:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo doc --workspace --all-features --no-deps
-        with:
+        env:
           RUSTDOCFLAGS: "--default-theme ayu"
       - name: Push changes to gh-pages
         run: |
