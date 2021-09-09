@@ -26,7 +26,7 @@ pub enum AANode<T> {
 
 impl<T> Default for AANode<T> {
 	fn default() -> Self {
-		Self::Nil
+		Self::new()
 	}
 }
 
@@ -42,8 +42,8 @@ impl<T> From<T> for AANode<T> {
 }
 
 impl<T> AANode<T> {
-	pub fn new() -> Self {
-		Self::default()
+	pub const fn new() -> Self {
+		Self::Nil
 	}
 
 	pub(super) fn level(&self) -> u8 {

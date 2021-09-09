@@ -78,7 +78,7 @@ impl<K: Debug, V: Debug> Debug for AATreeMap<K, V> {
 
 impl<K, V> AATreeMap<K, V> {
 	/// Construct a new, empty AA-Tree based map.
-	pub fn new() -> Self {
+	pub const fn new() -> Self {
 		Self {
 			root: AANode::new(),
 			len: 0

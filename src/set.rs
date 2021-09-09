@@ -76,7 +76,7 @@ impl<T: Debug> Debug for AATreeSet<T> {
 
 impl<T> AATreeSet<T> {
 	/// Construct a new, empty AA-Tree based set.
-	pub fn new() -> Self {
+	pub const fn new() -> Self {
 		Self {
 			root: AANode::new(),
 			len: 0
