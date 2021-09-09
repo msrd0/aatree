@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["aatree","cfg_if","log"];
+window.ALL_CRATES = ["aatree"];
