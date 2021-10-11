@@ -55,7 +55,7 @@ impl<K: PartialOrd, V> PartialOrd for Entry<K, V> {
 
 impl<K: PartialOrd, V> PartialOrd<K> for Entry<K, V> {
 	fn partial_cmp(&self, other: &K) -> Option<core::cmp::Ordering> {
-		self.key.partial_cmp(&other)
+		self.key.partial_cmp(other)
 	}
 }
 
@@ -112,7 +112,7 @@ impl<K, V> AATreeMap<K, V> {
 	}
 
 	/// Creates an iterator over this map that visits all entries with the keys in ascending order.
-	pub fn iter<'a>(&'a self) -> AAIter<'a, Entry<K, V>> {
+	pub fn iter(&self) -> AAIter<'_, Entry<K, V>> {
 		self.into_iter()
 	}
 }
@@ -199,54 +199,56 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	}
 
 	// TODO duplicated from set
-	pub fn contains_key(&self, k: &K) -> bool {
+	pub fn contains_key<Q>(&self, k: &Q) -> bool
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
 		self.root
 			.traverse(|content, sub| match sub {
 				Some(sub) => sub,
-				None => {
-					if content == k {
-						TraverseStep::Value(Some(()))
-					} else if content < k {
-						TraverseStep::Right
-					} else {
-						TraverseStep::Left
-					}
-				},
+				None => match content.key.borrow().cmp(k) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(()))
+				}
 			})
 			.is_some()
 	}
 
 	// TODO duplicated from set
-	pub fn smallest_geq_than(&self, k: &K) -> Option<(&K, &V)> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content > k => TraverseStep::Value(Some(content.as_tuple())),
-			Some(sub) => sub,
-			None => {
-				if content < k {
-					TraverseStep::Right
-				} else if content > k {
-					TraverseStep::Left
-				} else {
-					TraverseStep::Value(Some(content.as_tuple()))
+	pub fn smallest_geq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse(|content, sub| {
+			let key = content.key.borrow();
+			match sub {
+				Some(TraverseStep::Value(None)) if key > k => TraverseStep::Value(Some(content.as_tuple())),
+				Some(sub) => sub,
+				None => match key.cmp(k) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
 				}
-			},
+			}
 		})
 	}
 
 	// TODO duplicated from set
 	pub fn largest_leq_than(&self, k: &K) -> Option<(&K, &V)> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content < k => TraverseStep::Value(Some(content.as_tuple())),
-			Some(sub) => sub,
-			None => {
-				if content > k {
-					TraverseStep::Left
-				} else if content < k {
-					TraverseStep::Right
-				} else {
-					TraverseStep::Value(Some(content.as_tuple()))
+		self.root.traverse(|content, sub| {
+			let key = content.key.borrow();
+			match sub {
+				Some(TraverseStep::Value(None)) if key < k => TraverseStep::Value(Some(content.as_tuple())),
+				Some(sub) => sub,
+				None => match key.cmp(k) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
 				}
-			},
+			}
 		})
 	}
 

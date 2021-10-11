@@ -4,6 +4,7 @@ use crate::{
 };
 use core::{
 	borrow::Borrow,
+	cmp::Ordering,
 	fmt::{self, Debug},
 	iter::FromIterator
 };
@@ -94,7 +95,7 @@ impl<T> AATreeSet<T> {
 	}
 
 	/// Creates an iterator over this set that visits the values in ascending order.
-	pub fn iter<'a>(&'a self) -> AAIter<'a, T> {
+	pub fn iter(&self) -> AAIter<'_, T> {
 		self.into_iter()
 	}
 }
@@ -185,15 +186,10 @@ impl<T: Ord> AATreeSet<T> {
 		self.root
 			.traverse(|content, sub| match sub {
 				Some(sub) => sub,
-				None => {
-					let content = content.borrow();
-					if content == x {
-						TraverseStep::Value(Some(()))
-					} else if content < x {
-						TraverseStep::Right
-					} else {
-						TraverseStep::Left
-					}
+				None => match content.borrow().cmp(x) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(()))
 				}
 			})
 			.is_some()
@@ -221,15 +217,11 @@ impl<T: Ord> AATreeSet<T> {
 			match sub {
 				Some(TraverseStep::Value(None)) if c > x => TraverseStep::Value(Some(content)),
 				Some(sub) => sub,
-				None => {
-					if c < x {
-						TraverseStep::Right
-					} else if c > x {
-						TraverseStep::Left
-					} else {
-						TraverseStep::Value(Some(content))
-					}
-				},
+				None => match c.cmp(x) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(content))
+				}
 			}
 		})
 	}
@@ -256,15 +248,11 @@ impl<T: Ord> AATreeSet<T> {
 			match sub {
 				Some(TraverseStep::Value(None)) if c < x => TraverseStep::Value(Some(content)),
 				Some(sub) => sub,
-				None => {
-					if c > x {
-						TraverseStep::Left
-					} else if c < x {
-						TraverseStep::Right
-					} else {
-						TraverseStep::Value(Some(content))
-					}
-				},
+				None => match c.cmp(x) {
+					Ordering::Greater => TraverseStep::Left,
+					Ordering::Less => TraverseStep::Right,
+					Ordering::Equal => TraverseStep::Value(Some(content))
+				}
 			}
 		})
 	}
