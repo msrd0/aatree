@@ -308,18 +308,6 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">iter</span>::{<span class="ident">AAIntoIter</span>, <span class="ident">AAIter</span>},
@@ -327,6 +315,7 @@
 };
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">borrow::Borrow</span>,
+	<span class="ident">cmp::Ordering</span>,
 	<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>},
 	<span class="ident">iter::FromIterator</span>
 };
@@ -417,7 +406,7 @@
 	}
 
 	<span class="doccomment">/// Creates an iterator over this set that visits the values in ascending order.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">into_iter</span>()
 	}
 }
@@ -508,15 +497,10 @@
 		<span class="self">self</span>.<span class="ident">root</span>
 			.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
 				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">borrow</span>();
-					<span class="kw">if</span> <span class="ident">content</span> <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(()))
-					} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">content</span> <span class="op">&lt;</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Right</span>
-					} <span class="kw">else</span> {
-						<span class="ident">TraverseStep::Left</span>
-					}
+				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">cmp</span>(<span class="ident">x</span>) {
+					<span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Left</span>,
+					<span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Right</span>,
+					<span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(()))
 				}
 			})
 			.<span class="ident">is_some</span>()
@@ -544,15 +528,11 @@
 			<span class="kw">match</span> <span class="ident">sub</span> {
 				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>)),
 				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Right</span>
-					} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Left</span>
-					} <span class="kw">else</span> {
-						<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
-					}
-				},
+				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">cmp</span>(<span class="ident">x</span>) {
+					<span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Left</span>,
+					<span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Right</span>,
+					<span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+				}
 			}
 		})
 	}
@@ -579,15 +559,11 @@
 			<span class="kw">match</span> <span class="ident">sub</span> {
 				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>)),
 				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Left</span>
-					} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="ident">x</span> {
-						<span class="ident">TraverseStep::Right</span>
-					} <span class="kw">else</span> {
-						<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
-					}
-				},
+				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">cmp</span>(<span class="ident">x</span>) {
+					<span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Left</span>,
+					<span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Right</span>,
+					<span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+				}
 			}
 		})
 	}
