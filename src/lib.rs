@@ -1,6 +1,7 @@
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(doc, test)), no_std)]
+#![cfg_attr(doc, deny(rustdoc::broken_intra_doc_links))]
 #![warn(missing_debug_implementations, rust_2018_idioms)]
-#![deny(broken_intra_doc_links, elided_lifetimes_in_paths, unreachable_pub)]
+#![deny(elided_lifetimes_in_paths, unreachable_pub)]
 #![forbid(unsafe_code)]
 // clippy doesn't like our code style
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::tabs_in_doc_comments))]
