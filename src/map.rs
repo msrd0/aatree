@@ -17,6 +17,12 @@ pub struct Entry<K, V> {
 	pub value: V
 }
 
+impl<K, V> Entry<K, V> {
+	fn as_tuple(&self) -> (&K, &V) {
+		(&self.key, &self.value)
+	}
+}
+
 impl<K: PartialEq, V> PartialEq for Entry<K, V> {
 	fn eq(&self, other: &Self) -> bool {
 		self.key.eq(&other.key)
@@ -161,18 +167,18 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	}
 
 	// TODO duplicated from set
-	pub fn smallest(&self) -> Option<&Entry<K, V>> {
+	pub fn smallest(&self) -> Option<(&K, &V)> {
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
+			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content.as_tuple())),
 			Some(sub) => sub,
 			None => TraverseStep::Left
 		})
 	}
 
 	// TODO duplicated from set
-	pub fn largest(&self) -> Option<&Entry<K, V>> {
+	pub fn largest(&self) -> Option<(&K, &V)> {
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
+			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content.as_tuple())),
 			Some(sub) => sub,
 			None => TraverseStep::Right
 		})
@@ -197,9 +203,9 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	}
 
 	// TODO duplicated from set
-	pub fn smallest_geq_than(&self, k: &K) -> Option<&Entry<K, V>> {
+	pub fn smallest_geq_than(&self, k: &K) -> Option<(&K, &V)> {
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content > k => TraverseStep::Value(Some(content)),
+			Some(TraverseStep::Value(None)) if content > k => TraverseStep::Value(Some(content.as_tuple())),
 			Some(sub) => sub,
 			None => {
 				if content < k {
@@ -207,16 +213,16 @@ impl<K: Ord, V> AATreeMap<K, V> {
 				} else if content > k {
 					TraverseStep::Left
 				} else {
-					TraverseStep::Value(Some(content))
+					TraverseStep::Value(Some(content.as_tuple()))
 				}
 			},
 		})
 	}
 
 	// TODO duplicated from set
-	pub fn largest_leq_than(&self, k: &K) -> Option<&Entry<K, V>> {
+	pub fn largest_leq_than(&self, k: &K) -> Option<(&K, &V)> {
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) if content < k => TraverseStep::Value(Some(content)),
+			Some(TraverseStep::Value(None)) if content < k => TraverseStep::Value(Some(content.as_tuple())),
 			Some(sub) => sub,
 			None => {
 				if content > k {
@@ -224,7 +230,7 @@ impl<K: Ord, V> AATreeMap<K, V> {
 				} else if content < k {
 					TraverseStep::Right
 				} else {
-					TraverseStep::Value(Some(content))
+					TraverseStep::Value(Some(content.as_tuple()))
 				}
 			},
 		})
