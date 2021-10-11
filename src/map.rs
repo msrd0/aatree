@@ -27,6 +27,12 @@ impl<K, V> Entry<K, V> {
 	}
 }
 
+impl<K, V> Borrow<K> for Entry<K, V> {
+	fn borrow(&self) -> &K {
+		&self.key
+	}
+}
+
 impl<K: PartialEq, V> PartialEq for Entry<K, V> {
 	fn eq(&self, other: &Self) -> bool {
 		self.key.eq(&other.key)
@@ -242,6 +248,14 @@ impl<K: Ord, V> AATreeMap<K, V> {
 				}
 			},
 		})
+	}
+
+	pub fn remove<Q>(&mut self, k: &Q) -> Option<V>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.remove::<Q, K>(k).map(|entry| entry.value)
 	}
 }
 
