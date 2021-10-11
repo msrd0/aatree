@@ -28,38 +28,7 @@ impl<T: Eq + Ord> AANode<T> {
 				content,
 				left_child,
 				right_child
-			} if content.borrow() == to_remove => {
-				// for leaves, return the right child
-				if level == 1 {
-					(*right_child, Some(content))
-				}
-				// if we don't have a left child, use the successor
-				else if left_child.level() == 0 {
-					let (right, successor) = right_child.remove_successor();
-					(
-						Self::Node {
-							level,
-							content: successor.unwrap(),
-							left_child,
-							right_child: Box::new(right)
-						},
-						Some(content)
-					)
-				}
-				// else we can use the predecessor
-				else {
-					let (left, predecessor) = left_child.remove_predecessor();
-					(
-						Self::Node {
-							level,
-							content: predecessor.unwrap(),
-							left_child: Box::new(left),
-							right_child
-						},
-						Some(content)
-					)
-				}
-			},
+			} if content.borrow() == to_remove => (Self::remove_node(level, left_child, right_child), Some(content)),
 			Self::Node {
 				level,
 				content,
@@ -96,6 +65,53 @@ impl<T: Eq + Ord> AANode<T> {
 			}
 		};
 		(node.remove_cleanup(), removed)
+	}
+
+	/// Removes this (first) node, and returns its value if it wasn't `Nil`.
+	pub fn remove_self(&mut self) -> Option<T> {
+		let root = mem::replace(self, Self::Nil);
+		let (root, removed) = root.remove_self_impl();
+		*self = root;
+		removed
+	}
+
+	fn remove_self_impl(self) -> (Self, Option<T>) {
+		match self {
+			Self::Nil => (self, None),
+			Self::Node {
+				level,
+				content,
+				left_child,
+				right_child
+			} => (Self::remove_node(level, left_child, right_child), Some(content))
+		}
+	}
+
+	fn remove_node(level: u8, left_child: Box<Self>, right_child: Box<Self>) -> Self {
+		// for leaves, return the right child
+		if level == 1 {
+			*right_child
+		}
+		// if we don't have a left child, use the successor
+		else if left_child.level() == 0 {
+			let (right, successor) = right_child.remove_successor();
+			Self::Node {
+				level,
+				content: successor.unwrap(),
+				left_child,
+				right_child: Box::new(right)
+			}
+		}
+		// else we can use the predecessor
+		else {
+			let (left, predecessor) = left_child.remove_predecessor();
+			Self::Node {
+				level,
+				content: predecessor.unwrap(),
+				left_child: Box::new(left),
+				right_child
+			}
+		}
 	}
 
 	/// Removes the successor (smallest node) of the parent of this node and return it.

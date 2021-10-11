@@ -21,6 +21,10 @@ impl<K, V> Entry<K, V> {
 	fn as_tuple(&self) -> (&K, &V) {
 		(&self.key, &self.value)
 	}
+
+	fn into_tuple(self) -> (K, V) {
+		(self.key, self.value)
+	}
 }
 
 impl<K: PartialEq, V> PartialEq for Entry<K, V> {
@@ -173,6 +177,10 @@ impl<K: Ord, V> AATreeMap<K, V> {
 			Some(sub) => sub,
 			None => TraverseStep::Left
 		})
+	}
+
+	pub fn pop_smallest(&mut self) -> Option<(K, V)> {
+		self.root.remove_self().map(Entry::into_tuple)
 	}
 
 	// TODO duplicated from set
