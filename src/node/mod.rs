@@ -46,6 +46,13 @@ impl<T> AANode<T> {
 		Self::Nil
 	}
 
+	pub const fn is_nil(&self) -> bool {
+		match self {
+			Self::Nil => true,
+			Self::Node { .. } => false
+		}
+	}
+
 	pub(super) fn level(&self) -> u8 {
 		match self {
 			Self::Nil => 0,

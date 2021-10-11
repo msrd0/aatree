@@ -164,16 +164,25 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	/// *map.get_mut(&1).unwrap() = "b";
 	/// assert_eq!(map.get(&1), Some(&"b"));
 	/// ```
-	pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
+	pub fn get_mut<Q>(&mut self, k: &Q) -> Option<&mut V>
 	where
 		K: Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse_mut(|content| match key.cmp(content.key.borrow()) {
-			Ordering::Equal => TraverseStep::Value(Some(&mut content.value)),
-			Ordering::Less => TraverseStep::Left,
-			Ordering::Greater => TraverseStep::Right
-		})
+		self.root.traverse_mut(
+			|content| match content.key.borrow().cmp(k) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(&mut content.value))
+			},
+			|content| {
+				if content.key.borrow().eq(k) {
+					Some(&mut content.value)
+				} else {
+					None
+				}
+			}
+		)
 	}
 
 	// TODO duplicated from set
@@ -236,8 +245,33 @@ impl<K: Ord, V> AATreeMap<K, V> {
 		})
 	}
 
+	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse_mut(
+			|content| match content.key.borrow().cmp(k) {
+				Ordering::Equal => TraverseStep::Value(Some((&content.key, &mut content.value))),
+				Ordering::Less => TraverseStep::Left,
+				Ordering::Greater => TraverseStep::Right
+			},
+			|content| {
+				if content.key.borrow() > k {
+					Some((&content.key, &mut content.value))
+				} else {
+					None
+				}
+			}
+		)
+	}
+
 	// TODO duplicated from set
-	pub fn largest_leq_than(&self, k: &K) -> Option<(&K, &V)> {
+	pub fn largest_leq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
 		self.root.traverse(|content, sub| {
 			let key = content.key.borrow();
 			match sub {
@@ -250,6 +284,27 @@ impl<K: Ord, V> AATreeMap<K, V> {
 				}
 			}
 		})
+	}
+
+	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse_mut(
+			|content| match content.key.borrow().cmp(k) {
+				Ordering::Equal => TraverseStep::Value(Some((&content.key, &mut content.value))),
+				Ordering::Less => TraverseStep::Left,
+				Ordering::Greater => TraverseStep::Right
+			},
+			|content| {
+				if content.key.borrow() < k {
+					Some((&content.key, &mut content.value))
+				} else {
+					None
+				}
+			}
+		)
 	}
 
 	pub fn remove<Q>(&mut self, k: &Q) -> Option<V>
