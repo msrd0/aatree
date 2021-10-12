@@ -6,12 +6,21 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-lib:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@1.46.0
-      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features --lib
+        env:
+          RUST_BACKTRACE: 1
+  
+  test-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --workspace --all-features --doc
         env:
           RUST_BACKTRACE: 1
   
