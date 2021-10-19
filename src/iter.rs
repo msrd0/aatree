@@ -1,7 +1,7 @@
 //! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
-use super::node::AANode;
-use alloc::{boxed::Box, vec::Vec};
+use super::node::{AANode, Node};
+use alloc::vec::Vec;
 use core::iter::FusedIterator;
 
 /// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
@@ -25,10 +25,10 @@ impl<'a, T> Iterator for AAIter<'a, T> {
 	fn next(&mut self) -> Option<&'a T> {
 		loop {
 			let (visited_left, last) = self.stack.pop()?;
-			if let AANode::Node { left_child, .. } = last {
+			if let Some(Node { left_child, .. }) = last.as_ref() {
 				self.stack.push((true, last));
-				if !visited_left && matches!(**left_child, AANode::Node { .. }) {
-					self.stack.push((false, &**left_child));
+				if !visited_left && !left_child.is_nil() {
+					self.stack.push((false, &left_child));
 				} else {
 					break;
 				}
@@ -36,13 +36,13 @@ impl<'a, T> Iterator for AAIter<'a, T> {
 		}
 
 		let (_, last) = self.stack.pop()?;
-		match last {
-			AANode::Nil => unreachable!(),
-			AANode::Node {
+		match last.as_ref() {
+			None => unreachable!(),
+			Some(Node {
 				content, right_child, ..
-			} => {
-				if matches!(**right_child, AANode::Node { .. }) {
-					self.stack.push((false, &**right_child));
+			}) => {
+				if !right_child.is_nil() {
+					self.stack.push((false, right_child));
 				}
 				self.len -= 1;
 				Some(content)
@@ -80,21 +80,24 @@ impl<T> Iterator for AAIntoIter<T> {
 	fn next(&mut self) -> Option<T> {
 		loop {
 			let last = self.stack.pop()?;
-			if let AANode::Node {
+			if let Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} = last
+			}) = last.unbox()
 			{
-				self.stack.push(AANode::Node {
-					level,
-					content,
-					left_child: Box::new(AANode::Nil),
-					right_child
-				});
-				if matches!(*left_child, AANode::Node { .. }) {
-					self.stack.push(*left_child);
+				self.stack.push(
+					Node {
+						level,
+						content,
+						left_child: AANode::new(),
+						right_child
+					}
+					.into()
+				);
+				if !left_child.is_nil() {
+					self.stack.push(left_child);
 				} else {
 					break;
 				}
@@ -102,13 +105,13 @@ impl<T> Iterator for AAIntoIter<T> {
 		}
 
 		let last = self.stack.pop()?;
-		match last {
-			AANode::Nil => unreachable!(),
-			AANode::Node {
+		match last.unbox() {
+			None => unreachable!(),
+			Some(Node {
 				content, right_child, ..
-			} => {
-				if matches!(*right_child, AANode::Node { .. }) {
-					self.stack.push(*right_child);
+			}) => {
+				if !right_child.is_nil() {
+					self.stack.push(right_child);
 				}
 				self.len -= 1;
 				Some(content)

@@ -17,11 +17,11 @@ pub use traverse::*;
 pub struct AANode<T>(Option<Box<Node<T>>>);
 
 #[derive(Clone, Debug, PartialEq)]
-struct Node<T> {
-	level: u8,
-	content: T,
-	left_child: AANode<T>,
-	right_child: AANode<T>
+pub(super) struct Node<T> {
+	pub(super) level: u8,
+	pub(super) content: T,
+	pub(super) left_child: AANode<T>,
+	pub(super) right_child: AANode<T>
 }
 
 impl<T> Into<AANode<T>> for Node<T> {
@@ -49,11 +49,11 @@ impl<T> From<T> for AANode<T> {
 }
 
 impl<T> AANode<T> {
-	fn unbox(self) -> Option<Node<T>> {
+	pub(super) fn unbox(self) -> Option<Node<T>> {
 		self.0.map(|this| *this)
 	}
 
-	fn as_ref(&self) -> Option<&Node<T>> {
+	pub(super) fn as_ref(&self) -> Option<&Node<T>> {
 		self.0.as_ref().map(Box::as_ref)
 	}
 
