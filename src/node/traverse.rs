@@ -1,4 +1,4 @@
-use super::AANode;
+use super::{AANode, Node};
 
 /// This type specifies the requested step for [`traverse`](AANode::traverse).
 #[derive(Debug)]
@@ -45,14 +45,14 @@ impl<T> AANode<T> {
 	where
 		F: Fn(&'a T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
 	{
-		match self {
-			Self::Nil => TraverseStep::Value(None),
-			Self::Node {
+		match self.as_ref() {
+			None => TraverseStep::Value(None),
+			Some(Node {
 				content,
 				left_child,
 				right_child,
 				..
-			} => {
+			}) => {
 				let step = callback(content, None);
 				let res = match step {
 					TraverseStep::Left => left_child.traverse_impl(callback),
@@ -92,14 +92,14 @@ impl<T> AANode<T> {
 		F: Fn(&'a mut T) -> TraverseStep<R> + Copy,
 		L: Fn(&'a mut T) -> Option<R>
 	{
-		match self {
-			Self::Nil => TraverseStep::Value(None),
-			Self::Node {
+		match self.as_mut() {
+			None => TraverseStep::Value(None),
+			Some(Node {
 				content,
 				left_child,
 				right_child,
 				..
-			} => {
+			}) => {
 				if left_child.is_nil() && right_child.is_nil() {
 					TraverseStep::Value(leaf_callback(content))
 				} else {

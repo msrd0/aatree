@@ -1,6 +1,5 @@
-use super::AANode;
-use alloc::boxed::Box;
-use core::{borrow::Borrow, mem};
+use super::{AANode, Node};
+use core::borrow::Borrow;
 
 impl<T: Eq + Ord> AANode<T> {
 	/// Remove a value from this tree. If the value was found, it will be returned.
@@ -10,7 +9,7 @@ impl<T: Eq + Ord> AANode<T> {
 		R: Borrow<Q> + ?Sized,
 		Q: Ord + ?Sized
 	{
-		let root = mem::replace(self, Self::Nil);
+		let root = self.take();
 		let (root, removed) = root.remove_impl(value);
 		*self = root;
 		removed
@@ -23,45 +22,47 @@ impl<T: Eq + Ord> AANode<T> {
 		R: Borrow<Q> + ?Sized,
 		Q: Ord + ?Sized
 	{
-		let (node, removed) = match self {
-			Self::Nil => (self, None),
-			Self::Node {
+		let (node, removed) = match self.unbox() {
+			None => (Self::new(), None),
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} if content.borrow().borrow() == to_remove => (Self::remove_node(level, left_child, right_child), Some(content)),
-			Self::Node {
+			}) if content.borrow().borrow() == to_remove => (Self::remove_node(level, left_child, right_child), Some(content)),
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} if content.borrow().borrow() > to_remove => {
+			}) if content.borrow().borrow() > to_remove => {
 				let (left, value) = left_child.remove_impl(to_remove);
 				(
-					Self::Node {
+					Node {
 						level,
 						content,
-						left_child: Box::new(left),
+						left_child: left,
 						right_child
-					},
+					}
+					.into(),
 					value
 				)
 			},
-			Self::Node {
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} => {
+			}) => {
 				let (right, value) = right_child.remove_impl(to_remove);
 				(
-					Self::Node {
+					Node {
 						level,
 						content,
 						left_child,
-						right_child: Box::new(right)
-					},
+						right_child: right
+					}
+					.into(),
 					value
 				)
 			}
@@ -71,74 +72,77 @@ impl<T: Eq + Ord> AANode<T> {
 
 	/// Removes this (first) node, and returns its value if it wasn't `Nil`.
 	pub fn remove_self(&mut self) -> Option<T> {
-		let root = mem::replace(self, Self::Nil);
+		let root = self.take();
 		let (root, removed) = root.remove_self_impl();
 		*self = root;
 		removed
 	}
 
 	fn remove_self_impl(self) -> (Self, Option<T>) {
-		match self {
-			Self::Nil => (self, None),
-			Self::Node {
+		match self.unbox() {
+			None => (Self::new(), None),
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} => (Self::remove_node(level, left_child, right_child), Some(content))
+			}) => (Self::remove_node(level, left_child, right_child), Some(content))
 		}
 	}
 
-	fn remove_node(level: u8, left_child: Box<Self>, right_child: Box<Self>) -> Self {
+	fn remove_node(level: u8, left_child: Self, right_child: Self) -> Self {
 		// for leaves, return the right child
 		if level == 1 {
-			*right_child
+			right_child
 		}
 		// if we don't have a left child, use the successor
 		else if left_child.level() == 0 {
 			let (right, successor) = right_child.remove_successor();
-			Self::Node {
+			Node {
 				level,
 				content: successor.unwrap(),
 				left_child,
-				right_child: Box::new(right)
+				right_child: right
 			}
+			.into()
 		}
 		// else we can use the predecessor
 		else {
 			let (left, predecessor) = left_child.remove_predecessor();
-			Self::Node {
+			Node {
 				level,
 				content: predecessor.unwrap(),
-				left_child: Box::new(left),
+				left_child: left,
 				right_child
 			}
+			.into()
 		}
 	}
 
 	/// Removes the successor (smallest node) of the parent of this node and return it.
 	fn remove_successor(self) -> (Self, Option<T>) {
-		let (node, successor) = match self {
-			Self::Nil => (self, None),
-			Self::Node {
+		let (node, successor) = match self.unbox() {
+			None => (Self::new(), None),
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} => {
+			}) => {
 				let (left, successor) = left_child.remove_successor();
 				if let Some(successor) = successor {
 					(
-						Self::Node {
+						Node {
 							level,
 							content,
-							left_child: Box::new(left),
+							left_child: left,
 							right_child
-						},
+						}
+						.into(),
 						Some(successor)
 					)
 				} else {
-					(*right_child, Some(content))
+					(right_child, Some(content))
 				}
 			}
 		};
@@ -147,27 +151,28 @@ impl<T: Eq + Ord> AANode<T> {
 
 	/// Removes the predecessor (largest node) of the parent of this node and return it.
 	fn remove_predecessor(self) -> (Self, Option<T>) {
-		let (node, predecessor) = match self {
-			Self::Nil => (self, None),
-			Self::Node {
+		let (node, predecessor) = match self.unbox() {
+			None => (Self::new(), None),
+			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			} => {
+			}) => {
 				let (right, predecessor) = right_child.remove_predecessor();
 				if let Some(predecessor) = predecessor {
 					(
-						Self::Node {
+						Node {
 							level,
 							content,
 							left_child,
-							right_child: Box::new(right)
-						},
+							right_child: right
+						}
+						.into(),
 						Some(predecessor)
 					)
 				} else {
-					(*left_child, Some(content))
+					(left_child, Some(content))
 				}
 			}
 		};
@@ -177,14 +182,14 @@ impl<T: Eq + Ord> AANode<T> {
 	/// Run fixes necessary after removing/replacing `self` or one of the child nodes to retain
 	/// the AA tree properties.
 	fn remove_cleanup(self) -> Self {
-		match self {
-			Self::Nil => self,
-			Self::Node {
+		match self.unbox() {
+			None => Self::new(),
+			Some(Node {
 				mut level,
 				content,
 				left_child,
 				mut right_child
-			} => {
+			}) => {
 				// decrease the level if necessary
 				let expected = left_child.level().min(right_child.level()) + 1;
 				if expected < level {
@@ -193,35 +198,36 @@ impl<T: Eq + Ord> AANode<T> {
 						right_child.set_level(expected);
 					}
 				}
-				let mut node = Self::Node {
+				let mut node: AANode<_> = Node {
 					level,
 					content,
 					left_child,
 					right_child
-				};
+				}
+				.into();
 
 				// rebalance the tree by applying 3x skew and 2x split
 				node = node.skew();
-				match &mut node {
-					Self::Nil => unreachable!(),
-					Self::Node { right_child, .. } => {
-						let mut right = mem::replace(right_child.as_mut(), Self::Nil);
+				match node.as_mut() {
+					None => unreachable!(),
+					Some(node) => {
+						let mut right = node.right_child.take();
 						right = right.skew();
-						if let Self::Node { right_child, .. } = &mut right {
-							let mut right_grandchild = mem::replace(right_child.as_mut(), Self::Nil);
+						if let Some(right) = right.as_mut() {
+							let mut right_grandchild = right.right_child.take();
 							right_grandchild = right_grandchild.skew();
-							**right_child = right_grandchild;
+							right.right_child = right_grandchild;
 						}
-						**right_child = right;
+						node.right_child = right;
 					}
 				};
 				node = node.split();
-				match &mut node {
-					Self::Nil => unreachable!(),
-					Self::Node { right_child, .. } => {
-						let mut right = mem::replace(right_child.as_mut(), Self::Nil);
+				match node.as_mut() {
+					None => unreachable!(),
+					Some(node) => {
+						let mut right = node.right_child.take();
 						right = right.split();
-						**right_child = right;
+						node.right_child = right;
 					}
 				};
 				node
