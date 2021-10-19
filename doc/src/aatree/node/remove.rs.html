@@ -231,10 +231,15 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
 </pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::AANode</span>;
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">mem</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AANode</span>, <span class="ident">Node</span>};
+<span class="kw">use</span> <span class="ident">core::borrow::Borrow</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Remove a value from this tree. If the value was found, it will be returned.</span>
@@ -244,7 +249,7 @@
 		<span class="ident">R</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
 		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
 	{
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Nil</span>);
+		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take</span>();
 		<span class="kw">let</span> (<span class="ident">root</span>, <span class="ident">removed</span>) <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove_impl</span>(<span class="ident">value</span>);
 		<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">root</span>;
 		<span class="ident">removed</span>
@@ -257,45 +262,47 @@
 		<span class="ident">R</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
 		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
 	{
-		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">removed</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
-			<span class="self">Self</span><span class="ident">::Node</span> {
+		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">removed</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unbox</span>() {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::new</span>(), <span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="kw">if</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">borrow</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">to_remove</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::remove_node</span>(<span class="ident">level</span>, <span class="ident">left_child</span>, <span class="ident">right_child</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>)),
-			<span class="self">Self</span><span class="ident">::Node</span> {
+			}) <span class="kw">if</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">borrow</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">to_remove</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::remove_node</span>(<span class="ident">level</span>, <span class="ident">left_child</span>, <span class="ident">right_child</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>)),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="kw">if</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">borrow</span>() <span class="op">&gt;</span> <span class="ident">to_remove</span> <span class="op">=</span><span class="op">&gt;</span> {
+			}) <span class="kw">if</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">borrow</span>() <span class="op">&gt;</span> <span class="ident">to_remove</span> <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">left_child</span>.<span class="ident">remove_impl</span>(<span class="ident">to_remove</span>);
 				(
-					<span class="self">Self</span><span class="ident">::Node</span> {
+					<span class="ident">Node</span> {
 						<span class="ident">level</span>,
 						<span class="ident">content</span>,
-						<span class="ident">left_child</span>: <span class="ident">Box::new</span>(<span class="ident">left</span>),
+						<span class="ident">left_child</span>: <span class="ident">left</span>,
 						<span class="ident">right_child</span>
-					},
+					}
+					.<span class="ident">into</span>(),
 					<span class="ident">value</span>
 				)
 			},
-			<span class="self">Self</span><span class="ident">::Node</span> {
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="op">=</span><span class="op">&gt;</span> {
+			}) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> (<span class="ident">right</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">right_child</span>.<span class="ident">remove_impl</span>(<span class="ident">to_remove</span>);
 				(
-					<span class="self">Self</span><span class="ident">::Node</span> {
+					<span class="ident">Node</span> {
 						<span class="ident">level</span>,
 						<span class="ident">content</span>,
 						<span class="ident">left_child</span>,
-						<span class="ident">right_child</span>: <span class="ident">Box::new</span>(<span class="ident">right</span>)
-					},
+						<span class="ident">right_child</span>: <span class="ident">right</span>
+					}
+					.<span class="ident">into</span>(),
 					<span class="ident">value</span>
 				)
 			}
@@ -305,74 +312,77 @@
 
 	<span class="doccomment">/// Removes this (first) node, and returns its value if it wasn&#39;t `Nil`.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_self</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Nil</span>);
+		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take</span>();
 		<span class="kw">let</span> (<span class="ident">root</span>, <span class="ident">removed</span>) <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove_self_impl</span>();
 		<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">root</span>;
 		<span class="ident">removed</span>
 	}
 
 	<span class="kw">fn</span> <span class="ident">remove_self_impl</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
-			<span class="self">Self</span><span class="ident">::Node</span> {
+		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">unbox</span>() {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::new</span>(), <span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::remove_node</span>(<span class="ident">level</span>, <span class="ident">left_child</span>, <span class="ident">right_child</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>))
+			}) <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::remove_node</span>(<span class="ident">level</span>, <span class="ident">left_child</span>, <span class="ident">right_child</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>))
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">remove_node</span>(<span class="ident">level</span>: <span class="ident">u8</span>, <span class="ident">left_child</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">right_child</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">remove_node</span>(<span class="ident">level</span>: <span class="ident">u8</span>, <span class="ident">left_child</span>: <span class="self">Self</span>, <span class="ident">right_child</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="comment">// for leaves, return the right child</span>
 		<span class="kw">if</span> <span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
-			<span class="kw-2">*</span><span class="ident">right_child</span>
+			<span class="ident">right_child</span>
 		}
 		<span class="comment">// if we don&#39;t have a left child, use the successor</span>
 		<span class="kw">else</span> <span class="kw">if</span> <span class="ident">left_child</span>.<span class="ident">level</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
 			<span class="kw">let</span> (<span class="ident">right</span>, <span class="ident">successor</span>) <span class="op">=</span> <span class="ident">right_child</span>.<span class="ident">remove_successor</span>();
-			<span class="self">Self</span><span class="ident">::Node</span> {
+			<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>: <span class="ident">successor</span>.<span class="ident">unwrap</span>(),
 				<span class="ident">left_child</span>,
-				<span class="ident">right_child</span>: <span class="ident">Box::new</span>(<span class="ident">right</span>)
+				<span class="ident">right_child</span>: <span class="ident">right</span>
 			}
+			.<span class="ident">into</span>()
 		}
 		<span class="comment">// else we can use the predecessor</span>
 		<span class="kw">else</span> {
 			<span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">predecessor</span>) <span class="op">=</span> <span class="ident">left_child</span>.<span class="ident">remove_predecessor</span>();
-			<span class="self">Self</span><span class="ident">::Node</span> {
+			<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>: <span class="ident">predecessor</span>.<span class="ident">unwrap</span>(),
-				<span class="ident">left_child</span>: <span class="ident">Box::new</span>(<span class="ident">left</span>),
+				<span class="ident">left_child</span>: <span class="ident">left</span>,
 				<span class="ident">right_child</span>
 			}
+			.<span class="ident">into</span>()
 		}
 	}
 
 	<span class="doccomment">/// Removes the successor (smallest node) of the parent of this node and return it.</span>
 	<span class="kw">fn</span> <span class="ident">remove_successor</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">successor</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
-			<span class="self">Self</span><span class="ident">::Node</span> {
+		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">successor</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unbox</span>() {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::new</span>(), <span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="op">=</span><span class="op">&gt;</span> {
+			}) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">successor</span>) <span class="op">=</span> <span class="ident">left_child</span>.<span class="ident">remove_successor</span>();
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">successor</span>) <span class="op">=</span> <span class="ident">successor</span> {
 					(
-						<span class="self">Self</span><span class="ident">::Node</span> {
+						<span class="ident">Node</span> {
 							<span class="ident">level</span>,
 							<span class="ident">content</span>,
-							<span class="ident">left_child</span>: <span class="ident">Box::new</span>(<span class="ident">left</span>),
+							<span class="ident">left_child</span>: <span class="ident">left</span>,
 							<span class="ident">right_child</span>
-						},
+						}
+						.<span class="ident">into</span>(),
 						<span class="prelude-val">Some</span>(<span class="ident">successor</span>)
 					)
 				} <span class="kw">else</span> {
-					(<span class="kw-2">*</span><span class="ident">right_child</span>, <span class="prelude-val">Some</span>(<span class="ident">content</span>))
+					(<span class="ident">right_child</span>, <span class="prelude-val">Some</span>(<span class="ident">content</span>))
 				}
 			}
 		};
@@ -381,27 +391,28 @@
 
 	<span class="doccomment">/// Removes the predecessor (largest node) of the parent of this node and return it.</span>
 	<span class="kw">fn</span> <span class="ident">remove_predecessor</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">predecessor</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
-			<span class="self">Self</span><span class="ident">::Node</span> {
+		<span class="kw">let</span> (<span class="ident">node</span>, <span class="ident">predecessor</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unbox</span>() {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="self">Self</span><span class="ident">::new</span>(), <span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="ident">right_child</span>
-			} <span class="op">=</span><span class="op">&gt;</span> {
+			}) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> (<span class="ident">right</span>, <span class="ident">predecessor</span>) <span class="op">=</span> <span class="ident">right_child</span>.<span class="ident">remove_predecessor</span>();
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">predecessor</span>) <span class="op">=</span> <span class="ident">predecessor</span> {
 					(
-						<span class="self">Self</span><span class="ident">::Node</span> {
+						<span class="ident">Node</span> {
 							<span class="ident">level</span>,
 							<span class="ident">content</span>,
 							<span class="ident">left_child</span>,
-							<span class="ident">right_child</span>: <span class="ident">Box::new</span>(<span class="ident">right</span>)
-						},
+							<span class="ident">right_child</span>: <span class="ident">right</span>
+						}
+						.<span class="ident">into</span>(),
 						<span class="prelude-val">Some</span>(<span class="ident">predecessor</span>)
 					)
 				} <span class="kw">else</span> {
-					(<span class="kw-2">*</span><span class="ident">left_child</span>, <span class="prelude-val">Some</span>(<span class="ident">content</span>))
+					(<span class="ident">left_child</span>, <span class="prelude-val">Some</span>(<span class="ident">content</span>))
 				}
 			}
 		};
@@ -411,14 +422,14 @@
 	<span class="doccomment">/// Run fixes necessary after removing/replacing `self` or one of the child nodes to retain</span>
 	<span class="doccomment">/// the AA tree properties.</span>
 	<span class="kw">fn</span> <span class="ident">remove_cleanup</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>,
-			<span class="self">Self</span><span class="ident">::Node</span> {
+		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">unbox</span>() {
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::new</span>(),
+			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
 				<span class="kw-2">mut</span> <span class="ident">level</span>,
 				<span class="ident">content</span>,
 				<span class="ident">left_child</span>,
 				<span class="kw-2">mut</span> <span class="ident">right_child</span>
-			} <span class="op">=</span><span class="op">&gt;</span> {
+			}) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// decrease the level if necessary</span>
 				<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">left_child</span>.<span class="ident">level</span>().<span class="ident">min</span>(<span class="ident">right_child</span>.<span class="ident">level</span>()) <span class="op">+</span> <span class="number">1</span>;
 				<span class="kw">if</span> <span class="ident">expected</span> <span class="op">&lt;</span> <span class="ident">level</span> {
@@ -427,35 +438,36 @@
 						<span class="ident">right_child</span>.<span class="ident">set_level</span>(<span class="ident">expected</span>);
 					}
 				}
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::Node</span> {
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Node</span> {
 					<span class="ident">level</span>,
 					<span class="ident">content</span>,
 					<span class="ident">left_child</span>,
 					<span class="ident">right_child</span>
-				};
+				}
+				.<span class="ident">into</span>();
 
 				<span class="comment">// rebalance the tree by applying 3x skew and 2x split</span>
 				<span class="ident">node</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">skew</span>();
-				<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span> {
-					<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
-					<span class="self">Self</span><span class="ident">::Node</span> { <span class="ident">right_child</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">right_child</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>);
+				<span class="kw">match</span> <span class="ident">node</span>.<span class="ident">as_mut</span>() {
+					<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+					<span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">right_child</span>.<span class="ident">take</span>();
 						<span class="ident">right</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">skew</span>();
-						<span class="kw">if</span> <span class="kw">let</span> <span class="self">Self</span><span class="ident">::Node</span> { <span class="ident">right_child</span>, .. } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">right</span> {
-							<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right_grandchild</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">right_child</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>);
+						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">right</span>) <span class="op">=</span> <span class="ident">right</span>.<span class="ident">as_mut</span>() {
+							<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right_grandchild</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">right_child</span>.<span class="ident">take</span>();
 							<span class="ident">right_grandchild</span> <span class="op">=</span> <span class="ident">right_grandchild</span>.<span class="ident">skew</span>();
-							<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right_grandchild</span>;
+							<span class="ident">right</span>.<span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right_grandchild</span>;
 						}
-						<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right</span>;
+						<span class="ident">node</span>.<span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right</span>;
 					}
 				};
 				<span class="ident">node</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">split</span>();
-				<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span> {
-					<span class="self">Self</span><span class="ident">::Nil</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
-					<span class="self">Self</span><span class="ident">::Node</span> { <span class="ident">right_child</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">right_child</span>.<span class="ident">as_mut</span>(), <span class="self">Self</span><span class="ident">::Nil</span>);
+				<span class="kw">match</span> <span class="ident">node</span>.<span class="ident">as_mut</span>() {
+					<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+					<span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> {
+						<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">right_child</span>.<span class="ident">take</span>();
 						<span class="ident">right</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">split</span>();
-						<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right</span>;
+						<span class="ident">node</span>.<span class="ident">right_child</span> <span class="op">=</span> <span class="ident">right</span>;
 					}
 				};
 				<span class="ident">node</span>

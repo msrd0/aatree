@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["AANode",""],["TraverseStep","This type specifies the requested step for `traverse`."]]});
+initSidebarItems({"enum":[["TraverseStep","This type specifies the requested step for `traverse`."]],"struct":[["AANode",""]]});
