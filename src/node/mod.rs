@@ -10,8 +10,8 @@ pub use insert::*;
 mod remove;
 pub use remove::*;
 
-//mod traverse;
-//pub use traverse::*;
+mod traverse;
+pub use traverse::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct AANode<T>(Option<Box<Node<T>>>);
