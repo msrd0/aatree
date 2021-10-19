@@ -4,24 +4,24 @@
 use alloc::boxed::Box;
 use core::mem;
 
-mod insert;
-pub use insert::*;
+//mod insert;
+//pub use insert::*;
 
-mod remove;
-pub use remove::*;
+//mod remove;
+//pub use remove::*;
 
-mod traverse;
-pub use traverse::*;
+//mod traverse;
+//pub use traverse::*;
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum AANode<T> {
-	Nil,
-	Node {
-		level: u8,
-		content: T,
-		left_child: Box<AANode<T>>,
-		right_child: Box<AANode<T>>
-	}
+pub struct AANode<T>(Option<Box<Node<T>>>);
+
+#[derive(Clone, Debug, PartialEq)]
+struct Node<T> {
+	level: u8,
+	content: T,
+	left_child: AANode<T>,
+	right_child: AANode<T>
 }
 
 impl<T> Default for AANode<T> {
@@ -32,39 +32,48 @@ impl<T> Default for AANode<T> {
 
 impl<T> From<T> for AANode<T> {
 	fn from(content: T) -> Self {
-		Self::Node {
+		Self(Some(Box::new(Node {
 			level: 1,
 			content,
-			left_child: Box::new(Self::Nil),
-			right_child: Box::new(Self::Nil)
-		}
+			left_child: Self(None),
+			right_child: Self(None)
+		})))
 	}
 }
 
 impl<T> AANode<T> {
+	fn as_ref(&self) -> Option<&Node<T>> {
+		self.0.as_ref().map(Box::as_ref)
+	}
+
+	fn as_mut(&mut self) -> Option<&mut Node<T>> {
+		self.0.as_mut().map(Box::as_mut)
+	}
+
+	fn take(&mut self) -> Self {
+		Self(self.0.take())
+	}
+
 	pub const fn new() -> Self {
-		Self::Nil
+		Self(None)
 	}
 
 	pub const fn is_nil(&self) -> bool {
-		match self {
-			Self::Nil => true,
-			Self::Node { .. } => false
-		}
+		self.0.is_none()
 	}
 
 	pub(super) fn level(&self) -> u8 {
-		match self {
-			Self::Nil => 0,
-			Self::Node { level, .. } => *level
+		match self.as_ref() {
+			None => 0,
+			Some(Node { level, .. }) => *level
 		}
 	}
 
 	/// Update the level of this node. **Panic** if the node is [`Nil`](Self::Nil).
 	fn set_level(&mut self, level: u8) {
-		match self {
-			Self::Nil => panic!("Cannot change level of Nil"),
-			Self::Node { level: l, .. } => mem::replace(l, level)
+		match self.as_mut() {
+			None => panic!("Cannot change level of Nil"),
+			Some(Node { level: l, .. }) => mem::replace(l, level)
 		};
 	}
 
@@ -74,31 +83,26 @@ impl<T> AANode<T> {
 	/// A   B      R       A      B   R
 	/// ```
 	fn skew(mut self) -> Self {
-		match &mut self {
-			Self::Nil => self,
-			Self::Node {
+		match self.as_mut() {
+			None => self,
+			Some(Node {
 				level, left_child: l, ..
-			} => {
+			}) => {
 				// if level = l.level, remove the B node from L
 				let b_node = match l.as_mut() {
-					Self::Node {
+					Some(Node {
 						level: l_level,
 						right_child: b,
 						..
-					} if level == l_level => mem::replace(b.as_mut(), Self::Nil),
+					}) if level == l_level => b.take(),
 					_ => return self
 				};
 
 				// add the B node as our left child, removing L
-				let mut l_node = mem::replace(l.as_mut(), b_node);
+				let mut l_node = mem::replace(l, b_node);
 
 				// add our node T as the right child of L
-				match &mut l_node {
-					Self::Nil => unreachable!(),
-					Self::Node { right_child: t, .. } => {
-						**t = self;
-					}
-				};
+				l_node.as_mut().unwrap_or_else(|| unreachable!()).right_child = self;
 
 				// L is our new node
 				l_node
@@ -114,36 +118,28 @@ impl<T> AANode<T> {
 	///                      A   B
 	/// ```
 	fn split(mut self) -> Self {
-		match &mut self {
-			Self::Nil => self,
-			Self::Node {
+		match self.as_mut() {
+			None => self,
+			Some(Node {
 				level, right_child: r, ..
-			} => {
+			}) => {
 				// remove the B node if R and X are not Nil
 				let b_node = match r.as_mut() {
-					Self::Node {
+					Some(Node {
 						left_child: b,
 						right_child: x,
 						..
-					} if &x.level() == level => mem::replace(b.as_mut(), Self::Nil),
+					}) if &x.level() == level => b.take(),
 					_ => return self
 				};
 
 				// attach the B node to our node, removing R
-				let mut r_node = mem::replace(r.as_mut(), b_node);
+				let mut r_node = mem::replace(r, b_node);
 
 				// attach our node to R and increment its level
-				match &mut r_node {
-					Self::Nil => unreachable!(),
-					Self::Node {
-						level: r_level,
-						left_child: t,
-						..
-					} => {
-						*r_level += 1;
-						**t = self;
-					}
-				}
+				let r_node_mut = r_node.as_mut().unwrap_or_else(|| unreachable!());
+				r_node_mut.level += 1;
+				r_node_mut.left_child = self;
 
 				// R is our new node
 				r_node
@@ -158,10 +154,10 @@ mod test {
 
 	macro_rules! tree {
 		() => {
-			AANode::Nil
+			AANode::new()
 		};
 		(Nil) => {
-			AANode::Nil
+			AANode::new()
 		};
 		($content:expr) => {
 			AANode::from($content)
@@ -170,12 +166,12 @@ mod test {
 			{
 				let _left = tree!(@internal $left);
 				let _right = tree!(@internal $right);
-				AANode::Node {
+				AANode(Some(Box::new(Node {
 					level: $level,
 					content: $content,
-					left_child: Box::new(_left),
-					right_child: Box::new(_right)
-				}
+					left_child: _left,
+					right_child: _right
+				})))
 			}
 		};
 		(@internal ($content:expr => [$level:expr, $left:tt, $right:tt])) => {
@@ -261,7 +257,7 @@ mod test {
 		let expected = tree!('R' => [3, ('T' => [2, 'A', 'B']), ('X' => [2, 'Y', 'Z'])]);
 		assert_eq!(splitted, expected);
 	}
-
+	/*
 	// ### TEST INSERT ###
 
 	#[test]
@@ -327,5 +323,5 @@ mod test {
 			tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
 		assert_eq!(removed, Some(5));
 		assert_eq!(root, expected);
-	}
+	}*/
 }
