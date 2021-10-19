@@ -7,8 +7,8 @@ use core::mem;
 mod insert;
 pub use insert::*;
 
-//mod remove;
-//pub use remove::*;
+mod remove;
+pub use remove::*;
 
 //mod traverse;
 //pub use traverse::*;
@@ -24,6 +24,12 @@ struct Node<T> {
 	right_child: AANode<T>
 }
 
+impl<T> Into<AANode<T>> for Node<T> {
+	fn into(self) -> AANode<T> {
+		AANode(Some(Box::new(self)))
+	}
+}
+
 impl<T> Default for AANode<T> {
 	fn default() -> Self {
 		Self::new()
@@ -32,16 +38,21 @@ impl<T> Default for AANode<T> {
 
 impl<T> From<T> for AANode<T> {
 	fn from(content: T) -> Self {
-		Self(Some(Box::new(Node {
+		Node {
 			level: 1,
 			content,
 			left_child: Self(None),
 			right_child: Self(None)
-		})))
+		}
+		.into()
 	}
 }
 
 impl<T> AANode<T> {
+	fn unbox(self) -> Option<Node<T>> {
+		self.0.map(|this| *this)
+	}
+
 	fn as_ref(&self) -> Option<&Node<T>> {
 		self.0.as_ref().map(Box::as_ref)
 	}
@@ -289,7 +300,7 @@ mod test {
 		let expected = tree!('A');
 		assert_eq!(root, expected);
 	}
-	/*
+
 	// ### TEST REMOVE ###
 
 	#[test]
@@ -323,5 +334,5 @@ mod test {
 			tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
 		assert_eq!(removed, Some(5));
 		assert_eq!(root, expected);
-	}*/
+	}
 }
