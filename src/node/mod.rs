@@ -4,8 +4,8 @@
 use alloc::boxed::Box;
 use core::mem;
 
-//mod insert;
-//pub use insert::*;
+mod insert;
+pub use insert::*;
 
 //mod remove;
 //pub use remove::*;
@@ -257,7 +257,7 @@ mod test {
 		let expected = tree!('R' => [3, ('T' => [2, 'A', 'B']), ('X' => [2, 'Y', 'Z'])]);
 		assert_eq!(splitted, expected);
 	}
-	/*
+
 	// ### TEST INSERT ###
 
 	#[test]
@@ -289,7 +289,7 @@ mod test {
 		let expected = tree!('A');
 		assert_eq!(root, expected);
 	}
-
+	/*
 	// ### TEST REMOVE ###
 
 	#[test]

@@ -1,5 +1,4 @@
-use super::AANode;
-use core::mem;
+use super::{AANode, Node};
 
 impl<T: Ord> AANode<T> {
 	/// Insert a new node with `content` into the tree. If a node with this value already exist,
@@ -7,7 +6,7 @@ impl<T: Ord> AANode<T> {
 	pub fn insert(&mut self, content: T) -> bool {
 		let inserted = self.bst_insert(content);
 		if inserted {
-			let mut node = mem::replace(self, Self::Nil);
+			let mut node = self.take();
 			node = node.skew().split();
 			*self = node;
 		}
@@ -16,15 +15,15 @@ impl<T: Ord> AANode<T> {
 
 	/// Simple unbalanced BST insert.
 	fn bst_insert(&mut self, new: T) -> bool {
-		match self {
-			Self::Nil => {
+		match self.as_mut() {
+			None => {
 				*self = new.into();
 				true
 			},
-			Self::Node { content, left_child, .. } if &new < content => left_child.insert(new),
-			Self::Node {
+			Some(Node { content, left_child, .. }) if &new < content => left_child.insert(new),
+			Some(Node {
 				content, right_child, ..
-			} if &new > content => right_child.insert(new),
+			}) if &new > content => right_child.insert(new),
 			_ => false
 		}
 	}
