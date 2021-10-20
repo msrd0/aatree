@@ -2,7 +2,8 @@
 
 use core::borrow::Borrow;
 
-/// An entry in an [`AATreeMap`]. This type is used with iterators returned by [`AATreeMap`].
+/// An entry in an [`AATreeMap`](crate::AATreeMap). This type is used with iterators returned
+/// by [`AATreeMap`](crate::AATreeMap).
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive] // prevent initialization
 pub struct Entry<K, V> {
