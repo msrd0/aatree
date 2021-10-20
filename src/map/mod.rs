@@ -105,14 +105,17 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	/// map.insert(1, "a");
 	/// assert_eq!(map.get(&1), Some(&"a"));
 	/// map.insert(1, "b");
-	/// // TODO assert_eq!(map.get(&1), Some(&"b"));
+	/// assert_eq!(map.get(&1), Some(&"b"));
 	/// ```
-	pub fn insert(&mut self, key: K, value: V) -> bool {
-		let inserted = self.root.insert(Entry { key, value });
-		if inserted {
-			self.len += 1;
+	pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+		let inserted = self.root.insert_or_replace(Entry { key, value });
+		match inserted {
+			None => {
+				self.len += 1;
+				None
+			},
+			Some(entry) => Some(entry.value)
 		}
-		inserted
 	}
 
 	/// Check if a key is contained within this map.
