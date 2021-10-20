@@ -17,7 +17,7 @@ pub mod iter;
 pub mod node;
 
 mod map;
-pub use map::*;
+pub use map::{entry::Entry, AATreeMap};
 
 mod set;
 pub use set::*;
