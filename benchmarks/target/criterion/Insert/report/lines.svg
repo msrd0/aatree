@@ -232,14 +232,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(178,  34,  34)'  d='M1128.36,63.01 L1170.92,63.01 M64.14,619.48 L1103.19,125.37  '/></g>
+	<path stroke='rgb(178,  34,  34)'  d='M1128.36,63.01 L1170.92,63.01 M64.14,620.53 L1103.19,128.47  '/></g>
 	</g>
 	<g id="gnuplot_plot_2" ><title>gnuplot_plot_2</title>
 <g fill="none" color="white" stroke="rgb(178,  34,  34)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(64.14,619.48) scale(3.38)' color='rgb(178,  34,  34)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,125.37) scale(3.38)' color='rgb(178,  34,  34)'/>
+	<use xlink:href='#gpPt6' transform='translate(64.14,620.53) scale(3.38)' color='rgb(178,  34,  34)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,128.47) scale(3.38)' color='rgb(178,  34,  34)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_3" ><title>AATree_desc</title>
@@ -251,14 +251,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb( 46, 139,  87)'  d='M1128.36,81.01 L1170.92,81.01 M64.14,629.51 L1103.19,262.04  '/></g>
+	<path stroke='rgb( 46, 139,  87)'  d='M1128.36,81.01 L1170.92,81.01 M64.14,629.99 L1103.19,268.01  '/></g>
 	</g>
 	<g id="gnuplot_plot_4" ><title>gnuplot_plot_4</title>
 <g fill="none" color="white" stroke="rgb( 46, 139,  87)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(64.14,629.51) scale(3.38)' color='rgb( 46, 139,  87)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,262.04) scale(3.38)' color='rgb( 46, 139,  87)'/>
+	<use xlink:href='#gpPt6' transform='translate(64.14,629.99) scale(3.38)' color='rgb( 46, 139,  87)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,268.01) scale(3.38)' color='rgb( 46, 139,  87)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_5" ><title>BTree_asc</title>
@@ -270,14 +270,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(  0, 139, 139)'  d='M1128.36,99.01 L1170.92,99.01 M64.14,642.49 L1103.19,427.16  '/></g>
+	<path stroke='rgb(  0, 139, 139)'  d='M1128.36,99.01 L1170.92,99.01 M64.14,641.87 L1103.19,421.62  '/></g>
 	</g>
 	<g id="gnuplot_plot_6" ><title>gnuplot_plot_6</title>
 <g fill="none" color="white" stroke="rgb(  0, 139, 139)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(64.14,642.49) scale(3.38)' color='rgb(  0, 139, 139)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,427.16) scale(3.38)' color='rgb(  0, 139, 139)'/>
+	<use xlink:href='#gpPt6' transform='translate(64.14,641.87) scale(3.38)' color='rgb(  0, 139, 139)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,421.62) scale(3.38)' color='rgb(  0, 139, 139)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_7" ><title>BTree_desc</title>
@@ -289,14 +289,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(255, 215,   0)'  d='M1128.36,117.01 L1170.92,117.01 M64.14,653.77 L1103.19,564.70  '/></g>
+	<path stroke='rgb(255, 215,   0)'  d='M1128.36,117.01 L1170.92,117.01 M64.14,653.01 L1103.19,560.84  '/></g>
 	</g>
 	<g id="gnuplot_plot_8" ><title>gnuplot_plot_8</title>
 <g fill="none" color="white" stroke="rgb(255, 215,   0)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(64.14,653.77) scale(3.38)' color='rgb(255, 215,   0)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,564.70) scale(3.38)' color='rgb(255, 215,   0)'/>
+	<use xlink:href='#gpPt6' transform='translate(64.14,653.01) scale(3.38)' color='rgb(255, 215,   0)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,560.84) scale(3.38)' color='rgb(255, 215,   0)'/>
 </g>
 	</g>
 <g fill="none" color="white" stroke="rgb(255, 215,   0)" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">

@@ -21,3 +21,7 @@ harness = false
 [[bench]]
 name = "insert"
 harness = false
+
+[[bench]]
+name = "remove"
+harness = false
