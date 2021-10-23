@@ -22,14 +22,19 @@ impl<T: Eq + Ord> AANode<T> {
 		R: Borrow<Q> + ?Sized,
 		Q: Ord + ?Sized
 	{
-		let (node, removed) = match self.unbox() {
+		let (mut node, removed) = match self.unbox() {
 			None => (Self::new(), None),
+
 			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			}) if content.borrow().borrow() == to_remove => (Self::remove_node(level, left_child, right_child), Some(content)),
+			}) if content.borrow().borrow() == to_remove => {
+				let node = Self::remove_node(level, left_child, right_child);
+				(node, Some(content))
+			},
+
 			Some(Node {
 				level,
 				content,
@@ -37,17 +42,15 @@ impl<T: Eq + Ord> AANode<T> {
 				right_child
 			}) if content.borrow().borrow() > to_remove => {
 				let (left, value) = left_child.remove_impl(to_remove);
-				(
-					Node {
-						level,
-						content,
-						left_child: left,
-						right_child
-					}
-					.into(),
-					value
-				)
+				let node = Node {
+					level,
+					content,
+					left_child: left,
+					right_child
+				};
+				(node.into(), value)
 			},
+
 			Some(Node {
 				level,
 				content,
@@ -55,19 +58,20 @@ impl<T: Eq + Ord> AANode<T> {
 				right_child
 			}) => {
 				let (right, value) = right_child.remove_impl(to_remove);
-				(
-					Node {
-						level,
-						content,
-						left_child,
-						right_child: right
-					}
-					.into(),
-					value
-				)
+				let node = Node {
+					level,
+					content,
+					left_child,
+					right_child: right
+				};
+				(node.into(), value)
 			}
 		};
-		(node.remove_cleanup(), removed)
+
+		if removed.is_some() {
+			node = node.remove_cleanup();
+		}
+		(node, removed)
 	}
 
 	/// Removes this (first) node, and returns its value if it wasn't `Nil`.
