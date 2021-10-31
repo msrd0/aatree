@@ -25,9 +25,9 @@ The standard library comes with a good set of data structures. See [`std::collec
 ## Runtime Comparison
 
 <div>
-	<img alt="Insert Operation Comparison" src="benchmarks/target/criterion/Insert/report/lines.svg" width="33%" />
-	<img alt="Contains Operation Comparison" src="benchmarks/target/criterion/Contains/report/lines.svg" width="33%" />
-	<img alt="Remove Operation Comparison" src="benchmarks/target/criterion/Remove/report/lines.svg" width="33%" />
+	<img alt="Insert Operation Comparison" src="benchmarks/target/criterion/Insert/report/lines.svg" width="32%" />
+	<img alt="Contains Operation Comparison" src="benchmarks/target/criterion/Contains/report/lines.svg" width="32%" />
+	<img alt="Remove Operation Comparison" src="benchmarks/target/criterion/Remove/report/lines.svg" width="32%" />
 </div>
 
 ## Versioning
