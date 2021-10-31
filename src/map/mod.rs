@@ -78,21 +78,63 @@ impl<K, V> AATreeMap<K, V> {
 	/// # Example
 	///
 	/// ```rust
-	/// # type AATreeMap = aatree::AATreeMap<i64, ()>;
-	/// let map = AATreeMap::new();
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
 	/// assert!(map.is_empty());
+	/// map.insert(1, "a");
+	/// assert!(!map.is_empty());
 	/// ```
 	pub fn is_empty(&self) -> bool {
 		self.len == 0
+	}
+
+	/// Clears the map, removing all elements.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// map.clear();
+	/// assert!(map.is_empty());
+	/// ```
+	pub fn clear(&mut self) {
+		self.root = AANode::new();
+		self.len = 0;
 	}
 
 	/// Creates an iterator over this map that visits all entries with the keys in ascending order.
 	pub fn iter(&self) -> AAIter<'_, Entry<K, V>, (&K, &V)> {
 		self.into_iter()
 	}
-}
 
-impl<K: Ord, V> AATreeMap<K, V> {
+	/// Creates an iterator visiting all the keys, in sorted order.
+	pub fn keys(&self) -> impl Iterator<Item = &K> {
+		// TODO is there a better way to implement this?
+		self.iter().map(|(k, _)| k)
+	}
+
+	/// Creates an iterator visiting all the values, in sorted order.
+	pub fn values(&self) -> impl Iterator<Item = &V> {
+		// TODO is there a better way to implement this?
+		self.iter().map(|(_, v)| v)
+	}
+
+	/// Creates a consuming iterator visiting all the keys, in sorted order. The map
+	/// cannot be used after calling this.
+	pub fn into_keys(self) -> impl Iterator<Item = K> {
+		// TODO is there a better way to implement this?
+		self.into_iter().map(|(k, _)| k)
+	}
+
+	/// Creates a consuming iterator visiting all the values, in order by key. The map
+	/// cannot be used after calling this.
+	pub fn into_values(self) -> impl Iterator<Item = V> {
+		// TODO is there a better way to implement this?
+		self.into_iter().map(|(_, v)| v)
+	}
+
 	/// Insert a new element into the map, or overwrite an existing element
 	/// with the same key. If a value was overwritten, the old value will be
 	/// returned.
@@ -107,7 +149,10 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	/// map.insert(1, "b");
 	/// assert_eq!(map.get(&1), Some(&"b"));
 	/// ```
-	pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+	pub fn insert(&mut self, key: K, value: V) -> Option<V>
+	where
+		K: Ord
+	{
 		let inserted = self.root.insert_or_replace(Entry { key, value });
 		match inserted {
 			None => {
