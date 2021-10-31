@@ -1,11 +1,11 @@
 //! This file defines the [`Entry`] type that is used by [`AATreeMap`](crate::AATreeMap).
 
+use crate::iter::IterContent;
 use core::borrow::Borrow;
 
 /// An entry in an [`AATreeMap`](crate::AATreeMap). This type is used with iterators returned
 /// by [`AATreeMap`](crate::AATreeMap).
 #[derive(Clone, Copy, Debug)]
-#[non_exhaustive] // prevent initialization
 pub struct Entry<K, V> {
 	pub key: K,
 	pub value: V
@@ -18,6 +18,18 @@ impl<K, V> Entry<K, V> {
 
 	pub(super) fn into_tuple(self) -> (K, V) {
 		(self.key, self.value)
+	}
+}
+
+impl<K, V> IterContent<(K, V)> for Entry<K, V> {
+	fn content(self) -> (K, V) {
+		self.into_tuple()
+	}
+}
+
+impl<'a, K, V> IterContent<(&'a K, &'a V)> for &'a Entry<K, V> {
+	fn content(self) -> (&'a K, &'a V) {
+		self.as_tuple()
 	}
 }
 

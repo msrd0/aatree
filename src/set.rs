@@ -95,7 +95,7 @@ impl<T> AATreeSet<T> {
 	}
 
 	/// Creates an iterator over this set that visits the values in ascending order.
-	pub fn iter(&self) -> AAIter<'_, T> {
+	pub fn iter(&self) -> AAIter<'_, T, &T> {
 		self.into_iter()
 	}
 }
@@ -291,18 +291,18 @@ impl<T: Ord> FromIterator<T> for AATreeSet<T> {
 
 impl<T> IntoIterator for AATreeSet<T> {
 	type Item = T;
-	type IntoIter = AAIntoIter<T>;
+	type IntoIter = AAIntoIter<T, T>;
 
-	fn into_iter(self) -> AAIntoIter<T> {
+	fn into_iter(self) -> Self::IntoIter {
 		AAIntoIter::new(self.root, self.len)
 	}
 }
 
 impl<'a, T> IntoIterator for &'a AATreeSet<T> {
 	type Item = &'a T;
-	type IntoIter = AAIter<'a, T>;
+	type IntoIter = AAIter<'a, T, &'a T>;
 
-	fn into_iter(self) -> AAIter<'a, T> {
+	fn into_iter(self) -> Self::IntoIter {
 		AAIter::new(&self.root, self.len)
 	}
 }

@@ -9,7 +9,7 @@ use core::{
 	iter::FromIterator
 };
 
-pub(crate) mod entry;
+mod entry;
 use entry::Entry;
 
 mod get;
@@ -29,13 +29,13 @@ impl<K, V> Default for AATreeMap<K, V> {
 impl<K: Debug, V: Debug> Debug for AATreeMap<K, V> {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		f.write_str("{")?;
-		for (i, e) in self.iter().enumerate() {
+		for (i, (k, v)) in self.iter().enumerate() {
 			if i > 0 {
 				f.write_str(", ")?;
 			}
-			e.key.fmt(f)?;
+			k.fmt(f)?;
 			f.write_str(": ")?;
-			e.value.fmt(f)?;
+			v.fmt(f)?;
 		}
 		f.write_str("}")
 	}
@@ -87,7 +87,7 @@ impl<K, V> AATreeMap<K, V> {
 	}
 
 	/// Creates an iterator over this map that visits all entries with the keys in ascending order.
-	pub fn iter(&self) -> AAIter<'_, Entry<K, V>> {
+	pub fn iter(&self) -> AAIter<'_, Entry<K, V>, (&K, &V)> {
 		self.into_iter()
 	}
 }
@@ -170,35 +170,22 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	}
 }
 
-impl<K: Ord, V> FromIterator<Entry<K, V>> for AATreeMap<K, V> {
-	fn from_iter<I>(iter: I) -> Self
-	where
-		I: IntoIterator<Item = Entry<K, V>>
-	{
-		let mut map = Self::new();
-		for value in iter {
-			map.insert(value.key, value.value);
-		}
-		map
-	}
-}
-
 impl<K: Ord, V> FromIterator<(K, V)> for AATreeMap<K, V> {
 	fn from_iter<I>(iter: I) -> Self
 	where
 		I: IntoIterator<Item = (K, V)>
 	{
 		let mut map = Self::new();
-		for value in iter {
-			map.insert(value.0, value.1);
+		for (key, value) in iter {
+			map.insert(key, value);
 		}
 		map
 	}
 }
 
 impl<K, V> IntoIterator for AATreeMap<K, V> {
-	type Item = Entry<K, V>;
-	type IntoIter = AAIntoIter<Self::Item>;
+	type Item = (K, V);
+	type IntoIter = AAIntoIter<Entry<K, V>, (K, V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIntoIter::new(self.root, self.len)
@@ -206,8 +193,8 @@ impl<K, V> IntoIterator for AATreeMap<K, V> {
 }
 
 impl<'a, K, V> IntoIterator for &'a AATreeMap<K, V> {
-	type Item = &'a Entry<K, V>;
-	type IntoIter = AAIter<'a, Entry<K, V>>;
+	type Item = (&'a K, &'a V);
+	type IntoIter = AAIter<'a, Entry<K, V>, (&'a K, &'a V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIter::new(&self.root, self.len)
