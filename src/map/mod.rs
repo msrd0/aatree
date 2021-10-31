@@ -168,6 +168,29 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	{
 		self.root.remove::<Q, K>(k).map(|entry| entry.value)
 	}
+
+	/// Remove a key from the map if it exists, and return the key and the value that was
+	/// previously stored in the map for that key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// map.insert(2, "b");
+	/// assert_eq!(map.get(&1), Some(&"a"));
+	/// let value = map.remove(&1);
+	/// assert_eq!(value, Some("a"));
+	/// assert_eq!(map.get(&1), None);
+	/// ```
+	pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.root.remove::<Q, K>(k).map(Entry::into_tuple)
+	}
 }
 
 impl<K: Ord, V> FromIterator<(K, V)> for AATreeMap<K, V> {

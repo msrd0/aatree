@@ -88,8 +88,6 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	// TODO reimplement this method but working
-	/*
 	/// Returns and removes the entry with the smallest key in the map.
 	///
 	/// # Example
@@ -108,11 +106,12 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```
 	pub fn pop_smallest(&mut self) -> Option<(K, V)>
 	where
-		K: Ord
+		K: Clone + Ord
 	{
-		self.root.remove_self().map(Entry::into_tuple)
+		// TODO find a better way than cloning the key and walking through the tree twice
+		let key = self.smallest()?.0.clone();
+		self.remove_entry(&key)
 	}
-	*/
 
 	/// Returns a reference to the entry with the largest key in the map.
 	///
@@ -136,6 +135,31 @@ impl<K, V> AATreeMap<K, V> {
 			Some(sub) => sub,
 			None => TraverseStep::Right
 		})
+	}
+
+	/// Returns and removes the entry with the largest key in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.pop_largest(), None);
+	/// map.insert(1, "a");
+	/// map.insert(3, "b");
+	/// map.insert(2, "c");
+	/// assert_eq!(map.pop_largest(), Some((3, "b")));
+	/// assert_eq!(map.pop_largest(), Some((2, "c")));
+	/// assert_eq!(map.pop_largest(), Some((1, "a")));
+	/// assert_eq!(map.pop_largest(), None);
+	/// ```
+	pub fn pop_largest(&mut self) -> Option<(K, V)>
+	where
+		K: Clone + Ord
+	{
+		// TODO find a better way than cloning the key and walking through the tree twice
+		let key = self.largest()?.0.clone();
+		self.remove_entry(&key)
 	}
 
 	/// Returns a reference to the entry with the smallest key greater than or equal to `k` in the map.
