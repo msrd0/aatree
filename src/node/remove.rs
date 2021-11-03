@@ -63,26 +63,6 @@ impl<T: Eq + Ord> AANode<T> {
 		(node, removed)
 	}
 
-	/// Removes this (first) node, and returns its value if it wasn't `Nil`.
-	pub fn remove_self(&mut self) -> Option<T> {
-		let root = self.take();
-		let (root, removed) = root.remove_self_impl();
-		*self = root;
-		removed
-	}
-
-	fn remove_self_impl(self) -> (Self, Option<T>) {
-		match self.unbox() {
-			None => (Self::new(), None),
-			Some(Node {
-				level,
-				content,
-				left_child,
-				right_child
-			}) => (Self::remove_node(level, left_child, right_child), Some(content))
-		}
-	}
-
 	fn remove_node(level: u8, left_child: Self, right_child: Self) -> Self {
 		// for leaves, return the right child
 		if level == 1 {

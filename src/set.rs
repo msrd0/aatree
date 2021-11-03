@@ -143,10 +143,6 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	pub fn pop_smallest(&mut self) -> Option<T> {
-		self.root.remove_self()
-	}
-
 	/// Returns the largest element of the set.
 	///
 	/// # Example
