@@ -304,10 +304,6 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">iter</span>::{<span class="ident">AAIntoIter</span>, <span class="ident">AAIter</span>},
 	<span class="ident">node</span>::{<span class="ident">AANode</span>, <span class="ident">TraverseStep</span>}
@@ -451,10 +447,6 @@
 			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sub</span>,
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">TraverseStep::Left</span>
 		})
-	}
-
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_smallest</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_self</span>()
 	}
 
 	<span class="doccomment">/// Returns the largest element of the set.</span>
