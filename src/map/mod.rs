@@ -9,7 +9,7 @@ use core::{
 	iter::FromIterator
 };
 
-pub(crate) mod entry;
+mod entry;
 use entry::Entry;
 
 mod get;
@@ -29,13 +29,13 @@ impl<K, V> Default for AATreeMap<K, V> {
 impl<K: Debug, V: Debug> Debug for AATreeMap<K, V> {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		f.write_str("{")?;
-		for (i, e) in self.iter().enumerate() {
+		for (i, (k, v)) in self.iter().enumerate() {
 			if i > 0 {
 				f.write_str(", ")?;
 			}
-			e.key.fmt(f)?;
+			k.fmt(f)?;
 			f.write_str(": ")?;
-			e.value.fmt(f)?;
+			v.fmt(f)?;
 		}
 		f.write_str("}")
 	}
@@ -78,21 +78,63 @@ impl<K, V> AATreeMap<K, V> {
 	/// # Example
 	///
 	/// ```rust
-	/// # type AATreeMap = aatree::AATreeMap<i64, ()>;
-	/// let map = AATreeMap::new();
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
 	/// assert!(map.is_empty());
+	/// map.insert(1, "a");
+	/// assert!(!map.is_empty());
 	/// ```
 	pub fn is_empty(&self) -> bool {
 		self.len == 0
 	}
 
+	/// Clears the map, removing all elements.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// map.clear();
+	/// assert!(map.is_empty());
+	/// ```
+	pub fn clear(&mut self) {
+		self.root = AANode::new();
+		self.len = 0;
+	}
+
 	/// Creates an iterator over this map that visits all entries with the keys in ascending order.
-	pub fn iter(&self) -> AAIter<'_, Entry<K, V>> {
+	pub fn iter(&self) -> AAIter<'_, Entry<K, V>, (&K, &V)> {
 		self.into_iter()
 	}
-}
 
-impl<K: Ord, V> AATreeMap<K, V> {
+	/// Creates an iterator visiting all the keys, in sorted order.
+	pub fn keys(&self) -> impl Iterator<Item = &K> {
+		// TODO is there a better way to implement this?
+		self.iter().map(|(k, _)| k)
+	}
+
+	/// Creates an iterator visiting all the values, in sorted order.
+	pub fn values(&self) -> impl Iterator<Item = &V> {
+		// TODO is there a better way to implement this?
+		self.iter().map(|(_, v)| v)
+	}
+
+	/// Creates a consuming iterator visiting all the keys, in sorted order. The map
+	/// cannot be used after calling this.
+	pub fn into_keys(self) -> impl Iterator<Item = K> {
+		// TODO is there a better way to implement this?
+		self.into_iter().map(|(k, _)| k)
+	}
+
+	/// Creates a consuming iterator visiting all the values, in order by key. The map
+	/// cannot be used after calling this.
+	pub fn into_values(self) -> impl Iterator<Item = V> {
+		// TODO is there a better way to implement this?
+		self.into_iter().map(|(_, v)| v)
+	}
+
 	/// Insert a new element into the map, or overwrite an existing element
 	/// with the same key. If a value was overwritten, the old value will be
 	/// returned.
@@ -107,7 +149,10 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	/// map.insert(1, "b");
 	/// assert_eq!(map.get(&1), Some(&"b"));
 	/// ```
-	pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+	pub fn insert(&mut self, key: K, value: V) -> Option<V>
+	where
+		K: Ord
+	{
 		let inserted = self.root.insert_or_replace(Entry { key, value });
 		match inserted {
 			None => {
@@ -168,18 +213,28 @@ impl<K: Ord, V> AATreeMap<K, V> {
 	{
 		self.root.remove::<Q, K>(k).map(|entry| entry.value)
 	}
-}
 
-impl<K: Ord, V> FromIterator<Entry<K, V>> for AATreeMap<K, V> {
-	fn from_iter<I>(iter: I) -> Self
+	/// Remove a key from the map if it exists, and return the key and the value that was
+	/// previously stored in the map for that key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, "a");
+	/// map.insert(2, "b");
+	/// assert_eq!(map.get(&1), Some(&"a"));
+	/// let value = map.remove(&1);
+	/// assert_eq!(value, Some("a"));
+	/// assert_eq!(map.get(&1), None);
+	/// ```
+	pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
 	where
-		I: IntoIterator<Item = Entry<K, V>>
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
 	{
-		let mut map = Self::new();
-		for value in iter {
-			map.insert(value.key, value.value);
-		}
-		map
+		self.root.remove::<Q, K>(k).map(Entry::into_tuple)
 	}
 }
 
@@ -189,16 +244,16 @@ impl<K: Ord, V> FromIterator<(K, V)> for AATreeMap<K, V> {
 		I: IntoIterator<Item = (K, V)>
 	{
 		let mut map = Self::new();
-		for value in iter {
-			map.insert(value.0, value.1);
+		for (key, value) in iter {
+			map.insert(key, value);
 		}
 		map
 	}
 }
 
 impl<K, V> IntoIterator for AATreeMap<K, V> {
-	type Item = Entry<K, V>;
-	type IntoIter = AAIntoIter<Self::Item>;
+	type Item = (K, V);
+	type IntoIter = AAIntoIter<Entry<K, V>, (K, V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIntoIter::new(self.root, self.len)
@@ -206,8 +261,8 @@ impl<K, V> IntoIterator for AATreeMap<K, V> {
 }
 
 impl<'a, K, V> IntoIterator for &'a AATreeMap<K, V> {
-	type Item = &'a Entry<K, V>;
-	type IntoIter = AAIter<'a, Entry<K, V>>;
+	type Item = (&'a K, &'a V);
+	type IntoIter = AAIter<'a, Entry<K, V>, (&'a K, &'a V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIter::new(&self.root, self.len)
