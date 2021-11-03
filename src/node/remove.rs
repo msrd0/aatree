@@ -1,5 +1,5 @@
 use super::{AANode, Node};
-use core::borrow::Borrow;
+use core::{borrow::Borrow, cmp::Ordering};
 
 impl<T: Eq + Ord> AANode<T> {
 	/// Remove a value from this tree. If the value was found, it will be returned.
@@ -24,47 +24,36 @@ impl<T: Eq + Ord> AANode<T> {
 	{
 		let (mut node, removed) = match self.unbox() {
 			None => (Self::new(), None),
-
 			Some(Node {
 				level,
 				content,
 				left_child,
 				right_child
-			}) if content.borrow().borrow() == to_remove => {
-				let node = Self::remove_node(level, left_child, right_child);
-				(node, Some(content))
-			},
-
-			Some(Node {
-				level,
-				content,
-				left_child,
-				right_child
-			}) if content.borrow().borrow() > to_remove => {
-				let (left, value) = left_child.remove_impl(to_remove);
-				let node = Node {
-					level,
-					content,
-					left_child: left,
-					right_child
-				};
-				(node.into(), value)
-			},
-
-			Some(Node {
-				level,
-				content,
-				left_child,
-				right_child
-			}) => {
-				let (right, value) = right_child.remove_impl(to_remove);
-				let node = Node {
-					level,
-					content,
-					left_child,
-					right_child: right
-				};
-				(node.into(), value)
+			}) => match content.borrow().borrow().cmp(to_remove) {
+				Ordering::Equal => {
+					let node = Self::remove_node(level, left_child, right_child);
+					(node, Some(content))
+				},
+				Ordering::Greater => {
+					let (left, value) = left_child.remove_impl(to_remove);
+					let node = Node {
+						level,
+						content,
+						left_child: left,
+						right_child
+					};
+					(node.into(), value)
+				},
+				Ordering::Less => {
+					let (right, value) = right_child.remove_impl(to_remove);
+					let node = Node {
+						level,
+						content,
+						left_child,
+						right_child: right
+					};
+					(node.into(), value)
+				}
 			}
 		};
 
