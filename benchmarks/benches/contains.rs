@@ -1,6 +1,6 @@
 use aatree::AATreeSet;
 use criterion::{criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup, BenchmarkId, Criterion};
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, time::Duration};
 
 macro_rules! benchmark {
 	($ty:ty, $amount:expr, hit) => {
@@ -28,6 +28,7 @@ macro_rules! benchmark {
 		paste::item! {
 			fn [<bench_ $group:lower>](c: &mut Criterion) {
 				let mut g = c.benchmark_group($group);
+				g.sample_size(150).measurement_time(Duration::from_secs(20));
 				$([<bench_ $ty:lower _contains_ $amount _ $success>](&mut g, BenchmarkId::new(format!("{}_{}", $name, stringify!($success)), $amount));)+
 				g.finish();
 			}
