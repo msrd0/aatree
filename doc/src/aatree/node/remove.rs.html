@@ -178,7 +178,7 @@
 	}
 
 	<span class="doccomment">/// Remove the successor (smallest node) of the parent of this node and return its content.</span>
-	<span class="kw">fn</span> <span class="ident">remove_successor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_successor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">suc</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">left_child</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">left_child_mut</span>() {
 			<span class="ident">left_child</span>.<span class="ident">remove_successor</span>()
 		} <span class="kw">else</span> {
@@ -200,7 +200,7 @@
 	}
 
 	<span class="doccomment">/// Remove the predecessor (largest node) of the parent of this node and return its content.</span>
-	<span class="kw">fn</span> <span class="ident">remove_predecessor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_predecessor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">pred</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">right_child</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">right_child_mut</span>() {
 			<span class="ident">right_child</span>.<span class="ident">remove_predecessor</span>()
 		} <span class="kw">else</span> {
