@@ -8,7 +8,7 @@
 
 This crate implements an AA Tree in Rust. An AA Tree is basically a Red-Black Tree that disallows right children to be red. This results for less complexity in the implementation. For further details on the data structure, see https://en.wikipedia.org/wiki/AA_tree for more information on the data structure.
 
-The standard library comes with a good set of data structures. See [`std::collections`] for a list of data structures and their (dis)advantages, however, not all advertised functionality of `BTreeMap` is actually implemented (at the time of writing). On average, this AA Tree implementation is about half as fast as the standard libraries `BTree` data structures for insert and contains, and slightly faster for remove operations.
+The standard library comes with a good set of data structures. See [`std::collections`] for a list of data structures and their (dis)advantages, however, not all advertised functionality of `BTreeMap` is actually implemented (at the time of writing). On average, this AA Tree implementation is about half as fast as the standard libraries `BTree` data structures.
 
 ## When to use `AATree` over `std::collections::BTree`
 
