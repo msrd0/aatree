@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@1.48.0
+      - uses: dtolnay/rust-toolchain@1.50.0
       - run: cargo test --workspace --all-features --lib
         env:
           RUST_BACKTRACE: 1
