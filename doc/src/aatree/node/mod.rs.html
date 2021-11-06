@@ -384,6 +384,11 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Low-level implementation of an AA tree. You shouldn&#39;t have to use this directly; instead, use</span>
 <span class="doccomment">//! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
 
@@ -410,9 +415,9 @@
 	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">right_child</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="ident">AANode</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="self">self</span>)))
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">node</span>: <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">node</span>)))
 	}
 }
 
@@ -451,14 +456,17 @@
 		<span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">take</span>())
 	}
 
+	<span class="doccomment">/// Create a new `Nil` node.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="self">Self</span>(<span class="prelude-val">None</span>)
 	}
 
+	<span class="doccomment">/// Return true if this node is `Nil`.</span>
 	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_nil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_none</span>()
 	}
 
+	<span class="doccomment">/// Return true if this node is a leaf.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_leaf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
@@ -468,6 +476,7 @@
 		}
 	}
 
+	<span class="doccomment">/// Return true if this node has a left child.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_left_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
@@ -475,6 +484,7 @@
 		}
 	}
 
+	<span class="doccomment">/// Return true if this node has a right child.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_right_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
@@ -482,12 +492,12 @@
 		}
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_child_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">left_child_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">as_mut</span>()
 			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">Node</span> { <span class="ident">left_child</span>, .. }<span class="op">|</span> (<span class="op">!</span><span class="ident">left_child</span>.<span class="ident">is_nil</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">left_child</span>))
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right_child_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">right_child_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">as_mut</span>()
 			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">Node</span> { <span class="ident">right_child</span>, .. }<span class="op">|</span> (<span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">right_child</span>))
 	}
