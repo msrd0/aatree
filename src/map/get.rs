@@ -1,6 +1,6 @@
 //! This method defines several access methods for [`AATreeMap`].
 
-use super::AATreeMap;
+use super::{entry::Entry, AATreeMap};
 use crate::node::TraverseStep;
 use core::{borrow::Borrow, cmp::Ordering};
 
@@ -134,9 +134,7 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Clone + Ord
 	{
-		// TODO find a better way than cloning the key and walking through the tree twice
-		let key = self.smallest()?.0.clone();
-		self.remove_entry(&key)
+		self.root.remove_successor().map(Entry::into_tuple)
 	}
 
 	/// Returns a reference to the entry with the largest key in the map.
@@ -183,9 +181,7 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Clone + Ord
 	{
-		// TODO find a better way than cloning the key and walking through the tree twice
-		let key = self.largest()?.0.clone();
-		self.remove_entry(&key)
+		self.root.remove_predecessor().map(Entry::into_tuple)
 	}
 
 	/// Returns a reference to the entry with the smallest key greater than or equal to `k` in the map.

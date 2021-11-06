@@ -163,6 +163,44 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
+	/// Remove and return the smallest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert_eq!(set.pop_smallest(), None);
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.pop_smallest(), Some(40));
+	/// assert_eq!(set.pop_smallest(), Some(42));
+	/// assert_eq!(set.pop_smallest(), Some(44));
+	/// assert_eq!(set.pop_smallest(), None);
+	/// ```
+	pub fn pop_smallest(&mut self) -> Option<T> {
+		self.root.remove_successor()
+	}
+
+	/// Remove and return the largest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert_eq!(set.pop_largest(), None);
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.pop_largest(), Some(44));
+	/// assert_eq!(set.pop_largest(), Some(42));
+	/// assert_eq!(set.pop_largest(), Some(40));
+	/// assert_eq!(set.pop_largest(), None);
+	/// ```
+	pub fn pop_largest(&mut self) -> Option<T> {
+		self.root.remove_predecessor()
+	}
+
 	/// Returns `true` if the set contains an element with the given value.
 	///
 	/// # Example

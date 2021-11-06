@@ -47,7 +47,7 @@ impl<T> AANode<T> {
 	}
 
 	/// Remove the successor (smallest node) of the parent of this node and return its content.
-	fn remove_successor(&mut self) -> Option<T> {
+	pub(crate) fn remove_successor(&mut self) -> Option<T> {
 		let suc = if let Some(left_child) = self.left_child_mut() {
 			left_child.remove_successor()
 		} else {
@@ -69,7 +69,7 @@ impl<T> AANode<T> {
 	}
 
 	/// Remove the predecessor (largest node) of the parent of this node and return its content.
-	fn remove_predecessor(&mut self) -> Option<T> {
+	pub(crate) fn remove_predecessor(&mut self) -> Option<T> {
 		let pred = if let Some(right_child) = self.right_child_mut() {
 			right_child.remove_predecessor()
 		} else {
