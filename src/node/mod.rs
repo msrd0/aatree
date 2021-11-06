@@ -24,9 +24,9 @@ pub(super) struct Node<T> {
 	pub(super) right_child: AANode<T>
 }
 
-impl<T> Into<AANode<T>> for Node<T> {
-	fn into(self) -> AANode<T> {
-		AANode(Some(Box::new(self)))
+impl<T> From<Node<T>> for AANode<T> {
+	fn from(node: Node<T>) -> Self {
+		Self(Some(Box::new(node)))
 	}
 }
 
@@ -65,14 +65,17 @@ impl<T> AANode<T> {
 		Self(self.0.take())
 	}
 
+	/// Create a new `Nil` node.
 	pub const fn new() -> Self {
 		Self(None)
 	}
 
+	/// Return true if this node is `Nil`.
 	pub const fn is_nil(&self) -> bool {
 		self.0.is_none()
 	}
 
+	/// Return true if this node is a leaf.
 	pub fn is_leaf(&self) -> bool {
 		match self.as_ref() {
 			None => false,
@@ -82,6 +85,7 @@ impl<T> AANode<T> {
 		}
 	}
 
+	/// Return true if this node has a left child.
 	pub fn has_left_child(&self) -> bool {
 		match self.as_ref() {
 			None => false,
@@ -89,6 +93,7 @@ impl<T> AANode<T> {
 		}
 	}
 
+	/// Return true if this node has a right child.
 	pub fn has_right_child(&self) -> bool {
 		match self.as_ref() {
 			None => false,
@@ -96,12 +101,12 @@ impl<T> AANode<T> {
 		}
 	}
 
-	pub fn left_child_mut(&mut self) -> Option<&mut Self> {
+	fn left_child_mut(&mut self) -> Option<&mut Self> {
 		self.as_mut()
 			.and_then(|Node { left_child, .. }| (!left_child.is_nil()).then(|| left_child))
 	}
 
-	pub fn right_child_mut(&mut self) -> Option<&mut Self> {
+	fn right_child_mut(&mut self) -> Option<&mut Self> {
 		self.as_mut()
 			.and_then(|Node { right_child, .. }| (!right_child.is_nil()).then(|| right_child))
 	}

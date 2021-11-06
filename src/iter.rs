@@ -1,3 +1,5 @@
+#![allow(missing_debug_implementations)]
+
 //! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
 use super::node::{AANode, Node};
@@ -17,7 +19,6 @@ impl<T> IterContent<T> for T {
 }
 
 /// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
-#[derive(Debug)]
 pub struct AAIter<'a, C, T> {
 	stack: Vec<(bool, &'a AANode<C>)>,
 	len: usize,
@@ -48,7 +49,7 @@ where
 			if let Some(Node { left_child, .. }) = last.as_ref() {
 				self.stack.push((true, last));
 				if !visited_left && !left_child.is_nil() {
-					self.stack.push((false, &left_child));
+					self.stack.push((false, left_child));
 				} else {
 					break;
 				}
@@ -80,7 +81,6 @@ impl<'a, C, T> ExactSizeIterator for AAIter<'a, C, T> where &'a C: IterContent<T
 impl<'a, C, T> FusedIterator for AAIter<'a, C, T> where &'a C: IterContent<T> {}
 
 /// The iterator produces from an AATree-based data structure when turned into an iterator.
-#[derive(Debug)]
 pub struct AAIntoIter<C, T> {
 	stack: Vec<AANode<C>>,
 	len: usize,
