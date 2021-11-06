@@ -8,6 +8,12 @@ name = "aatree"
 version = "0.1.0"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 license = "Apache-2.0"
+include = ["/src/**/*.rs", "/LICENSE", "/README.md"]
+
+description = "AATree implementation in Rust"
+repository = "https://github.com/msrd0/aatree"
+keywords = ["data-structures", "tree", "collections", "set", "map"]
+categories = ["data-structures"]
 
 edition = "2018"
 rust-version = "1.50"

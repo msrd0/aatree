@@ -1,6 +1,8 @@
 # AA Tree
 
 [![Build Status](https://github.com/msrd0/aatree/actions/workflows/rust.yml/badge.svg)](https://github.com/msrd0/aatree/actions/workflows/rust.yml)
+[![crates.io](https://img.shields.io/crates/v/aatree.svg)](https://crates.io/crates/aatree)
+[![docs.rs](https://docs.rs/aatree/badge.svg)](https://docs.rs/aatree)
 [![Documentation](https://img.shields.io/badge/docs-main-blue.svg)](https://msrd0.github.io/aatree/doc/aatree/index.html)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![MSRV](https://img.shields.io/badge/rustc-1.50+-orange.svg)](https://blog.rust-lang.org/2021/02/11/Rust-1.50.0.html)
