@@ -73,11 +73,57 @@ impl<T> AANode<T> {
 		self.0.is_none()
 	}
 
+	pub fn is_leaf(&self) -> bool {
+		match self.as_ref() {
+			None => false,
+			Some(Node {
+				left_child, right_child, ..
+			}) => left_child.is_nil() && right_child.is_nil()
+		}
+	}
+
+	pub fn has_left_child(&self) -> bool {
+		match self.as_ref() {
+			None => false,
+			Some(Node { left_child, .. }) => !left_child.is_nil()
+		}
+	}
+
+	pub fn has_right_child(&self) -> bool {
+		match self.as_ref() {
+			None => false,
+			Some(Node { right_child, .. }) => !right_child.is_nil()
+		}
+	}
+
+	pub fn left_child_mut(&mut self) -> Option<&mut Self> {
+		self.as_mut()
+			.and_then(|Node { left_child, .. }| (!left_child.is_nil()).then(|| left_child))
+	}
+
+	pub fn right_child_mut(&mut self) -> Option<&mut Self> {
+		self.as_mut()
+			.and_then(|Node { right_child, .. }| (!right_child.is_nil()).then(|| right_child))
+	}
+
+	fn set_right_child(&mut self, child: Self) {
+		match self.as_mut() {
+			None => panic!("I don't have a right child"),
+			Some(Node { right_child, .. }) => {
+				*right_child = child;
+			}
+		}
+	}
+
 	pub(super) fn level(&self) -> u8 {
 		match self.as_ref() {
 			None => 0,
 			Some(Node { level, .. }) => *level
 		}
+	}
+
+	fn content_mut(&mut self) -> Option<&mut T> {
+		self.as_mut().map(|Node { content, .. }| content)
 	}
 
 	/// Update the level of this node. **Panic** if the node is [`Nil`](Self::Nil).
