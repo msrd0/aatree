@@ -76,6 +76,26 @@ impl<T: Debug> Debug for AATreeSet<T> {
 	}
 }
 
+impl<T: PartialEq> PartialEq for AATreeSet<T> {
+	fn eq(&self, other: &Self) -> bool {
+		self.len() == other.len() && self.iter().zip(other).all(|(a, b)| a == b)
+	}
+}
+
+impl<T: Eq> Eq for AATreeSet<T> {}
+
+impl<T: PartialOrd> PartialOrd for AATreeSet<T> {
+	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+		self.iter().partial_cmp(other.iter())
+	}
+}
+
+impl<T: Ord> Ord for AATreeSet<T> {
+	fn cmp(&self, other: &Self) -> Ordering {
+		self.iter().cmp(other.iter())
+	}
+}
+
 impl<T> AATreeSet<T> {
 	/// Construct a new, empty AA-Tree based set.
 	pub const fn new() -> Self {

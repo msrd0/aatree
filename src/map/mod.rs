@@ -42,6 +42,26 @@ impl<K: Debug, V: Debug> Debug for AATreeMap<K, V> {
 	}
 }
 
+impl<K: PartialEq, V: PartialEq> PartialEq for AATreeMap<K, V> {
+	fn eq(&self, other: &Self) -> bool {
+		self.len() == other.len() && self.iter().zip(other).all(|(a, b)| a == b)
+	}
+}
+
+impl<K: Eq, V: Eq> Eq for AATreeMap<K, V> {}
+
+impl<K: PartialOrd, V: PartialOrd> PartialOrd for AATreeMap<K, V> {
+	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+		self.iter().partial_cmp(other.iter())
+	}
+}
+
+impl<K: Ord, V: Ord> Ord for AATreeMap<K, V> {
+	fn cmp(&self, other: &Self) -> Ordering {
+		self.iter().cmp(other.iter())
+	}
+}
+
 impl<K, V> AATreeMap<K, V> {
 	/// Construct a new, empty AA-Tree based map.
 	///
