@@ -5,7 +5,7 @@ members = [".", "./benchmarks"]
 
 [package]
 name = "aatree"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Dominic Meiser <git@msrd0.de>"]
 license = "Apache-2.0"
 include = ["/src/**/*.rs", "/LICENSE", "/README.md"]
