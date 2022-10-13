@@ -90,20 +90,20 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	/// Returns a reference to the entry with the smallest key in the map.
+	/// Returns a reference to the first entry (that is, with the smallest key) in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.smallest(), None);
+	/// assert_eq!(map.first_key_value(), None);
 	/// map.insert(3, "a");
 	/// map.insert(1, "b");
 	/// map.insert(2, "c");
-	/// assert_eq!(map.smallest(), Some((&1, &"b")));
+	/// assert_eq!(map.first_key_value(), Some((&1, &"b")));
 	/// ```
-	pub fn smallest(&self) -> Option<(&K, &V)>
+	pub fn first_key_value(&self) -> Option<(&K, &V)>
 	where
 		K: Ord
 	{
@@ -114,43 +114,59 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	/// Returns and removes the entry with the smallest key in the map.
+	#[deprecated(since = "0.1.1", note = "Use first_key_value() instead")]
+	pub fn smallest(&self) -> Option<(&K, &V)>
+	where
+		K: Ord
+	{
+		self.first_key_value()
+	}
+
+	/// Returns and removes the first entry (that is, with the smallest key) in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.pop_smallest(), None);
+	/// assert_eq!(map.pop_first(), None);
 	/// map.insert(3, "a");
 	/// map.insert(1, "b");
 	/// map.insert(2, "c");
-	/// assert_eq!(map.pop_smallest(), Some((1, "b")));
-	/// assert_eq!(map.pop_smallest(), Some((2, "c")));
-	/// assert_eq!(map.pop_smallest(), Some((3, "a")));
-	/// assert_eq!(map.pop_smallest(), None);
+	/// assert_eq!(map.pop_first(), Some((1, "b")));
+	/// assert_eq!(map.pop_first(), Some((2, "c")));
+	/// assert_eq!(map.pop_first(), Some((3, "a")));
+	/// assert_eq!(map.pop_first(), None);
 	/// ```
-	pub fn pop_smallest(&mut self) -> Option<(K, V)>
+	pub fn pop_first(&mut self) -> Option<(K, V)>
 	where
 		K: Clone + Ord
 	{
 		self.root.remove_successor().map(Entry::into_tuple)
 	}
 
-	/// Returns a reference to the entry with the largest key in the map.
+	#[deprecated(since = "0.1.1", note = "Use pop_first() instead")]
+	pub fn pop_smallest(&mut self) -> Option<(K, V)>
+	where
+		K: Clone + Ord
+	{
+		self.pop_first()
+	}
+
+	/// Returns a reference to the last entry (that is, with the largest key) in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.largest(), None);
+	/// assert_eq!(map.last_key_value(), None);
 	/// map.insert(1, "a");
 	/// map.insert(3, "b");
 	/// map.insert(2, "c");
-	/// assert_eq!(map.largest(), Some((&3, &"b")));
+	/// assert_eq!(map.last_key_value(), Some((&3, &"b")));
 	/// ```
-	pub fn largest(&self) -> Option<(&K, &V)>
+	pub fn last_key_value(&self) -> Option<(&K, &V)>
 	where
 		K: Ord
 	{
@@ -161,43 +177,59 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	/// Returns and removes the entry with the largest key in the map.
+	#[deprecated(since = "0.1.1", note = "Use last_key_value() instead")]
+	pub fn largest(&self) -> Option<(&K, &V)>
+	where
+		K: Ord
+	{
+		self.last_key_value()
+	}
+
+	/// Returns and removes the last entry (that is, with the largest key) in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.pop_largest(), None);
+	/// assert_eq!(map.pop_last(), None);
 	/// map.insert(1, "a");
 	/// map.insert(3, "b");
 	/// map.insert(2, "c");
-	/// assert_eq!(map.pop_largest(), Some((3, "b")));
-	/// assert_eq!(map.pop_largest(), Some((2, "c")));
-	/// assert_eq!(map.pop_largest(), Some((1, "a")));
-	/// assert_eq!(map.pop_largest(), None);
+	/// assert_eq!(map.pop_last(), Some((3, "b")));
+	/// assert_eq!(map.pop_last(), Some((2, "c")));
+	/// assert_eq!(map.pop_last(), Some((1, "a")));
+	/// assert_eq!(map.pop_last(), None);
 	/// ```
-	pub fn pop_largest(&mut self) -> Option<(K, V)>
+	pub fn pop_last(&mut self) -> Option<(K, V)>
 	where
 		K: Clone + Ord
 	{
 		self.root.remove_predecessor().map(Entry::into_tuple)
 	}
 
-	/// Returns a reference to the entry with the smallest key greater than or equal to `k` in the map.
+	pub fn pop_largest(&mut self) -> Option<(K, V)>
+	where
+		K: Clone + Ord
+	{
+		self.pop_last()
+	}
+
+	/// Returns a reference to the first entry with a key greater than or equal to `k` in
+	/// the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.smallest_geq_than(&15), None);
+	/// assert_eq!(map.first_key_value_at_or_after(&15), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// assert_eq!(map.smallest_geq_than(&15), Some((&20, &"c")));
+	/// assert_eq!(map.first_key_value_at_or_after(&15), Some((&20, &"c")));
 	/// ```
-	pub fn smallest_geq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	pub fn first_key_value_at_or_after<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -216,23 +248,33 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	/// Returns a mutable reference to the entry with the smallest key greater than or equal to `k` in the map.
+	#[deprecated(since = "0.1.1", note = "Use first_key_value_at_or_after() instead")]
+	pub fn smallest_geq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.first_key_value_at_or_after(k)
+	}
+
+	/// Returns a mutable reference to the first entry with a key greater than or equal
+	/// to `k` in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.smallest_geq_than_mut(&15), None);
+	/// assert_eq!(map.first_key_value_mut_at_or_after(&15), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// let value: &mut &str = map.smallest_geq_than_mut(&15).unwrap().1;
+	/// let value: &mut &str = map.first_key_value_mut_at_or_after(&15).unwrap().1;
 	/// assert_eq!(*value, "c");
 	/// *value = "d";
-	/// assert_eq!(map.smallest_geq_than(&15), Some((&20, &"d")));
+	/// assert_eq!(map.first_key_value_at_or_after(&15), Some((&20, &"d")));
 	/// ```
-	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	pub fn first_key_value_mut_at_or_after<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -253,20 +295,30 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	/// Returns a reference to the entry with the largest key smaller than or equal to `k` in the map.
+	#[deprecated(since = "0.1.1", note = "Use first_key_value_mut_at_or_after() instead")]
+	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.first_key_value_mut_at_or_after(k)
+	}
+
+	/// Returns a reference to the last entry with a key smaller than or equal to `k` in
+	/// the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.largest_leq_than(&25), None);
+	/// assert_eq!(map.last_key_value_at_or_before(&25), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// assert_eq!(map.largest_leq_than(&25), Some((&20, &"c")));
+	/// assert_eq!(map.last_key_value_at_or_before(&25), Some((&20, &"c")));
 	/// ```
-	pub fn largest_leq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	pub fn last_key_value_at_or_before<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -285,23 +337,33 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	/// Returns a mutable reference to the entry with the largest key smaller than or equal to `k` in the map.
+	#[deprecated(since = "0.1.1", note = "Use last_key_value_at_or_before() instead")]
+	pub fn largest_leq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.last_key_value_at_or_before(k)
+	}
+
+	/// Returns a mutable reference to the last entry with a key smaller than or equal to
+	/// `k` in the map.
 	///
 	/// # Example
 	///
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.largest_leq_than_mut(&25), None);
+	/// assert_eq!(map.last_key_value_mut_at_or_before(&25), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// let value: &mut &str = map.largest_leq_than_mut(&25).unwrap().1;
+	/// let value: &mut &str = map.last_key_value_mut_at_or_before(&25).unwrap().1;
 	/// assert_eq!(*value, "c");
 	/// *value = "d";
-	/// assert_eq!(map.largest_leq_than(&25), Some((&20, &"d")));
+	/// assert_eq!(map.last_key_value_at_or_before(&25), Some((&20, &"d")));
 	/// ```
-	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	pub fn last_key_value_mut_at_or_before<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -320,5 +382,14 @@ impl<K, V> AATreeMap<K, V> {
 				}
 			}
 		)
+	}
+
+	#[deprecated(since = "0.1.1", note = "Use last_key_value_mut_at_or_before() instead")]
+	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	where
+		K: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.last_key_value_mut_at_or_before(k)
 	}
 }

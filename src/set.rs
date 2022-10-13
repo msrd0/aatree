@@ -123,19 +123,19 @@ impl<T: Ord> AATreeSet<T> {
 		inserted
 	}
 
-	/// Returns the smallest element of the set.
+	/// Returns the first/smallest element of the set.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.smallest().is_none());
+	/// assert!(set.first().is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.smallest(), Some(&40));
+	/// assert_eq!(set.first(), Some(&40));
 	/// ```
-	pub fn smallest(&self) -> Option<&T> {
+	pub fn first(&self) -> Option<&T> {
 		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
@@ -143,19 +143,24 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	/// Returns the largest element of the set.
+	#[deprecated(since = "0.1.1", note = "Use first() instead")]
+	pub fn smallest(&self) -> Option<&T> {
+		self.first()
+	}
+
+	/// Returns the last/largest element of the set.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.largest().is_none());
+	/// assert!(set.last().is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.largest(), Some(&44));
+	/// assert_eq!(set.last(), Some(&44));
 	/// ```
-	pub fn largest(&self) -> Option<&T> {
+	pub fn last(&self) -> Option<&T> {
 		self.root.traverse(|content, sub| match sub {
 			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
 			Some(sub) => sub,
@@ -163,42 +168,57 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	/// Remove and return the smallest element of the set.
+	#[deprecated(since = "0.1.1", note = "Use last() instead")]
+	pub fn largest(&self) -> Option<&T> {
+		self.last()
+	}
+
+	/// Remove and return the first/smallest element of the set.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert_eq!(set.pop_smallest(), None);
+	/// assert_eq!(set.pop_first(), None);
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.pop_smallest(), Some(40));
-	/// assert_eq!(set.pop_smallest(), Some(42));
-	/// assert_eq!(set.pop_smallest(), Some(44));
-	/// assert_eq!(set.pop_smallest(), None);
+	/// assert_eq!(set.pop_first(), Some(40));
+	/// assert_eq!(set.pop_first(), Some(42));
+	/// assert_eq!(set.pop_first(), Some(44));
+	/// assert_eq!(set.pop_first(), None);
 	/// ```
-	pub fn pop_smallest(&mut self) -> Option<T> {
+	pub fn pop_first(&mut self) -> Option<T> {
 		self.root.remove_successor()
 	}
 
-	/// Remove and return the largest element of the set.
+	#[deprecated(since = "0.1.1", note = "Use pop_first() instead")]
+	pub fn pop_smallest(&mut self) -> Option<T> {
+		self.pop_first()
+	}
+
+	/// Remove and return the last/largest element of the set.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert_eq!(set.pop_largest(), None);
+	/// assert_eq!(set.pop_last(), None);
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.pop_largest(), Some(44));
-	/// assert_eq!(set.pop_largest(), Some(42));
-	/// assert_eq!(set.pop_largest(), Some(40));
-	/// assert_eq!(set.pop_largest(), None);
+	/// assert_eq!(set.pop_last(), Some(44));
+	/// assert_eq!(set.pop_last(), Some(42));
+	/// assert_eq!(set.pop_last(), Some(40));
+	/// assert_eq!(set.pop_last(), None);
 	/// ```
-	pub fn pop_largest(&mut self) -> Option<T> {
+	pub fn pop_last(&mut self) -> Option<T> {
 		self.root.remove_predecessor()
+	}
+
+	#[deprecated(since = "0.1.1", note = "Use pop_last() instead")]
+	pub fn pop_largest(&mut self) -> Option<T> {
+		self.pop_last()
 	}
 
 	/// Returns `true` if the set contains an element with the given value.
@@ -212,7 +232,7 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(42);
 	/// assert_eq!(set.contains(&42), true);
 	/// ```
-	pub fn contains<Q>(&self, x: &Q) -> bool
+	pub fn contains<Q>(&self, value: &Q) -> bool
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -220,7 +240,7 @@ impl<T: Ord> AATreeSet<T> {
 		self.root
 			.traverse(|content, sub| match sub {
 				Some(sub) => sub,
-				None => match content.borrow().cmp(x) {
+				None => match content.borrow().cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
 					Ordering::Less => TraverseStep::Right,
 					Ordering::Equal => TraverseStep::Value(Some(()))
@@ -229,19 +249,19 @@ impl<T: Ord> AATreeSet<T> {
 			.is_some()
 	}
 
-	/// Returns the smallest element of the set that is greater or equal to `x`.
+	/// Returns the first/smallest element of the set that is greater or equal to `x`.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.smallest_geq_than(&41).is_none());
+	/// assert!(set.first_at_or_after(&41).is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.smallest_geq_than(&41), Some(&42));
+	/// assert_eq!(set.first_at_or_after(&41), Some(&42));
 	/// ```
-	pub fn smallest_geq_than<Q>(&self, x: &Q) -> Option<&T>
+	pub fn first_at_or_after<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -249,9 +269,9 @@ impl<T: Ord> AATreeSet<T> {
 		self.root.traverse(|content, sub| {
 			let c = content.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if c > x => TraverseStep::Value(Some(content)),
+				Some(TraverseStep::Value(None)) if c > value => TraverseStep::Value(Some(content)),
 				Some(sub) => sub,
-				None => match c.cmp(x) {
+				None => match c.cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
 					Ordering::Less => TraverseStep::Right,
 					Ordering::Equal => TraverseStep::Value(Some(content))
@@ -260,19 +280,28 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	/// Returns the largest element of the set that is smaller or equal to `x`.
+	#[deprecated(since = "0.1.1", note = "Use first_at_or_after() instead")]
+	pub fn smallest_geq_than<Q>(&self, value: &Q) -> Option<&T>
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.first_at_or_after(value)
+	}
+
+	/// Returns the last/largest element of the set that is smaller or equal to `x`.
 	///
 	/// # Example
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.largest_leq_than(&43).is_none());
+	/// assert!(set.last_at_or_before(&43).is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.largest_leq_than(&43), Some(&42));
+	/// assert_eq!(set.last_at_or_before(&43), Some(&42));
 	/// ```
-	pub fn largest_leq_than<Q>(&self, x: &Q) -> Option<&T>
+	pub fn last_at_or_before<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -280,15 +309,24 @@ impl<T: Ord> AATreeSet<T> {
 		self.root.traverse(|content, sub| {
 			let c = content.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if c < x => TraverseStep::Value(Some(content)),
+				Some(TraverseStep::Value(None)) if c < value => TraverseStep::Value(Some(content)),
 				Some(sub) => sub,
-				None => match c.cmp(x) {
+				None => match c.cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
 					Ordering::Less => TraverseStep::Right,
 					Ordering::Equal => TraverseStep::Value(Some(content))
 				}
 			}
 		})
+	}
+
+	#[deprecated(since = "0.1.1", note = "Use last_at_or_before() instead")]
+	pub fn largest_leq_than<Q>(&self, value: &Q) -> Option<&T>
+	where
+		T: Borrow<Q> + Ord,
+		Q: Ord + ?Sized
+	{
+		self.last_at_or_before(value)
 	}
 
 	/// Removes a value from the set, and returns `true` if it was removed.
