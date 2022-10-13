@@ -7,7 +7,8 @@ use core::{
 	borrow::Borrow,
 	cmp::Ordering,
 	fmt::{self, Debug},
-	iter::FromIterator
+	iter::FromIterator,
+	mem
 };
 
 /// A set based on an AA-Tree.
@@ -142,6 +143,38 @@ impl<T: Ord> AATreeSet<T> {
 			self.len += 1;
 		}
 		inserted
+	}
+
+	/// Moves all elements from `other` into `self`, leaving `other` empty.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use aatree::AATreeSet;
+	///
+	/// let mut a = AATreeSet::new();
+	/// a.insert(1);
+	/// a.insert(2);
+	/// a.insert(3);
+	///
+	/// let mut b = AATreeSet::new();
+	/// b.insert(3);
+	/// b.insert(4);
+	/// b.insert(5);
+	///
+	/// a.append(&mut b);
+	///
+	/// assert_eq!(a.len(), 5);
+	/// assert_eq!(b.len(), 0);
+	///
+	/// assert!(a.contains(&1));
+	/// assert!(a.contains(&2));
+	/// assert!(a.contains(&3));
+	/// assert!(a.contains(&4));
+	/// assert!(a.contains(&5));
+	/// ```
+	pub fn append(&mut self, other: &mut Self) {
+		self.extend(mem::take(other));
 	}
 
 	/// Returns the first/smallest element of the set.
