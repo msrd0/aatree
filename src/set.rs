@@ -378,6 +378,20 @@ impl<T: Ord> From<Vec<T>> for AATreeSet<T> {
 	}
 }
 
+impl<T: Ord> Extend<T> for AATreeSet<T> {
+	fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+		for value in iter {
+			self.insert(value);
+		}
+	}
+}
+
+impl<'a, T: Ord + Copy + 'a> Extend<&'a T> for AATreeSet<T> {
+	fn extend<I: IntoIterator<Item = &'a T>>(&mut self, iter: I) {
+		self.extend(iter.into_iter().copied())
+	}
+}
+
 impl<T> IntoIterator for AATreeSet<T> {
 	type Item = T;
 	type IntoIter = AAIntoIter<T, T>;

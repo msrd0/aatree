@@ -264,6 +264,22 @@ impl<K: Ord, V> From<Vec<(K, V)>> for AATreeMap<K, V> {
 	}
 }
 
+impl<K: Ord, V> Extend<(K, V)> for AATreeMap<K, V> {
+	fn extend<I: IntoIterator<Item = (K, V)>>(&mut self, iter: I) {
+		for (key, value) in iter {
+			self.insert(key, value);
+		}
+	}
+}
+
+impl<'a, K: Ord + Copy + 'a, V: Ord + Copy + 'a> Extend<(&'a K, &'a V)>
+	for AATreeMap<K, V>
+{
+	fn extend<I: IntoIterator<Item = (&'a K, &'a V)>>(&mut self, iter: I) {
+		self.extend(iter.into_iter().map(|(k, v)| (*k, *v)))
+	}
+}
+
 impl<K, V> IntoIterator for AATreeMap<K, V> {
 	type Item = (K, V);
 	type IntoIter = AAIntoIter<Entry<K, V>, (K, V)>;
