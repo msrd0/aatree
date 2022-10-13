@@ -255,13 +255,13 @@ impl<T: Ord> AATreeSet<T> {
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.first_after(&41).is_none());
+	/// assert!(set.first_at_or_after(&41).is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.first_after(&41), Some(&42));
+	/// assert_eq!(set.first_at_or_after(&41), Some(&42));
 	/// ```
-	pub fn first_after<Q>(&self, value: &Q) -> Option<&T>
+	pub fn first_at_or_after<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -280,13 +280,13 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_after() instead")]
+	#[deprecated(since = "0.1.1", note = "Use first_at_or_after() instead")]
 	pub fn smallest_geq_than<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.first_after(value)
+		self.first_at_or_after(value)
 	}
 
 	/// Returns the last/largest element of the set that is smaller or equal to `x`.
@@ -295,13 +295,13 @@ impl<T: Ord> AATreeSet<T> {
 	/// ```rust
 	/// # use aatree::AATreeSet;
 	/// let mut set = AATreeSet::new();
-	/// assert!(set.last_before(&43).is_none());
+	/// assert!(set.last_at_or_before(&43).is_none());
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
-	/// assert_eq!(set.last_before(&43), Some(&42));
+	/// assert_eq!(set.last_at_or_before(&43), Some(&42));
 	/// ```
-	pub fn last_before<Q>(&self, value: &Q) -> Option<&T>
+	pub fn last_at_or_before<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -320,13 +320,13 @@ impl<T: Ord> AATreeSet<T> {
 		})
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use last_before() instead")]
+	#[deprecated(since = "0.1.1", note = "Use last_at_or_before() instead")]
 	pub fn largest_leq_than<Q>(&self, value: &Q) -> Option<&T>
 	where
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.last_before(value)
+		self.last_at_or_before(value)
 	}
 
 	/// Removes a value from the set, and returns `true` if it was removed.

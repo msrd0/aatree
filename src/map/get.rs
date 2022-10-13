@@ -223,13 +223,13 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.first_key_value_after(&15), None);
+	/// assert_eq!(map.first_key_value_at_or_after(&15), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// assert_eq!(map.first_key_value_after(&15), Some((&20, &"c")));
+	/// assert_eq!(map.first_key_value_at_or_after(&15), Some((&20, &"c")));
 	/// ```
-	pub fn first_key_value_after<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	pub fn first_key_value_at_or_after<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -248,13 +248,13 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_key_value_after() instead")]
+	#[deprecated(since = "0.1.1", note = "Use first_key_value_at_or_after() instead")]
 	pub fn smallest_geq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.first_key_value_after(k)
+		self.first_key_value_at_or_after(k)
 	}
 
 	/// Returns a mutable reference to the first entry with a key greater than or equal
@@ -265,16 +265,16 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.smallest_geq_than_mut(&15), None);
+	/// assert_eq!(map.first_key_value_mut_at_or_after(&15), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// let value: &mut &str = map.smallest_geq_than_mut(&15).unwrap().1;
+	/// let value: &mut &str = map.first_key_value_mut_at_or_after(&15).unwrap().1;
 	/// assert_eq!(*value, "c");
 	/// *value = "d";
-	/// assert_eq!(map.smallest_geq_than(&15), Some((&20, &"d")));
+	/// assert_eq!(map.first_key_value_at_or_after(&15), Some((&20, &"d")));
 	/// ```
-	pub fn first_key_value_mut_after<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	pub fn first_key_value_mut_at_or_after<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -295,13 +295,13 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_key_value_mut_after() instead")]
+	#[deprecated(since = "0.1.1", note = "Use first_key_value_mut_at_or_after() instead")]
 	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.first_key_value_mut_after(k)
+		self.first_key_value_mut_at_or_after(k)
 	}
 
 	/// Returns a reference to the last entry with a key smaller than or equal to `k` in
@@ -312,13 +312,13 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.last_key_value_before(&25), None);
+	/// assert_eq!(map.last_key_value_at_or_before(&25), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// assert_eq!(map.last_key_value_before(&25), Some((&20, &"c")));
+	/// assert_eq!(map.last_key_value_at_or_before(&25), Some((&20, &"c")));
 	/// ```
-	pub fn last_key_value_before<Q>(&self, k: &Q) -> Option<(&K, &V)>
+	pub fn last_key_value_at_or_before<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -337,13 +337,13 @@ impl<K, V> AATreeMap<K, V> {
 		})
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use last_key_value_before() instead")]
+	#[deprecated(since = "0.1.1", note = "Use last_key_value_at_or_before() instead")]
 	pub fn largest_leq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.last_key_value_before(k)
+		self.last_key_value_at_or_before(k)
 	}
 
 	/// Returns a mutable reference to the last entry with a key smaller than or equal to
@@ -354,16 +354,16 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```rust
 	/// # use aatree::AATreeMap;
 	/// let mut map = AATreeMap::new();
-	/// assert_eq!(map.last_key_value_mut_before(&25), None);
+	/// assert_eq!(map.last_key_value_mut_at_or_before(&25), None);
 	/// map.insert(10, "a");
 	/// map.insert(30, "b");
 	/// map.insert(20, "c");
-	/// let value: &mut &str = map.last_key_value_mut_before(&25).unwrap().1;
+	/// let value: &mut &str = map.last_key_value_mut_at_or_before(&25).unwrap().1;
 	/// assert_eq!(*value, "c");
 	/// *value = "d";
-	/// assert_eq!(map.last_key_value_mut_before(&25), Some((&20, &"d")));
+	/// assert_eq!(map.last_key_value_at_or_before(&25), Some((&20, &"d")));
 	/// ```
-	pub fn last_key_value_mut_before<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
+	pub fn last_key_value_mut_at_or_before<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
@@ -384,12 +384,12 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use last_key_value_mut_before() instead")]
+	#[deprecated(since = "0.1.1", note = "Use last_key_value_mut_at_or_before() instead")]
 	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.last_key_value_mut_before(k)
+		self.last_key_value_mut_at_or_before(k)
 	}
 }
