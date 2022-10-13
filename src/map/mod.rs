@@ -2,6 +2,7 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
+use alloc::vec::Vec;
 use core::{
 	borrow::Borrow,
 	cmp::Ordering,
@@ -248,6 +249,18 @@ impl<K: Ord, V> FromIterator<(K, V)> for AATreeMap<K, V> {
 			map.insert(key, value);
 		}
 		map
+	}
+}
+
+impl<K: Ord, V, const N: usize> From<[(K, V); N]> for AATreeMap<K, V> {
+	fn from(array: [(K, V); N]) -> Self {
+		array.into_iter().collect()
+	}
+}
+
+impl<K: Ord, V> From<Vec<(K, V)>> for AATreeMap<K, V> {
+	fn from(vec: Vec<(K, V)>) -> Self {
+		vec.into_iter().collect()
 	}
 }
 
