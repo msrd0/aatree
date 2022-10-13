@@ -116,6 +116,22 @@ impl<T> AATreeSet<T> {
 		self.len == 0
 	}
 
+	/// Clears the set, removing all elements.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// set.insert(1);
+	/// set.clear();
+	/// assert!(set.is_empty());
+	/// ```
+	pub fn clear(&mut self) {
+		self.root = AANode::new();
+		self.len = 0;
+	}
+
 	/// Creates an iterator over this set that visits the values in ascending order.
 	pub fn iter(&self) -> AAIter<'_, T, &T> {
 		self.into_iter()
