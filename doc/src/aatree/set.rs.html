@@ -464,6 +464,22 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">iter</span>::{<span class="ident">AAIntoIter</span>, <span class="ident">AAIter</span>},
 	<span class="ident">node</span>::{<span class="ident">AANode</span>, <span class="ident">TraverseStep</span>}
@@ -580,6 +596,22 @@
 	<span class="doccomment">/// Returns `true` if the set contains no elements.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
+	}
+
+	<span class="doccomment">/// Clears the set, removing all elements.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Example</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// # use aatree::AATreeSet;</span>
+	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
+	<span class="doccomment">/// set.insert(1);</span>
+	<span class="doccomment">/// set.clear();</span>
+	<span class="doccomment">/// assert!(set.is_empty());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+		<span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">AANode::new</span>();
+		<span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
 	}
 
 	<span class="doccomment">/// Creates an iterator over this set that visits the values in ascending order.</span>
