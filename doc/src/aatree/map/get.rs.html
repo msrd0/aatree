@@ -553,7 +553,7 @@
 	<span class="doccomment">/// ```</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
 	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>
+		<span class="ident">K</span>: <span class="ident">Ord</span>
 	{
 		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_successor</span>().<span class="ident">map</span>(<span class="ident">Entry::into_tuple</span>)
 	}
@@ -561,7 +561,7 @@
 	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use pop_first() instead&quot;</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_smallest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
 	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>
+		<span class="ident">K</span>: <span class="ident">Ord</span>
 	{
 		<span class="self">self</span>.<span class="ident">pop_first</span>()
 	}
@@ -618,14 +618,14 @@
 	<span class="doccomment">/// ```</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
 	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>
+		<span class="ident">K</span>: <span class="ident">Ord</span>
 	{
 		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_predecessor</span>().<span class="ident">map</span>(<span class="ident">Entry::into_tuple</span>)
 	}
 
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_largest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
 	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>
+		<span class="ident">K</span>: <span class="ident">Ord</span>
 	{
 		<span class="self">self</span>.<span class="ident">pop_last</span>()
 	}
