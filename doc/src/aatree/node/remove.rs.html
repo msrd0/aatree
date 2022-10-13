@@ -129,6 +129,12 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AANode</span>, <span class="ident">Node</span>};
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">cmp::Ordering</span>, <span class="ident">mem</span>};
 
@@ -185,7 +191,9 @@
 			<span class="kw">match</span> <span class="self">self</span>.<span class="ident">take</span>().<span class="ident">unbox</span>() {
 				<span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
 				<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-					<span class="ident">right_child</span>, <span class="ident">content</span>, ..
+					<span class="ident">right_child</span>,
+					<span class="ident">content</span>,
+					..
 				}) =&gt; {
 					<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">right_child</span>;
 					<span class="prelude-val">Some</span>(<span class="ident">content</span>)
@@ -206,7 +214,11 @@
 		} <span class="kw">else</span> {
 			<span class="kw">match</span> <span class="self">self</span>.<span class="ident">take</span>().<span class="ident">unbox</span>() {
 				<span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-				<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">left_child</span>, <span class="ident">content</span>, .. }) =&gt; {
+				<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
+					<span class="ident">left_child</span>,
+					<span class="ident">content</span>,
+					..
+				}) =&gt; {
 					<span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">left_child</span>;
 					<span class="prelude-val">Some</span>(<span class="ident">content</span>)
 				}

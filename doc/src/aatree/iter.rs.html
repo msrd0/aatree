@@ -157,6 +157,10 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 
 <span class="doccomment">//! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
@@ -219,7 +223,9 @@
 		<span class="kw">match</span> <span class="ident">last</span>.<span class="ident">as_ref</span>() {
 			<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
 			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>, <span class="ident">right_child</span>, ..
+				<span class="ident">content</span>,
+				<span class="ident">right_child</span>,
+				..
 			}) =&gt; {
 				<span class="kw">if</span> <span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>() {
 					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>((<span class="bool-val">false</span>, <span class="ident">right_child</span>));
@@ -295,7 +301,9 @@
 		<span class="kw">match</span> <span class="ident">last</span>.<span class="ident">unbox</span>() {
 			<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
 			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>, <span class="ident">right_child</span>, ..
+				<span class="ident">content</span>,
+				<span class="ident">right_child</span>,
+				..
 			}) =&gt; {
 				<span class="kw">if</span> <span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>() {
 					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">right_child</span>);
