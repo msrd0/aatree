@@ -2,6 +2,7 @@ use crate::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
 };
+use alloc::vec::Vec;
 use core::{
 	borrow::Borrow,
 	cmp::Ordering,
@@ -362,6 +363,18 @@ impl<T: Ord> FromIterator<T> for AATreeSet<T> {
 			set.insert(value);
 		}
 		set
+	}
+}
+
+impl<T: Ord, const N: usize> From<[T; N]> for AATreeSet<T> {
+	fn from(array: [T; N]) -> Self {
+		array.into_iter().collect()
+	}
+}
+
+impl<T: Ord> From<Vec<T>> for AATreeSet<T> {
+	fn from(vec: Vec<T>) -> Self {
+		vec.into_iter().collect()
 	}
 }
 
