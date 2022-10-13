@@ -142,7 +142,7 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```
 	pub fn pop_first(&mut self) -> Option<(K, V)>
 	where
-		K: Clone + Ord
+		K: Ord
 	{
 		self.root.remove_successor().map(Entry::into_tuple)
 	}
@@ -150,7 +150,7 @@ impl<K, V> AATreeMap<K, V> {
 	#[deprecated(since = "0.1.1", note = "Use pop_first() instead")]
 	pub fn pop_smallest(&mut self) -> Option<(K, V)>
 	where
-		K: Clone + Ord
+		K: Ord
 	{
 		self.pop_first()
 	}
@@ -207,14 +207,14 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```
 	pub fn pop_last(&mut self) -> Option<(K, V)>
 	where
-		K: Clone + Ord
+		K: Ord
 	{
 		self.root.remove_predecessor().map(Entry::into_tuple)
 	}
 
 	pub fn pop_largest(&mut self) -> Option<(K, V)>
 	where
-		K: Clone + Ord
+		K: Ord
 	{
 		self.pop_last()
 	}
