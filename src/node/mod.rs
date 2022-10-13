@@ -80,7 +80,9 @@ impl<T> AANode<T> {
 		match self.as_ref() {
 			None => false,
 			Some(Node {
-				left_child, right_child, ..
+				left_child,
+				right_child,
+				..
 			}) => left_child.is_nil() && right_child.is_nil()
 		}
 	}
@@ -102,13 +104,15 @@ impl<T> AANode<T> {
 	}
 
 	fn left_child_mut(&mut self) -> Option<&mut Self> {
-		self.as_mut()
-			.and_then(|Node { left_child, .. }| (!left_child.is_nil()).then(|| left_child))
+		self.as_mut().and_then(|Node { left_child, .. }| {
+			(!left_child.is_nil()).then(|| left_child)
+		})
 	}
 
 	fn right_child_mut(&mut self) -> Option<&mut Self> {
-		self.as_mut()
-			.and_then(|Node { right_child, .. }| (!right_child.is_nil()).then(|| right_child))
+		self.as_mut().and_then(|Node { right_child, .. }| {
+			(!right_child.is_nil()).then(|| right_child)
+		})
 	}
 
 	fn set_right_child(&mut self, child: Self) {
@@ -148,7 +152,9 @@ impl<T> AANode<T> {
 		match self.as_mut() {
 			None => self,
 			Some(Node {
-				level, left_child: l, ..
+				level,
+				left_child: l,
+				..
 			}) => {
 				// if level = l.level, remove the B node from L
 				let b_node = match l.as_mut() {
@@ -164,7 +170,10 @@ impl<T> AANode<T> {
 				let mut l_node = mem::replace(l, b_node);
 
 				// add our node T as the right child of L
-				l_node.as_mut().unwrap_or_else(|| unreachable!()).right_child = self;
+				l_node
+					.as_mut()
+					.unwrap_or_else(|| unreachable!())
+					.right_child = self;
 
 				// L is our new node
 				l_node
@@ -183,7 +192,9 @@ impl<T> AANode<T> {
 		match self.as_mut() {
 			None => self,
 			Some(Node {
-				level, right_child: r, ..
+				level,
+				right_child: r,
+				..
 			}) => {
 				// remove the B node if R and X are not Nil
 				let b_node = match r.as_mut() {
@@ -377,12 +388,10 @@ mod test {
 	#[test]
 	fn test_remove_complex() {
 		// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf
-		let mut root =
-			tree!(30 => [3, (15 => [2, 5, 20]), (70 => [3, (50 => [2, 35, (60 => [2, 55, 65])]), (85 => [2, 80, 90])])]);
+		let mut root = tree!(30 => [3, (15 => [2, 5, 20]), (70 => [3, (50 => [2, 35, (60 => [2, 55, 65])]), (85 => [2, 80, 90])])]);
 		println!("Input:  `{:?}`", root);
 		let removed = root.remove(&5);
-		let expected =
-			tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
+		let expected = tree!(50 => [3, (30 => [2, (15 => [1, Nil, 20]), 35]), (70 => [3, (60 => [2, 55, 65]), (85 => [2, 80, 90])])]);
 		assert_eq!(removed, Some(5));
 		assert_eq!(root, expected);
 	}

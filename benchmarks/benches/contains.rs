@@ -1,5 +1,8 @@
 use aatree::AATreeSet;
-use criterion::{criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup, BenchmarkId, Criterion};
+use criterion::{
+	criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup,
+	BenchmarkId, Criterion
+};
 use std::{collections::BTreeSet, time::Duration};
 
 macro_rules! benchmark {

@@ -84,7 +84,11 @@ impl<T> AANode<T> {
 	///
 	/// **It is a logic error to mutate the nodes in a way that changes their order with
 	/// respect to the other nodes in the tree.**
-	pub(crate) fn traverse_mut<'a, F, L, R>(&'a mut self, callback: F, leaf_callback: L) -> Option<R>
+	pub(crate) fn traverse_mut<'a, F, L, R>(
+		&'a mut self,
+		callback: F,
+		leaf_callback: L
+	) -> Option<R>
 	where
 		F: Fn(&'a mut T, TraverseMutContext) -> TraverseStep<R> + Copy,
 		L: Fn(&'a mut T) -> Option<R>
@@ -99,7 +103,11 @@ impl<T> AANode<T> {
 		}
 	}
 
-	fn traverse_mut_impl<'a, F, L, R>(&'a mut self, callback: F, leaf_callback: L) -> TraverseStep<R>
+	fn traverse_mut_impl<'a, F, L, R>(
+		&'a mut self,
+		callback: F,
+		leaf_callback: L
+	) -> TraverseStep<R>
 	where
 		F: Fn(&'a mut T, TraverseMutContext) -> TraverseStep<R> + Copy,
 		L: Fn(&'a mut T) -> Option<R>
@@ -115,10 +123,17 @@ impl<T> AANode<T> {
 				if left_child.is_nil() && right_child.is_nil() {
 					TraverseStep::Value(leaf_callback(content))
 				} else {
-					let step = callback(content, TraverseMutContext(left_child.is_nil(), right_child.is_nil()));
+					let step = callback(
+						content,
+						TraverseMutContext(left_child.is_nil(), right_child.is_nil())
+					);
 					match step {
-						TraverseStep::Left => left_child.traverse_mut_impl(callback, leaf_callback),
-						TraverseStep::Right => right_child.traverse_mut_impl(callback, leaf_callback),
+						TraverseStep::Left => {
+							left_child.traverse_mut_impl(callback, leaf_callback)
+						},
+						TraverseStep::Right => {
+							right_child.traverse_mut_impl(callback, leaf_callback)
+						},
 						TraverseStep::Value(_) => step
 					}
 				}

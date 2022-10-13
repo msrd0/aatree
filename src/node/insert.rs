@@ -21,9 +21,15 @@ impl<T: Ord> AANode<T> {
 				*self = new.into();
 				true
 			},
-			Some(Node { content, left_child, .. }) if &new < content => left_child.insert(new),
 			Some(Node {
-				content, right_child, ..
+				content,
+				left_child,
+				..
+			}) if &new < content => left_child.insert(new),
+			Some(Node {
+				content,
+				right_child,
+				..
 			}) if &new > content => right_child.insert(new),
 			_ => false
 		}
@@ -48,10 +54,18 @@ impl<T: Ord> AANode<T> {
 				*self = new.into();
 				None
 			},
-			Some(Node { content, .. }) if &new == content => Some(mem::replace(content, new)),
-			Some(Node { content, left_child, .. }) if &new < content => left_child.insert_or_replace(new),
+			Some(Node { content, .. }) if &new == content => {
+				Some(mem::replace(content, new))
+			},
 			Some(Node {
-				content, right_child, ..
+				content,
+				left_child,
+				..
+			}) if &new < content => left_child.insert_or_replace(new),
+			Some(Node {
+				content,
+				right_child,
+				..
 			}) if &new > content => right_child.insert_or_replace(new),
 			_ => unreachable!()
 		}

@@ -54,7 +54,9 @@ impl<T> AANode<T> {
 			match self.take().unbox() {
 				None => None,
 				Some(Node {
-					right_child, content, ..
+					right_child,
+					content,
+					..
 				}) => {
 					*self = right_child;
 					Some(content)
@@ -75,7 +77,11 @@ impl<T> AANode<T> {
 		} else {
 			match self.take().unbox() {
 				None => None,
-				Some(Node { left_child, content, .. }) => {
+				Some(Node {
+					left_child,
+					content,
+					..
+				}) => {
 					*self = left_child;
 					Some(content)
 				}

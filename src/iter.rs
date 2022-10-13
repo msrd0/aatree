@@ -60,7 +60,9 @@ where
 		match last.as_ref() {
 			None => unreachable!(),
 			Some(Node {
-				content, right_child, ..
+				content,
+				right_child,
+				..
 			}) => {
 				if !right_child.is_nil() {
 					self.stack.push((false, right_child));
@@ -136,7 +138,9 @@ where
 		match last.unbox() {
 			None => unreachable!(),
 			Some(Node {
-				content, right_child, ..
+				content,
+				right_child,
+				..
 			}) => {
 				if !right_child.is_nil() {
 					self.stack.push(right_child);

@@ -108,7 +108,9 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord
 	{
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content.as_tuple())),
+			Some(TraverseStep::Value(None)) => {
+				TraverseStep::Value(Some(content.as_tuple()))
+			},
 			Some(sub) => sub,
 			None => TraverseStep::Left
 		})
@@ -171,7 +173,9 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord
 	{
 		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content.as_tuple())),
+			Some(TraverseStep::Value(None)) => {
+				TraverseStep::Value(Some(content.as_tuple()))
+			},
 			Some(sub) => sub,
 			None => TraverseStep::Right
 		})
@@ -237,7 +241,9 @@ impl<K, V> AATreeMap<K, V> {
 		self.root.traverse(|content, sub| {
 			let key = content.key.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if key > k => TraverseStep::Value(Some(content.as_tuple())),
+				Some(TraverseStep::Value(None)) if key > k => {
+					TraverseStep::Value(Some(content.as_tuple()))
+				},
 				Some(sub) => sub,
 				None => match key.cmp(k) {
 					Ordering::Greater => TraverseStep::Left,
@@ -295,7 +301,10 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_key_value_mut_at_or_after() instead")]
+	#[deprecated(
+		since = "0.1.1",
+		note = "Use first_key_value_mut_at_or_after() instead"
+	)]
 	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,
@@ -326,7 +335,9 @@ impl<K, V> AATreeMap<K, V> {
 		self.root.traverse(|content, sub| {
 			let key = content.key.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if key < k => TraverseStep::Value(Some(content.as_tuple())),
+				Some(TraverseStep::Value(None)) if key < k => {
+					TraverseStep::Value(Some(content.as_tuple()))
+				},
 				Some(sub) => sub,
 				None => match key.cmp(k) {
 					Ordering::Greater => TraverseStep::Left,
@@ -384,7 +395,10 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use last_key_value_mut_at_or_before() instead")]
+	#[deprecated(
+		since = "0.1.1",
+		note = "Use last_key_value_mut_at_or_before() instead"
+	)]
 	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
 		K: Borrow<Q> + Ord,

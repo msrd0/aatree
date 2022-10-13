@@ -269,7 +269,9 @@ impl<T: Ord> AATreeSet<T> {
 		self.root.traverse(|content, sub| {
 			let c = content.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if c > value => TraverseStep::Value(Some(content)),
+				Some(TraverseStep::Value(None)) if c > value => {
+					TraverseStep::Value(Some(content))
+				},
 				Some(sub) => sub,
 				None => match c.cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
@@ -309,7 +311,9 @@ impl<T: Ord> AATreeSet<T> {
 		self.root.traverse(|content, sub| {
 			let c = content.borrow();
 			match sub {
-				Some(TraverseStep::Value(None)) if c < value => TraverseStep::Value(Some(content)),
+				Some(TraverseStep::Value(None)) if c < value => {
+					TraverseStep::Value(Some(content))
+				},
 				Some(sub) => sub,
 				None => match c.cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
