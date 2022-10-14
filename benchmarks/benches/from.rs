@@ -14,7 +14,8 @@ macro_rules! benchmark {
 	($ty:ty, $amount:expr, collect) => {
 		paste::item! {
 			fn [<$ty:lower _collect_ $amount>]() -> $ty<u64> {
-				(0..$amount).collect()
+				let vec: Vec<_> = (0..$amount).collect();
+				vec.into_iter().collect()
 			}
 		}
 	};
