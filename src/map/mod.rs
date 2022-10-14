@@ -310,6 +310,8 @@ impl<K: Ord, V> FromIterator<(K, V)> for AATreeMap<K, V> {
 
 impl<K: Ord, V, const N: usize> From<[(K, V); N]> for AATreeMap<K, V> {
 	fn from(array: [(K, V); N]) -> Self {
+		// TODO more efficient implementation, see From<Vec<(K, V)>>
+		// blocked on https://github.com/rust-lang/rust/issues/54279
 		array.into_iter().collect()
 	}
 }

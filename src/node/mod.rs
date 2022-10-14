@@ -11,8 +11,6 @@ mod remove;
 mod tests;
 mod traverse;
 
-pub use insert::*;
-pub use remove::*;
 pub use traverse::*;
 
 #[derive(Clone, Debug, PartialEq)]
