@@ -20,11 +20,18 @@ macro_rules! benchmark {
 					container.remove(i);
 				}
 			}
-			fn [<bench_ $ty:lower _remove_ $amount _ $success>]<M: Measurement>(g: &mut BenchmarkGroup<M>, id: BenchmarkId) {
+			fn [<bench_ $ty:lower _remove_ $amount _ $success>]<M: Measurement>(
+				g: &mut BenchmarkGroup<M>,
+				id: BenchmarkId
+			) {
 				let container: $ty<u64> = $iter_fill.collect();
 				let test: Vec<u64> = $iter_test.collect();
 				let container = Rc::new(Mutex::new(container));
-				g.bench_with_input(id, &(container, test), |b, (c, t)| b.iter(|| [<$ty:lower _remove_ $amount _ $success>](c, t)));
+				g.bench_with_input(
+					id,
+					&(container, test),
+					|b, (c, t)| b.iter(|| [<$ty:lower _remove_ $amount _ $success>](c, t))
+				);
 			}
 		}
 	};
@@ -34,7 +41,10 @@ macro_rules! benchmark {
 			fn [<bench_ $group:lower>](c: &mut Criterion) {
 				let mut g = c.benchmark_group($group);
 				g.sample_size(150).measurement_time(Duration::from_secs(20));
-				$([<bench_ $ty:lower _remove_ $amount _ $success>](&mut g, BenchmarkId::new(format!("{}_{}", $name, stringify!($success)), $amount));)+
+				$([<bench_ $ty:lower _remove_ $amount _ $success>](
+					&mut g,
+					BenchmarkId::new(format!("{}_{}", $name, stringify!($success)), $amount)
+				);)+
 				g.finish();
 			}
 		}

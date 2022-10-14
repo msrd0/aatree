@@ -26,7 +26,10 @@ macro_rules! benchmark {
 			fn [<bench_ $group:lower>](c: &mut Criterion) {
 				let mut g = c.benchmark_group($group);
 				g.sample_size(150).measurement_time(Duration::from_secs(20));
-				$(g.bench_function(BenchmarkId::new(format!("{}_{}", $name, stringify!($order)), $amount), |b| b.iter([<$ty:lower _insert_ $amount _ $order>]));)+
+				$(g.bench_function(
+					BenchmarkId::new(format!("{}_{}", $name, stringify!($order)), $amount),
+					|b| b.iter([<$ty:lower _insert_ $amount _ $order>])
+				);)+
 				g.finish();
 			}
 		}
