@@ -192,10 +192,13 @@ mod remove {
 mod bulk_insert {
 	use super::*;
 
-	fn tree_from<T: Ord, const N: usize>(data: [T; N]) -> AANode<T> {
-		let mut root = AANode::new();
-		root.bulk_insert(data.into_iter());
-		root
+	fn tree_from<I>(data: I) -> AANode<I::Item>
+	where
+		I: IntoIterator,
+		<I as IntoIterator>::Item: Ord,
+		<I as IntoIterator>::IntoIter: ExactSizeIterator
+	{
+		AANode::from_sorted_data(data.into_iter())
 	}
 
 	#[test]
