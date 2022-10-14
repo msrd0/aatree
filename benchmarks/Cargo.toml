@@ -19,6 +19,10 @@ name = "contains"
 harness = false
 
 [[bench]]
+name = "from"
+harness = false
+
+[[bench]]
 name = "insert"
 harness = false
 
