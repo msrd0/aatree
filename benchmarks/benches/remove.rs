@@ -43,7 +43,7 @@ macro_rules! benchmark {
 				g.sample_size(150).measurement_time(Duration::from_secs(20));
 				$([<bench_ $ty:lower _remove_ $amount _ $success>](
 					&mut g,
-					BenchmarkId::new(format!("{}_{}", $name, stringify!($success)), $amount)
+					BenchmarkId::new(concat!($name, "_", stringify!($success)), $amount)
 				);)+
 				g.finish();
 			}

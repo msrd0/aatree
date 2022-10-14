@@ -27,7 +27,7 @@ macro_rules! benchmark {
 				let mut g = c.benchmark_group($group);
 				g.sample_size(150).measurement_time(Duration::from_secs(20));
 				$(g.bench_function(
-					BenchmarkId::new(format!("{}_{}", $name, stringify!($order)), $amount),
+					BenchmarkId::new(concat!($name, "_", stringify!($order)), $amount),
 					|b| b.iter([<$ty:lower _insert_ $amount _ $order>])
 				);)+
 				g.finish();
