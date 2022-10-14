@@ -11,6 +11,12 @@ pub struct Entry<K, V> {
 	pub value: V
 }
 
+impl<K, V> From<(K, V)> for Entry<K, V> {
+	fn from((key, value): (K, V)) -> Self {
+		Self { key, value }
+	}
+}
+
 impl<K, V> Entry<K, V> {
 	pub(super) fn as_tuple(&self) -> (&K, &V) {
 		(&self.key, &self.value)

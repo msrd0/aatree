@@ -315,8 +315,14 @@ impl<K: Ord, V, const N: usize> From<[(K, V); N]> for AATreeMap<K, V> {
 }
 
 impl<K: Ord, V> From<Vec<(K, V)>> for AATreeMap<K, V> {
-	fn from(vec: Vec<(K, V)>) -> Self {
-		vec.into_iter().collect()
+	fn from(mut vec: Vec<(K, V)>) -> Self {
+		vec.sort_by(|lhs, rhs| lhs.0.cmp(&rhs.0));
+		vec.dedup_by(|lhs, rhs| lhs.0 == rhs.0);
+
+		let iter = vec.into_iter().map(Into::into);
+		let len = iter.len();
+		let root = AANode::from_sorted_data(iter);
+		Self { root, len }
 	}
 }
 
