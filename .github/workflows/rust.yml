@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@1.56.0
+      - uses: dtolnay/rust-toolchain@1.70.0
       - run: cargo test --workspace --all-features --lib
         env:
           RUST_BACKTRACE: 1
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.70.0
       - run: cargo test --workspace --all-features --doc
         env:
           RUST_BACKTRACE: 1
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@nightly
+      - uses: dtolnay/rust-toolchain@1.70.0
         with:
           components: rustfmt
       - run: cargo fmt --all -- --check
@@ -38,7 +38,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.70.0
       - run: cargo doc --workspace --all-features --no-deps
         env:
           RUSTDOCFLAGS: "--default-theme ayu"
