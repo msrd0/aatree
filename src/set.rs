@@ -206,11 +206,8 @@ impl<T: Ord> AATreeSet<T> {
 	/// assert_eq!(set.first(), Some(&40));
 	/// ```
 	pub fn first(&self) -> Option<&T> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
-			Some(sub) => sub,
-			None => TraverseStep::Left
-		})
+		self.root
+			.traverse(|_| TraverseStep::Left, |content, sub| sub.or(Some(content)))
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use first() instead")]
@@ -231,11 +228,10 @@ impl<T: Ord> AATreeSet<T> {
 	/// assert_eq!(set.last(), Some(&44));
 	/// ```
 	pub fn last(&self) -> Option<&T> {
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => TraverseStep::Value(Some(content)),
-			Some(sub) => sub,
-			None => TraverseStep::Right
-		})
+		self.root.traverse(
+			|_| TraverseStep::Right,
+			|content, sub| sub.or(Some(content))
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use last() instead")]
@@ -308,14 +304,14 @@ impl<T: Ord> AATreeSet<T> {
 		Q: Ord + ?Sized
 	{
 		self.root
-			.traverse(|content, sub| match sub {
-				Some(sub) => sub,
-				None => match content.borrow().cmp(value) {
+			.traverse(
+				|content| match content.borrow().cmp(value) {
 					Ordering::Greater => TraverseStep::Left,
 					Ordering::Less => TraverseStep::Right,
 					Ordering::Equal => TraverseStep::Value(Some(()))
-				}
-			})
+				},
+				|_, sub| sub
+			)
 			.is_some()
 	}
 
@@ -336,20 +332,17 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| {
-			let c = content.borrow();
-			match sub {
-				Some(TraverseStep::Value(None)) if c > value => {
-					TraverseStep::Value(Some(content))
-				},
-				Some(sub) => sub,
-				None => match c.cmp(value) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(content))
-				}
+		self.root.traverse(
+			|content| match content.borrow().cmp(value) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(content))
+			},
+			|content, sub| match sub {
+				None if content.borrow() > value => Some(content),
+				sub => sub
 			}
-		})
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use first_at_or_after() instead")]
@@ -378,20 +371,17 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| {
-			let c = content.borrow();
-			match sub {
-				Some(TraverseStep::Value(None)) if c < value => {
-					TraverseStep::Value(Some(content))
-				},
-				Some(sub) => sub,
-				None => match c.cmp(value) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(content))
-				}
+		self.root.traverse(
+			|content| match content.borrow().cmp(value) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(content))
+			},
+			|content, sub| match sub {
+				None if content.borrow() < value => Some(content),
+				sub => sub
 			}
-		})
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use last_at_or_before() instead")]

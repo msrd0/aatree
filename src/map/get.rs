@@ -21,14 +21,14 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| match sub {
-			Some(sub) => sub,
-			None => match key.cmp(content.key.borrow()) {
+		self.root.traverse(
+			|content| match key.cmp(content.key.borrow()) {
 				Ordering::Equal => TraverseStep::Value(Some(&content.value)),
 				Ordering::Less => TraverseStep::Left,
 				Ordering::Greater => TraverseStep::Right
-			}
-		})
+			},
+			|_, sub| sub
+		)
 	}
 
 	/// Returns a reference to the key and value corresponding to the key.
@@ -47,14 +47,14 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| match sub {
-			Some(sub) => sub,
-			None => match key.cmp(content.key.borrow()) {
+		self.root.traverse(
+			|content| match key.cmp(content.key.borrow()) {
 				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple())),
 				Ordering::Less => TraverseStep::Left,
 				Ordering::Greater => TraverseStep::Right
-			}
-		})
+			},
+			|_, sub| sub
+		)
 	}
 
 	/// Returns a mutable reference to the value corresponding to the key.
@@ -107,13 +107,10 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => {
-				TraverseStep::Value(Some(content.as_tuple()))
-			},
-			Some(sub) => sub,
-			None => TraverseStep::Left
-		})
+		self.root.traverse(
+			|_| TraverseStep::Left,
+			|content, sub| sub.or_else(|| Some(content.as_tuple()))
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use first_key_value() instead")]
@@ -172,13 +169,10 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.traverse(|content, sub| match sub {
-			Some(TraverseStep::Value(None)) => {
-				TraverseStep::Value(Some(content.as_tuple()))
-			},
-			Some(sub) => sub,
-			None => TraverseStep::Right
-		})
+		self.root.traverse(
+			|_| TraverseStep::Right,
+			|content, sub| sub.or_else(|| Some(content.as_tuple()))
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use last_key_value() instead")]
@@ -238,20 +232,17 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| {
-			let key = content.key.borrow();
-			match sub {
-				Some(TraverseStep::Value(None)) if key > k => {
-					TraverseStep::Value(Some(content.as_tuple()))
-				},
-				Some(sub) => sub,
-				None => match key.cmp(k) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
-				}
+		self.root.traverse(
+			|content| match content.key.borrow().cmp(k) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
+			},
+			|content, sub| match sub {
+				None if content.key.borrow() > k => Some(content.as_tuple()),
+				sub => sub
 			}
-		})
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use first_key_value_at_or_after() instead")]
@@ -332,20 +323,17 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(|content, sub| {
-			let key = content.key.borrow();
-			match sub {
-				Some(TraverseStep::Value(None)) if key < k => {
-					TraverseStep::Value(Some(content.as_tuple()))
-				},
-				Some(sub) => sub,
-				None => match key.cmp(k) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
-				}
+		self.root.traverse(
+			|content| match content.key.borrow().cmp(k) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
+			},
+			|content, sub| match sub {
+				None if content.key.borrow() < k => Some(content.as_tuple()),
+				sub => sub
 			}
-		})
+		)
 	}
 
 	#[deprecated(since = "0.1.1", note = "Use last_key_value_at_or_before() instead")]
