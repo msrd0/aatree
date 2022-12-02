@@ -437,13 +437,21 @@ impl<T: Ord> FromIterator<T> for AATreeSet<T> {
 
 impl<T: Ord, const N: usize> From<[T; N]> for AATreeSet<T> {
 	fn from(array: [T; N]) -> Self {
+		// TODO more efficient implementation, see From<Vec<(K, V)>>
+		// blocked on https://github.com/rust-lang/rust/issues/54279
 		array.into_iter().collect()
 	}
 }
 
 impl<T: Ord> From<Vec<T>> for AATreeSet<T> {
-	fn from(vec: Vec<T>) -> Self {
-		vec.into_iter().collect()
+	fn from(mut vec: Vec<T>) -> Self {
+		vec.sort();
+		vec.dedup();
+
+		let iter = vec.into_iter();
+		let len = iter.len();
+		let root = AANode::from_sorted_data(iter);
+		Self { root, len }
 	}
 }
 
