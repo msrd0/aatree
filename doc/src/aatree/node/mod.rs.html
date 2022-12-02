@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/node/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/node/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../aatree/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -398,403 +398,403 @@
 <span id="396">396</span>
 <span id="397">397</span>
 <span id="398">398</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Low-level implementation of an AA tree. You shouldn&#39;t have to use this directly; instead, use</span>
-<span class="doccomment">//! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Low-level implementation of an AA tree. You shouldn&#39;t have to use this directly; instead, use
+//! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
+</span><span class="kw">use </span>alloc::boxed::Box;
+<span class="kw">use </span>core::mem;
 
-<span class="kw">mod</span> <span class="ident">insert</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">insert</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>insert;
+<span class="kw">pub use </span>insert::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">remove</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">remove</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>remove;
+<span class="kw">pub use </span>remove::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">traverse</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traverse</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>traverse;
+<span class="kw">pub use </span>traverse::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>AANode&lt;T&gt;(<span class="prelude-ty">Option</span>&lt;Box&lt;Node&lt;T&gt;&gt;&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">level</span>: <span class="ident">u8</span>,
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">content</span>: <span class="ident">T</span>,
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">left_child</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">right_child</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Node&lt;T&gt; {
+	<span class="kw">pub</span>(<span class="kw">super</span>) level: u8,
+	<span class="kw">pub</span>(<span class="kw">super</span>) content: T,
+	<span class="kw">pub</span>(<span class="kw">super</span>) left_child: AANode&lt;T&gt;,
+	<span class="kw">pub</span>(<span class="kw">super</span>) right_child: AANode&lt;T&gt;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">node</span>: <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">node</span>)))
+<span class="kw">impl</span>&lt;T&gt; From&lt;Node&lt;T&gt;&gt; <span class="kw">for </span>AANode&lt;T&gt; {
+	<span class="kw">fn </span>from(node: Node&lt;T&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(<span class="prelude-val">Some</span>(Box::new(node)))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AANode&lt;T&gt; {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">Node</span> {
-			<span class="ident">level</span>: <span class="number">1</span>,
-			<span class="ident">content</span>,
-			<span class="ident">left_child</span>: <span class="self">Self</span>(<span class="prelude-val">None</span>),
-			<span class="ident">right_child</span>: <span class="self">Self</span>(<span class="prelude-val">None</span>)
+<span class="kw">impl</span>&lt;T&gt; From&lt;T&gt; <span class="kw">for </span>AANode&lt;T&gt; {
+	<span class="kw">fn </span>from(content: T) -&gt; <span class="self">Self </span>{
+		Node {
+			level: <span class="number">1</span>,
+			content,
+			left_child: <span class="self">Self</span>(<span class="prelude-val">None</span>),
+			right_child: <span class="self">Self</span>(<span class="prelude-val">None</span>)
 		}
-		.<span class="ident">into</span>()
+		.into()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unbox</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">this</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">this</span>)
+<span class="kw">impl</span>&lt;T&gt; AANode&lt;T&gt; {
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>unbox(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Node&lt;T&gt;&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.map(|this| <span class="kw-2">*</span>this)
 	}
 
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Box::as_ref</span>)
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Node&lt;T&gt;&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.as_ref().map(Box::as_ref)
 	}
 
-	<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="ident">Box::as_mut</span>)
+	<span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Node&lt;T&gt;&gt; {
+		<span class="self">self</span>.<span class="number">0</span>.as_mut().map(Box::as_mut)
 	}
 
-	<span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">take</span>())
+	<span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.take())
 	}
 
-	<span class="doccomment">/// Create a new `Nil` node.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+	<span class="doccomment">/// Create a new `Nil` node.
+	</span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
 		<span class="self">Self</span>(<span class="prelude-val">None</span>)
 	}
 
-	<span class="doccomment">/// Return true if this node is `Nil`.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_nil</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_none</span>()
+	<span class="doccomment">/// Return true if this node is `Nil`.
+	</span><span class="kw">pub const fn </span>is_nil(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.<span class="number">0</span>.is_none()
 	}
 
-	<span class="doccomment">/// Return true if this node is a leaf.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_leaf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">left_child</span>,
-				<span class="ident">right_child</span>,
+	<span class="doccomment">/// Return true if this node is a leaf.
+	</span><span class="kw">pub fn </span>is_leaf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="kw">match </span><span class="self">self</span>.as_ref() {
+			<span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+			<span class="prelude-val">Some</span>(Node {
+				left_child,
+				right_child,
 				..
-			}) =&gt; <span class="ident">left_child</span>.<span class="ident">is_nil</span>() <span class="op">&amp;&amp;</span> <span class="ident">right_child</span>.<span class="ident">is_nil</span>()
+			}) =&gt; left_child.is_nil() &amp;&amp; right_child.is_nil()
 		}
 	}
 
-	<span class="doccomment">/// Return true if this node has a left child.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_left_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">left_child</span>, .. }) =&gt; <span class="op">!</span><span class="ident">left_child</span>.<span class="ident">is_nil</span>()
+	<span class="doccomment">/// Return true if this node has a left child.
+	</span><span class="kw">pub fn </span>has_left_child(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="kw">match </span><span class="self">self</span>.as_ref() {
+			<span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+			<span class="prelude-val">Some</span>(Node { left_child, .. }) =&gt; !left_child.is_nil()
 		}
 	}
 
-	<span class="doccomment">/// Return true if this node has a right child.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_right_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">right_child</span>, .. }) =&gt; <span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>()
+	<span class="doccomment">/// Return true if this node has a right child.
+	</span><span class="kw">pub fn </span>has_right_child(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="kw">match </span><span class="self">self</span>.as_ref() {
+			<span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+			<span class="prelude-val">Some</span>(Node { right_child, .. }) =&gt; !right_child.is_nil()
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">left_child_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">Node</span> { <span class="ident">left_child</span>, .. }<span class="op">|</span> {
-			(<span class="op">!</span><span class="ident">left_child</span>.<span class="ident">is_nil</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">left_child</span>)
+	<span class="kw">fn </span>left_child_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt; {
+		<span class="self">self</span>.as_mut().and_then(|Node { left_child, .. }| {
+			(!left_child.is_nil()).then(|| left_child)
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">right_child_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">Node</span> { <span class="ident">right_child</span>, .. }<span class="op">|</span> {
-			(<span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">right_child</span>)
+	<span class="kw">fn </span>right_child_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt; {
+		<span class="self">self</span>.as_mut().and_then(|Node { right_child, .. }| {
+			(!right_child.is_nil()).then(|| right_child)
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">set_right_child</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">child</span>: <span class="self">Self</span>) {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;I don&#39;t have a right child&quot;</span>),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">right_child</span>, .. }) =&gt; {
-				<span class="kw-2">*</span><span class="ident">right_child</span> <span class="op">=</span> <span class="ident">child</span>;
+	<span class="kw">fn </span>set_right_child(<span class="kw-2">&amp;mut </span><span class="self">self</span>, child: <span class="self">Self</span>) {
+		<span class="kw">match </span><span class="self">self</span>.as_mut() {
+			<span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;I don&#39;t have a right child&quot;</span>),
+			<span class="prelude-val">Some</span>(Node { right_child, .. }) =&gt; {
+				<span class="kw-2">*</span>right_child = child;
 			}
 		}
 	}
 
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">level</span>, .. }) =&gt; <span class="kw-2">*</span><span class="ident">level</span>
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+		<span class="kw">match </span><span class="self">self</span>.as_ref() {
+			<span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
+			<span class="prelude-val">Some</span>(Node { level, .. }) =&gt; <span class="kw-2">*</span>level
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">content_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">Node</span> { <span class="ident">content</span>, .. }<span class="op">|</span> <span class="ident">content</span>)
+	<span class="kw">fn </span>content_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>T&gt; {
+		<span class="self">self</span>.as_mut().map(|Node { content, .. }| content)
 	}
 
-	<span class="doccomment">/// Update the level of this node. **Panic** if the node is [`Nil`](Self::Nil).</span>
-	<span class="kw">fn</span> <span class="ident">set_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">u8</span>) {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Cannot change level of Nil&quot;</span>),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">level</span>: <span class="ident">l</span>, .. }) =&gt; <span class="ident">mem::replace</span>(<span class="ident">l</span>, <span class="ident">level</span>)
+	<span class="doccomment">/// Update the level of this node. **Panic** if the node is [`Nil`](Self::Nil).
+	</span><span class="kw">fn </span>set_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: u8) {
+		<span class="kw">match </span><span class="self">self</span>.as_mut() {
+			<span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Cannot change level of Nil&quot;</span>),
+			<span class="prelude-val">Some</span>(Node { level: l, .. }) =&gt; mem::replace(l, level)
 		};
 	}
 
-	<span class="doccomment">/// ```none</span>
-	<span class="doccomment">///   L &lt;--- S           S ---&gt; T</span>
-	<span class="doccomment">///  / \      \     =&gt;  /      / \</span>
-	<span class="doccomment">/// A   B      R       A      B   R</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">skew</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="self">self</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">level</span>,
-				<span class="ident">left_child</span>: <span class="ident">l</span>,
+	<span class="doccomment">/// ```none
+	///   L &lt;--- S           S ---&gt; T
+	///  / \      \     =&gt;  /      / \
+	/// A   B      R       A      B   R
+	/// ```
+	</span><span class="kw">fn </span>skew(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="kw">match </span><span class="self">self</span>.as_mut() {
+			<span class="prelude-val">None </span>=&gt; <span class="self">self</span>,
+			<span class="prelude-val">Some</span>(Node {
+				level,
+				left_child: l,
 				..
 			}) =&gt; {
-				<span class="comment">// if level = l.level, remove the B node from L</span>
-				<span class="kw">let</span> <span class="ident">b_node</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">l</span>.<span class="ident">as_mut</span>() {
-					<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-						<span class="ident">level</span>: <span class="ident">l_level</span>,
-						<span class="ident">right_child</span>: <span class="ident">b</span>,
+				<span class="comment">// if level = l.level, remove the B node from L
+				</span><span class="kw">let </span>b_node = <span class="kw">match </span>l.as_mut() {
+					<span class="prelude-val">Some</span>(Node {
+						level: l_level,
+						right_child: b,
 						..
-					}) <span class="kw">if</span> <span class="ident">level</span> <span class="op">==</span> <span class="ident">l_level</span> =&gt; <span class="ident">b</span>.<span class="ident">take</span>(),
-					<span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="self">self</span>
-				};
+					}) <span class="kw">if </span>level == l_level =&gt; b.take(),
+					<span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="self">self
+				</span>};
 
-				<span class="comment">// add the B node as our left child, removing L</span>
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l_node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">l</span>, <span class="ident">b_node</span>);
+				<span class="comment">// add the B node as our left child, removing L
+				</span><span class="kw">let </span><span class="kw-2">mut </span>l_node = mem::replace(l, b_node);
 
-				<span class="comment">// add our node T as the right child of L</span>
-				<span class="ident">l_node</span>
-					.<span class="ident">as_mut</span>()
-					.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">unreachable!</span>())
-					.<span class="ident">right_child</span> <span class="op">=</span> <span class="self">self</span>;
+				<span class="comment">// add our node T as the right child of L
+				</span>l_node
+					.as_mut()
+					.unwrap_or_else(|| <span class="macro">unreachable!</span>())
+					.right_child = <span class="self">self</span>;
 
-				<span class="comment">// L is our new node</span>
-				<span class="ident">l_node</span>
+				<span class="comment">// L is our new node
+				</span>l_node
 			}
 		}
 	}
 
-	<span class="doccomment">/// ```none</span>
-	<span class="doccomment">///   S --&gt; R --&gt; X          R</span>
-	<span class="doccomment">///  /     /          =&gt;    / \</span>
-	<span class="doccomment">/// A     B                T   X</span>
-	<span class="doccomment">///                       / \</span>
-	<span class="doccomment">///                      A   B</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="self">self</span>,
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">level</span>,
-				<span class="ident">right_child</span>: <span class="ident">r</span>,
+	<span class="doccomment">/// ```none
+	///   S --&gt; R --&gt; X          R
+	///  /     /          =&gt;    / \
+	/// A     B                T   X
+	///                       / \
+	///                      A   B
+	/// ```
+	</span><span class="kw">fn </span>split(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="kw">match </span><span class="self">self</span>.as_mut() {
+			<span class="prelude-val">None </span>=&gt; <span class="self">self</span>,
+			<span class="prelude-val">Some</span>(Node {
+				level,
+				right_child: r,
 				..
 			}) =&gt; {
-				<span class="comment">// remove the B node if R and X are not Nil</span>
-				<span class="kw">let</span> <span class="ident">b_node</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">as_mut</span>() {
-					<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-						<span class="ident">left_child</span>: <span class="ident">b</span>,
-						<span class="ident">right_child</span>: <span class="ident">x</span>,
+				<span class="comment">// remove the B node if R and X are not Nil
+				</span><span class="kw">let </span>b_node = <span class="kw">match </span>r.as_mut() {
+					<span class="prelude-val">Some</span>(Node {
+						left_child: b,
+						right_child: x,
 						..
-					}) <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">x</span>.<span class="ident">level</span>() <span class="op">==</span> <span class="ident">level</span> =&gt; <span class="ident">b</span>.<span class="ident">take</span>(),
-					<span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="self">self</span>
-				};
+					}) <span class="kw">if </span><span class="kw-2">&amp;</span>x.level() == level =&gt; b.take(),
+					<span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="self">self
+				</span>};
 
-				<span class="comment">// attach the B node to our node, removing R</span>
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r_node</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="ident">r</span>, <span class="ident">b_node</span>);
+				<span class="comment">// attach the B node to our node, removing R
+				</span><span class="kw">let </span><span class="kw-2">mut </span>r_node = mem::replace(r, b_node);
 
-				<span class="comment">// attach our node to R and increment its level</span>
-				<span class="kw">let</span> <span class="ident">r_node_mut</span> <span class="op">=</span> <span class="ident">r_node</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">unreachable!</span>());
-				<span class="ident">r_node_mut</span>.<span class="ident">level</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-				<span class="ident">r_node_mut</span>.<span class="ident">left_child</span> <span class="op">=</span> <span class="self">self</span>;
+				<span class="comment">// attach our node to R and increment its level
+				</span><span class="kw">let </span>r_node_mut = r_node.as_mut().unwrap_or_else(|| <span class="macro">unreachable!</span>());
+				r_node_mut.level += <span class="number">1</span>;
+				r_node_mut.left_child = <span class="self">self</span>;
 
-				<span class="comment">// R is our new node</span>
-				<span class="ident">r_node</span>
+				<span class="comment">// R is our new node
+				</span>r_node
 			}
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;benchmark&quot;</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(test, not(feature = <span class="string">&quot;benchmark&quot;</span>)))]
+</span><span class="kw">mod </span>test {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-	<span class="macro">macro_rules!</span> <span class="ident">tree</span> {
+	<span class="macro">macro_rules! </span>tree {
 		() =&gt; {
-			<span class="ident">AANode::new</span>()
+			AANode::new()
 		};
-		(<span class="ident">Nil</span>) =&gt; {
-			<span class="ident">AANode::new</span>()
+		(Nil) =&gt; {
+			AANode::new()
 		};
-		(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">expr</span>) =&gt; {
-			<span class="ident">AANode::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>)
+		(<span class="macro-nonterminal">$content</span>:expr) =&gt; {
+			AANode::from(<span class="macro-nonterminal">$content</span>)
 		};
-		(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">expr</span> =&gt; [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">level</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">tt</span>]) =&gt; {
+		(<span class="macro-nonterminal">$content</span>:expr =&gt; [<span class="macro-nonterminal">$level</span>:expr, <span class="macro-nonterminal">$left</span>:tt, <span class="macro-nonterminal">$right</span>:tt]) =&gt; {
 			{
-				<span class="kw">let</span> <span class="ident">_left</span> <span class="op">=</span> <span class="macro">tree!</span>(@<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>);
-				<span class="kw">let</span> <span class="ident">_right</span> <span class="op">=</span> <span class="macro">tree!</span>(@<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>);
-				<span class="ident">AANode</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Node</span> {
-					<span class="ident">level</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">level</span>,
-					<span class="ident">content</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>,
-					<span class="ident">left_child</span>: <span class="ident">_left</span>,
-					<span class="ident">right_child</span>: <span class="ident">_right</span>
+				<span class="kw">let </span>_left = <span class="macro">tree!</span>(@internal <span class="macro-nonterminal">$left</span>);
+				<span class="kw">let </span>_right = <span class="macro">tree!</span>(@internal <span class="macro-nonterminal">$right</span>);
+				AANode(<span class="prelude-val">Some</span>(Box::new(Node {
+					level: <span class="macro-nonterminal">$level</span>,
+					content: <span class="macro-nonterminal">$content</span>,
+					left_child: _left,
+					right_child: _right
 				})))
 			}
 		};
-		(@<span class="ident">internal</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span>:<span class="ident">expr</span> =&gt; [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">level</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">tt</span>])) =&gt; {
-			<span class="macro">tree!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">content</span> =&gt; [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">level</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>])
+		(@internal (<span class="macro-nonterminal">$content</span>:expr =&gt; [<span class="macro-nonterminal">$level</span>:expr, <span class="macro-nonterminal">$left</span>:tt, <span class="macro-nonterminal">$right</span>:tt])) =&gt; {
+			<span class="macro">tree!</span>(<span class="macro-nonterminal">$content </span>=&gt; [<span class="macro-nonterminal">$level</span>, <span class="macro-nonterminal">$left</span>, <span class="macro-nonterminal">$right</span>])
 		};
-		(@<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>:<span class="ident">tt</span>) =&gt; {
-			<span class="macro">tree!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>)
+		(@internal <span class="macro-nonterminal">$inner</span>:tt) =&gt; {
+			<span class="macro">tree!</span>(<span class="macro-nonterminal">$inner</span>)
 		};
 	}
 
-	<span class="comment">// ### TEST SKEW ###</span>
+	<span class="comment">// ### TEST SKEW ###
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_skew_nil</span>() {
-		<span class="kw">let</span> <span class="ident">root</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">skewed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">skew</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="macro">assert_eq!</span>(<span class="ident">skewed</span>, <span class="ident">expected</span>);
+	</span><span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_skew_nil() {
+		<span class="kw">let </span>root: AANode&lt;char&gt; = <span class="macro">tree!</span>();
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>skewed = root.skew();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>();
+		<span class="macro">assert_eq!</span>(skewed, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_skew_leaf</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">skewed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">skew</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">skewed</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_skew_leaf() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>skewed = root.skew();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
+		<span class="macro">assert_eq!</span>(skewed, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_skew_simple</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, (<span class="string">&#39;L&#39;</span> =&gt; [<span class="number">2</span>, <span class="ident">Nil</span>, <span class="ident">Nil</span>]), <span class="string">&#39;R&#39;</span>]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">skewed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">skew</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;L&#39;</span> =&gt; [<span class="number">2</span>, <span class="ident">Nil</span>, (<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="ident">Nil</span>, <span class="string">&#39;R&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">skewed</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_skew_simple() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, (<span class="string">&#39;L&#39; </span>=&gt; [<span class="number">2</span>, Nil, Nil]), <span class="string">&#39;R&#39;</span>]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>skewed = root.skew();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;L&#39; </span>=&gt; [<span class="number">2</span>, Nil, (<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, Nil, <span class="string">&#39;R&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(skewed, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_skew_full</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, (<span class="string">&#39;L&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>]), <span class="string">&#39;R&#39;</span>]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">skewed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">skew</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;L&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;R&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">skewed</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_skew_full() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, (<span class="string">&#39;L&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>]), <span class="string">&#39;R&#39;</span>]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>skewed = root.skew();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;L&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;R&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(skewed, expected);
 	}
 
-	<span class="comment">// ### TEST SPLIT ###</span>
+	<span class="comment">// ### TEST SPLIT ###
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_split_nil</span>() {
-		<span class="kw">let</span> <span class="ident">root</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">splitted</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">split</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="macro">assert_eq!</span>(<span class="ident">splitted</span>, <span class="ident">expected</span>);
+	</span><span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_split_nil() {
+		<span class="kw">let </span>root: AANode&lt;char&gt; = <span class="macro">tree!</span>();
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>splitted = root.split();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>();
+		<span class="macro">assert_eq!</span>(splitted, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_split_leaf</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">splitted</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">split</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">splitted</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_split_leaf() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>splitted = root.split();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span>);
+		<span class="macro">assert_eq!</span>(splitted, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_split_good_tree</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;X&#39;</span>])]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">splitted</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">split</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;X&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">splitted</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_split_good_tree() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;X&#39;</span>])]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>splitted = root.split();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;X&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(splitted, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_split_bad_tree</span>() {
-		<span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, (<span class="string">&#39;X&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;Z&#39;</span>])])]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">splitted</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">split</span>();
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;R&#39;</span> =&gt; [<span class="number">3</span>, (<span class="string">&#39;T&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>]), (<span class="string">&#39;X&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;Z&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">splitted</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_split_bad_tree() {
+		<span class="kw">let </span>root = <span class="macro">tree!</span>(<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, (<span class="string">&#39;R&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;B&#39;</span>, (<span class="string">&#39;X&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;Z&#39;</span>])])]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input: {:?}&quot;</span>, root);
+		<span class="kw">let </span>splitted = root.split();
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;R&#39; </span>=&gt; [<span class="number">3</span>, (<span class="string">&#39;T&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>]), (<span class="string">&#39;X&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;Z&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(splitted, expected);
 	}
 
-	<span class="comment">// ### TEST INSERT ###</span>
+	<span class="comment">// ### TEST INSERT ###
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_insert_greater</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="kw">for</span> <span class="ident">content</span> <span class="kw">in</span> [<span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;C&#39;</span>, <span class="string">&#39;D&#39;</span>, <span class="string">&#39;E&#39;</span>, <span class="string">&#39;F&#39;</span>, <span class="string">&#39;G&#39;</span>].<span class="ident">iter</span>() {
-			<span class="macro">assert!</span>(<span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">content</span>));
+	</span><span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_insert_greater() {
+		<span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>();
+		<span class="kw">for </span>content <span class="kw">in </span>[<span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;C&#39;</span>, <span class="string">&#39;D&#39;</span>, <span class="string">&#39;E&#39;</span>, <span class="string">&#39;F&#39;</span>, <span class="string">&#39;G&#39;</span>].iter() {
+			<span class="macro">assert!</span>(root.insert(<span class="kw-2">*</span>content));
 		}
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;D&#39;</span> =&gt; [<span class="number">3</span>, (<span class="string">&#39;B&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;C&#39;</span>]), (<span class="string">&#39;F&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;E&#39;</span>, <span class="string">&#39;G&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;D&#39; </span>=&gt; [<span class="number">3</span>, (<span class="string">&#39;B&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;C&#39;</span>]), (<span class="string">&#39;F&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;E&#39;</span>, <span class="string">&#39;G&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_insert_smaller</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="kw">for</span> <span class="ident">content</span> <span class="kw">in</span> [<span class="string">&#39;Z&#39;</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;X&#39;</span>, <span class="string">&#39;W&#39;</span>, <span class="string">&#39;V&#39;</span>].<span class="ident">iter</span>() {
-			<span class="macro">assert!</span>(<span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">content</span>));
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_insert_smaller() {
+		<span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>();
+		<span class="kw">for </span>content <span class="kw">in </span>[<span class="string">&#39;Z&#39;</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;X&#39;</span>, <span class="string">&#39;W&#39;</span>, <span class="string">&#39;V&#39;</span>].iter() {
+			<span class="macro">assert!</span>(root.insert(<span class="kw-2">*</span>content));
 		}
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;W&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;V&#39;</span>, (<span class="string">&#39;Y&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;X&#39;</span>, <span class="string">&#39;Z&#39;</span>])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;W&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;V&#39;</span>, (<span class="string">&#39;Y&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;X&#39;</span>, <span class="string">&#39;Z&#39;</span>])]);
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_insert_multiple</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>();
-		<span class="kw">for</span> <span class="ident">content</span> <span class="kw">in</span> [<span class="string">&#39;A&#39;</span>, <span class="string">&#39;A&#39;</span>].<span class="ident">iter</span>() {
-			<span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">content</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_insert_multiple() {
+		<span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>();
+		<span class="kw">for </span>content <span class="kw">in </span>[<span class="string">&#39;A&#39;</span>, <span class="string">&#39;A&#39;</span>].iter() {
+			root.insert(<span class="kw-2">*</span>content);
 		}
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;A&#39;</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;A&#39;</span>);
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 
-	<span class="comment">// ### TEST REMOVE ###</span>
+	<span class="comment">// ### TEST REMOVE ###
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_remove_successor</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;B&#39;</span> =&gt; [<span class="number">1</span>, <span class="ident">Nil</span>, <span class="string">&#39;C&#39;</span>]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">removed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="string">&#39;B&#39;</span>);
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;C&#39;</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">removed</span>, <span class="prelude-val">Some</span>(<span class="string">&#39;B&#39;</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+	</span><span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_remove_successor() {
+		<span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>(<span class="string">&#39;B&#39; </span>=&gt; [<span class="number">1</span>, Nil, <span class="string">&#39;C&#39;</span>]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, root);
+		<span class="kw">let </span>removed = root.remove(<span class="kw-2">&amp;</span><span class="string">&#39;B&#39;</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;C&#39;</span>);
+		<span class="macro">assert_eq!</span>(removed, <span class="prelude-val">Some</span>(<span class="string">&#39;B&#39;</span>));
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_remove_predecessor</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;B&#39;</span> =&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;C&#39;</span>]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">removed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="string">&#39;B&#39;</span>);
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="string">&#39;A&#39;</span> =&gt; [<span class="number">1</span>, <span class="ident">Nil</span>, <span class="string">&#39;C&#39;</span>]);
-		<span class="macro">assert_eq!</span>(<span class="ident">removed</span>, <span class="prelude-val">Some</span>(<span class="string">&#39;B&#39;</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_remove_predecessor() {
+		<span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>(<span class="string">&#39;B&#39; </span>=&gt; [<span class="number">2</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;C&#39;</span>]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, root);
+		<span class="kw">let </span>removed = root.remove(<span class="kw-2">&amp;</span><span class="string">&#39;B&#39;</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="string">&#39;A&#39; </span>=&gt; [<span class="number">1</span>, Nil, <span class="string">&#39;C&#39;</span>]);
+		<span class="macro">assert_eq!</span>(removed, <span class="prelude-val">Some</span>(<span class="string">&#39;B&#39;</span>));
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">test_remove_complex</span>() {
-		<span class="comment">// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="number">30</span> =&gt; [<span class="number">3</span>, (<span class="number">15</span> =&gt; [<span class="number">2</span>, <span class="number">5</span>, <span class="number">20</span>]), (<span class="number">70</span> =&gt; [<span class="number">3</span>, (<span class="number">50</span> =&gt; [<span class="number">2</span>, <span class="number">35</span>, (<span class="number">60</span> =&gt; [<span class="number">2</span>, <span class="number">55</span>, <span class="number">65</span>])]), (<span class="number">85</span> =&gt; [<span class="number">2</span>, <span class="number">80</span>, <span class="number">90</span>])])]);
-		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, <span class="ident">root</span>);
-		<span class="kw">let</span> <span class="ident">removed</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="number">5</span>);
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">tree!</span>(<span class="number">50</span> =&gt; [<span class="number">3</span>, (<span class="number">30</span> =&gt; [<span class="number">2</span>, (<span class="number">15</span> =&gt; [<span class="number">1</span>, <span class="ident">Nil</span>, <span class="number">20</span>]), <span class="number">35</span>]), (<span class="number">70</span> =&gt; [<span class="number">3</span>, (<span class="number">60</span> =&gt; [<span class="number">2</span>, <span class="number">55</span>, <span class="number">65</span>]), (<span class="number">85</span> =&gt; [<span class="number">2</span>, <span class="number">80</span>, <span class="number">90</span>])])]);
-		<span class="macro">assert_eq!</span>(<span class="ident">removed</span>, <span class="prelude-val">Some</span>(<span class="number">5</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">root</span>, <span class="ident">expected</span>);
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>test_remove_complex() {
+		<span class="comment">// example taken from https://web.eecs.umich.edu/~sugih/courses/eecs281/f11/lectures/12-AAtrees+Treaps.pdf
+		</span><span class="kw">let </span><span class="kw-2">mut </span>root = <span class="macro">tree!</span>(<span class="number">30 </span>=&gt; [<span class="number">3</span>, (<span class="number">15 </span>=&gt; [<span class="number">2</span>, <span class="number">5</span>, <span class="number">20</span>]), (<span class="number">70 </span>=&gt; [<span class="number">3</span>, (<span class="number">50 </span>=&gt; [<span class="number">2</span>, <span class="number">35</span>, (<span class="number">60 </span>=&gt; [<span class="number">2</span>, <span class="number">55</span>, <span class="number">65</span>])]), (<span class="number">85 </span>=&gt; [<span class="number">2</span>, <span class="number">80</span>, <span class="number">90</span>])])]);
+		<span class="macro">println!</span>(<span class="string">&quot;Input:  `{:?}`&quot;</span>, root);
+		<span class="kw">let </span>removed = root.remove(<span class="kw-2">&amp;</span><span class="number">5</span>);
+		<span class="kw">let </span>expected = <span class="macro">tree!</span>(<span class="number">50 </span>=&gt; [<span class="number">3</span>, (<span class="number">30 </span>=&gt; [<span class="number">2</span>, (<span class="number">15 </span>=&gt; [<span class="number">1</span>, Nil, <span class="number">20</span>]), <span class="number">35</span>]), (<span class="number">70 </span>=&gt; [<span class="number">3</span>, (<span class="number">60 </span>=&gt; [<span class="number">2</span>, <span class="number">55</span>, <span class="number">65</span>]), (<span class="number">85 </span>=&gt; [<span class="number">2</span>, <span class="number">80</span>, <span class="number">90</span>])])]);
+		<span class="macro">assert_eq!</span>(removed, <span class="prelude-val">Some</span>(<span class="number">5</span>));
+		<span class="macro">assert_eq!</span>(root, expected);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../aatree/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -480,485 +480,485 @@
 <span id="478">478</span>
 <span id="479">479</span>
 <span id="480">480</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">iter</span>::{<span class="ident">AAIntoIter</span>, <span class="ident">AAIter</span>},
-	<span class="ident">node</span>::{<span class="ident">AANode</span>, <span class="ident">TraverseStep</span>}
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+	iter::{AAIntoIter, AAIter},
+	node::{AANode, TraverseStep}
 };
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">borrow::Borrow</span>,
-	<span class="ident">cmp::Ordering</span>,
-	<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>},
-	<span class="ident">iter::FromIterator</span>,
-	<span class="ident">mem</span>
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::{
+	borrow::Borrow,
+	cmp::Ordering,
+	fmt::{<span class="self">self</span>, Debug},
+	iter::FromIterator,
+	mem
 };
 
-<span class="doccomment">/// A set based on an AA-Tree.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`AATreeMap`]&#39;s documentation for a detailed discussion of this collection&#39;s performance benefits and drawbacks.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is a logic error for an item to be modified in such a way that the item&#39;s ordering relative to any</span>
-<span class="doccomment">/// other item, as determined by the `Ord` trait, changes while it is in the set. This is normally only possible</span>
-<span class="doccomment">/// through `Cell`, `RefCell`, global state, I/O, or unsafe code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This example is adopted from [`BTreeSet`]&#39;s documentation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use aatree::AATreeSet;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut books = AATreeSet::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Add some books.</span>
-<span class="doccomment">/// books.insert(&quot;A Dance With Dragons&quot;);</span>
-<span class="doccomment">/// books.insert(&quot;To Kill a Mockingbird&quot;);</span>
-<span class="doccomment">/// books.insert(&quot;The Odyssey&quot;);</span>
-<span class="doccomment">/// books.insert(&quot;The Great Gatsby&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Check for a specific one</span>
-<span class="doccomment">/// if !books.contains(&quot;The Winds of Winter&quot;) {</span>
-<span class="doccomment">/// 	println!(&quot;We have {} books, but The Winds of Winter ain&#39;t one.&quot;, books.len());</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # else { assert!(false) }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Remove a book.</span>
-<span class="doccomment">/// books.remove(&quot;The Odyssey&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Iterate over everything.</span>
-<span class="doccomment">/// for book in &amp;books {</span>
-<span class="doccomment">/// 	println!(&quot;{}&quot;, book);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # assert_eq!(books.into_iter().collect::&lt;Vec&lt;_&gt;&gt;(), vec![&quot;A Dance With Dragons&quot;, &quot;The Great Gatsby&quot;, &quot;To Kill a Mockingbird&quot;]);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  [`AATreeMap`]: crate::AATreeMap</span>
-<span class="doccomment">///  [`BTreeSet`]: std::collections::BTreeSet</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="ident">root</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">len</span>: <span class="ident">usize</span>
+<span class="doccomment">/// A set based on an AA-Tree.
+///
+/// See [`AATreeMap`]&#39;s documentation for a detailed discussion of this collection&#39;s performance benefits and drawbacks.
+///
+/// It is a logic error for an item to be modified in such a way that the item&#39;s ordering relative to any
+/// other item, as determined by the `Ord` trait, changes while it is in the set. This is normally only possible
+/// through `Cell`, `RefCell`, global state, I/O, or unsafe code.
+///
+/// # Example
+///
+/// This example is adopted from [`BTreeSet`]&#39;s documentation:
+///
+/// ```rust
+/// use aatree::AATreeSet;
+///
+/// let mut books = AATreeSet::new();
+///
+/// // Add some books.
+/// books.insert(&quot;A Dance With Dragons&quot;);
+/// books.insert(&quot;To Kill a Mockingbird&quot;);
+/// books.insert(&quot;The Odyssey&quot;);
+/// books.insert(&quot;The Great Gatsby&quot;);
+///
+/// // Check for a specific one
+/// if !books.contains(&quot;The Winds of Winter&quot;) {
+/// 	println!(&quot;We have {} books, but The Winds of Winter ain&#39;t one.&quot;, books.len());
+/// }
+/// # else { assert!(false) }
+///
+/// // Remove a book.
+/// books.remove(&quot;The Odyssey&quot;);
+///
+/// // Iterate over everything.
+/// for book in &amp;books {
+/// 	println!(&quot;{}&quot;, book);
+/// }
+/// # assert_eq!(books.into_iter().collect::&lt;Vec&lt;_&gt;&gt;(), vec![&quot;A Dance With Dragons&quot;, &quot;The Great Gatsby&quot;, &quot;To Kill a Mockingbird&quot;]);
+/// ```
+///
+///  [`AATreeMap`]: crate::AATreeMap
+///  [`BTreeSet`]: std::collections::BTreeSet
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>AATreeSet&lt;T&gt; {
+	root: AANode&lt;T&gt;,
+	len: usize
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Debug</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-		<span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-			<span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-				<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;T: Debug&gt; Debug <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+		f.write_str(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+		<span class="kw">for </span>(i, v) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+			<span class="kw">if </span>i &gt; <span class="number">0 </span>{
+				f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
 			}
-			<span class="ident">v</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+			v.fmt(f)<span class="question-mark">?</span>;
 		}
-		<span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;]&quot;</span>)
+		f.write_str(<span class="string">&quot;]&quot;</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">other</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>)
+<span class="kw">impl</span>&lt;T: PartialEq&gt; PartialEq <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+		<span class="self">self</span>.len() == other.len() &amp;&amp; <span class="self">self</span>.iter().zip(other).all(|(a, b)| a == b)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Eq</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T: Eq&gt; Eq <span class="kw">for </span>AATreeSet&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PartialOrd</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+<span class="kw">impl</span>&lt;T: PartialOrd&gt; PartialOrd <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+		<span class="self">self</span>.iter().partial_cmp(other.iter())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-		<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+<span class="kw">impl</span>&lt;T: Ord&gt; Ord <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+		<span class="self">self</span>.iter().cmp(other.iter())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Construct a new, empty AA-Tree based set.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">root</span>: <span class="ident">AANode::new</span>(),
-			<span class="ident">len</span>: <span class="number">0</span>
+<span class="kw">impl</span>&lt;T&gt; AATreeSet&lt;T&gt; {
+	<span class="doccomment">/// Construct a new, empty AA-Tree based set.
+	</span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			root: AANode::new(),
+			len: <span class="number">0
+		</span>}
+	}
+
+	<span class="doccomment">/// Returns the number of elements in the set.
+	</span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		<span class="self">self</span>.len
+	}
+
+	<span class="doccomment">/// Returns `true` if the set contains no elements.
+	</span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.len == <span class="number">0
+	</span>}
+
+	<span class="doccomment">/// Clears the set, removing all elements.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// set.insert(1);
+	/// set.clear();
+	/// assert!(set.is_empty());
+	/// ```
+	</span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+		<span class="self">self</span>.root = AANode::new();
+		<span class="self">self</span>.len = <span class="number">0</span>;
+	}
+
+	<span class="doccomment">/// Creates an iterator over this set that visits the values in ascending order.
+	</span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AAIter&lt;<span class="lifetime">&#39;_</span>, T, <span class="kw-2">&amp;</span>T&gt; {
+		<span class="self">self</span>.into_iter()
+	}
+}
+
+<span class="kw">impl</span>&lt;T: Ord&gt; AATreeSet&lt;T&gt; {
+	<span class="doccomment">/// Adds a value to the set.
+	///
+	/// If the set did already contain this value, the entry is not updated, and
+	/// `false` is returned.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// set.insert(42);
+	/// set.insert(42);
+	/// assert_eq!(set.len(), 1);
+	/// ```
+	</span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: T) -&gt; bool {
+		<span class="kw">let </span>inserted = <span class="self">self</span>.root.insert(value);
+		<span class="kw">if </span>inserted {
+			<span class="self">self</span>.len += <span class="number">1</span>;
 		}
+		inserted
 	}
 
-	<span class="doccomment">/// Returns the number of elements in the set.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		<span class="self">self</span>.<span class="ident">len</span>
+	<span class="doccomment">/// Moves all elements from `other` into `self`, leaving `other` empty.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use aatree::AATreeSet;
+	///
+	/// let mut a = AATreeSet::new();
+	/// a.insert(1);
+	/// a.insert(2);
+	/// a.insert(3);
+	///
+	/// let mut b = AATreeSet::new();
+	/// b.insert(3);
+	/// b.insert(4);
+	/// b.insert(5);
+	///
+	/// a.append(&amp;mut b);
+	///
+	/// assert_eq!(a.len(), 5);
+	/// assert_eq!(b.len(), 0);
+	///
+	/// assert!(a.contains(&amp;1));
+	/// assert!(a.contains(&amp;2));
+	/// assert!(a.contains(&amp;3));
+	/// assert!(a.contains(&amp;4));
+	/// assert!(a.contains(&amp;5));
+	/// ```
+	</span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;mut </span><span class="self">Self</span>) {
+		<span class="self">self</span>.extend(mem::take(other));
 	}
 
-	<span class="doccomment">/// Returns `true` if the set contains no elements.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
-	}
-
-	<span class="doccomment">/// Clears the set, removing all elements.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// set.insert(1);</span>
-	<span class="doccomment">/// set.clear();</span>
-	<span class="doccomment">/// assert!(set.is_empty());</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">AANode::new</span>();
-		<span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
-	}
-
-	<span class="doccomment">/// Creates an iterator over this set that visits the values in ascending order.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">into_iter</span>()
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Adds a value to the set.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// If the set did already contain this value, the entry is not updated, and</span>
-	<span class="doccomment">/// `false` is returned.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// assert_eq!(set.len(), 1);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">let</span> <span class="ident">inserted</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
-		<span class="kw">if</span> <span class="ident">inserted</span> {
-			<span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-		}
-		<span class="ident">inserted</span>
-	}
-
-	<span class="doccomment">/// Moves all elements from `other` into `self`, leaving `other` empty.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">/// use aatree::AATreeSet;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut a = AATreeSet::new();</span>
-	<span class="doccomment">/// a.insert(1);</span>
-	<span class="doccomment">/// a.insert(2);</span>
-	<span class="doccomment">/// a.insert(3);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut b = AATreeSet::new();</span>
-	<span class="doccomment">/// b.insert(3);</span>
-	<span class="doccomment">/// b.insert(4);</span>
-	<span class="doccomment">/// b.insert(5);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// a.append(&amp;mut b);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert_eq!(a.len(), 5);</span>
-	<span class="doccomment">/// assert_eq!(b.len(), 0);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert!(a.contains(&amp;1));</span>
-	<span class="doccomment">/// assert!(a.contains(&amp;2));</span>
-	<span class="doccomment">/// assert!(a.contains(&amp;3));</span>
-	<span class="doccomment">/// assert!(a.contains(&amp;4));</span>
-	<span class="doccomment">/// assert!(a.contains(&amp;5));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>) {
-		<span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">mem::take</span>(<span class="ident">other</span>));
-	}
-
-	<span class="doccomment">/// Returns the first/smallest element of the set.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert!(set.first().is_none());</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.first(), Some(&amp;40));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>)),
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Left</span>
+	<span class="doccomment">/// Returns the first/smallest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.first().is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.first(), Some(&amp;40));
+	/// ```
+	</span><span class="kw">pub fn </span>first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content)),
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Left
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use first() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">smallest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">first</span>()
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>smallest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+		<span class="self">self</span>.first()
 	}
 
-	<span class="doccomment">/// Returns the last/largest element of the set.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert!(set.last().is_none());</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.last(), Some(&amp;44));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>)),
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Right</span>
+	<span class="doccomment">/// Returns the last/largest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.last().is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.last(), Some(&amp;44));
+	/// ```
+	</span><span class="kw">pub fn </span>last(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content)),
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Right
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use last() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">largest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">last</span>()
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>largest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+		<span class="self">self</span>.last()
 	}
 
-	<span class="doccomment">/// Remove and return the first/smallest element of the set.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert_eq!(set.pop_first(), None);</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.pop_first(), Some(40));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_first(), Some(42));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_first(), Some(44));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_first(), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_successor</span>()
+	<span class="doccomment">/// Remove and return the first/smallest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert_eq!(set.pop_first(), None);
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.pop_first(), Some(40));
+	/// assert_eq!(set.pop_first(), Some(42));
+	/// assert_eq!(set.pop_first(), Some(44));
+	/// assert_eq!(set.pop_first(), None);
+	/// ```
+	</span><span class="kw">pub fn </span>pop_first(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="self">self</span>.root.remove_successor()
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use pop_first() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_smallest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">pop_first</span>()
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use pop_first() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>pop_smallest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="self">self</span>.pop_first()
 	}
 
-	<span class="doccomment">/// Remove and return the last/largest element of the set.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert_eq!(set.pop_last(), None);</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.pop_last(), Some(44));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_last(), Some(42));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_last(), Some(40));</span>
-	<span class="doccomment">/// assert_eq!(set.pop_last(), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_predecessor</span>()
+	<span class="doccomment">/// Remove and return the last/largest element of the set.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert_eq!(set.pop_last(), None);
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.pop_last(), Some(44));
+	/// assert_eq!(set.pop_last(), Some(42));
+	/// assert_eq!(set.pop_last(), Some(40));
+	/// assert_eq!(set.pop_last(), None);
+	/// ```
+	</span><span class="kw">pub fn </span>pop_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="self">self</span>.root.remove_predecessor()
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use pop_last() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_largest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">pop_last</span>()
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use pop_last() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>pop_largest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="self">self</span>.pop_last()
 	}
 
-	<span class="doccomment">/// Returns `true` if the set contains an element with the given value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// set.insert(43);</span>
-	<span class="doccomment">/// assert_eq!(set.contains(&amp;42), false);</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// assert_eq!(set.contains(&amp;42), true);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="ident">bool</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns `true` if the set contains an element with the given value.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// set.insert(43);
+	/// assert_eq!(set.contains(&amp;42), false);
+	/// set.insert(42);
+	/// assert_eq!(set.contains(&amp;42), true);
+	/// ```
+	</span><span class="kw">pub fn </span>contains&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; bool
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>
-			.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">borrow</span>().<span class="ident">cmp</span>(<span class="ident">value</span>) {
-					<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-					<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-					<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(()))
+		<span class="self">self</span>.root
+			.traverse(|content, sub| <span class="kw">match </span>sub {
+				<span class="prelude-val">Some</span>(sub) =&gt; sub,
+				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>content.borrow().cmp(value) {
+					Ordering::Greater =&gt; TraverseStep::Left,
+					Ordering::Less =&gt; TraverseStep::Right,
+					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(()))
 				}
 			})
-			.<span class="ident">is_some</span>()
+			.is_some()
 	}
 
-	<span class="doccomment">/// Returns the first/smallest element of the set that is greater or equal to `x`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert!(set.first_at_or_after(&amp;41).is_none());</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.first_at_or_after(&amp;41), Some(&amp;42));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_at_or_after</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns the first/smallest element of the set that is greater or equal to `x`.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.first_at_or_after(&amp;41).is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.first_at_or_after(&amp;41), Some(&amp;42));
+	/// ```
+	</span><span class="kw">pub fn </span>first_at_or_after&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">borrow</span>();
-			<span class="kw">match</span> <span class="ident">sub</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="ident">value</span> =&gt; {
-					<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+		<span class="self">self</span>.root.traverse(|content, sub| {
+			<span class="kw">let </span>c = content.borrow();
+			<span class="kw">match </span>sub {
+				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>c &gt; value =&gt; {
+					TraverseStep::Value(<span class="prelude-val">Some</span>(content))
 				},
-				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">cmp</span>(<span class="ident">value</span>) {
-					<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-					<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-					<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+				<span class="prelude-val">Some</span>(sub) =&gt; sub,
+				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>c.cmp(value) {
+					Ordering::Greater =&gt; TraverseStep::Left,
+					Ordering::Less =&gt; TraverseStep::Right,
+					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
 				}
 			}
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use first_at_or_after() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">smallest_geq_than</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_at_or_after() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>smallest_geq_than&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">first_at_or_after</span>(<span class="ident">value</span>)
+		<span class="self">self</span>.first_at_or_after(value)
 	}
 
-	<span class="doccomment">/// Returns the last/largest element of the set that is smaller or equal to `x`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeSet;</span>
-	<span class="doccomment">/// let mut set = AATreeSet::new();</span>
-	<span class="doccomment">/// assert!(set.last_at_or_before(&amp;43).is_none());</span>
-	<span class="doccomment">/// set.insert(42);</span>
-	<span class="doccomment">/// set.insert(44);</span>
-	<span class="doccomment">/// set.insert(40);</span>
-	<span class="doccomment">/// assert_eq!(set.last_at_or_before(&amp;43), Some(&amp;42));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_at_or_before</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns the last/largest element of the set that is smaller or equal to `x`.
+	///
+	/// # Example
+	/// ```rust
+	/// # use aatree::AATreeSet;
+	/// let mut set = AATreeSet::new();
+	/// assert!(set.last_at_or_before(&amp;43).is_none());
+	/// set.insert(42);
+	/// set.insert(44);
+	/// set.insert(40);
+	/// assert_eq!(set.last_at_or_before(&amp;43), Some(&amp;42));
+	/// ```
+	</span><span class="kw">pub fn </span>last_at_or_before&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">borrow</span>();
-			<span class="kw">match</span> <span class="ident">sub</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="ident">value</span> =&gt; {
-					<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+		<span class="self">self</span>.root.traverse(|content, sub| {
+			<span class="kw">let </span>c = content.borrow();
+			<span class="kw">match </span>sub {
+				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>c &lt; value =&gt; {
+					TraverseStep::Value(<span class="prelude-val">Some</span>(content))
 				},
-				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">cmp</span>(<span class="ident">value</span>) {
-					<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-					<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-					<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>))
+				<span class="prelude-val">Some</span>(sub) =&gt; sub,
+				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>c.cmp(value) {
+					Ordering::Greater =&gt; TraverseStep::Left,
+					Ordering::Less =&gt; TraverseStep::Right,
+					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
 				}
 			}
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use last_at_or_before() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">largest_leq_than</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_at_or_before() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>largest_leq_than&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">last_at_or_before</span>(<span class="ident">value</span>)
+		<span class="self">self</span>.last_at_or_before(value)
 	}
 
-	<span class="doccomment">/// Removes a value from the set, and returns `true` if it was removed.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="ident">bool</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Removes a value from the set, and returns `true` if it was removed.
+	</span><span class="kw">pub fn </span>remove&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>Q) -&gt; bool
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove</span>(<span class="ident">x</span>).<span class="ident">is_some</span>()
+		<span class="self">self</span>.root.remove(x).is_some()
 	}
 
-	<span class="doccomment">/// Removes a value from the set, and returns the value that was removed.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">T</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Removes a value from the set, and returns the value that was removed.
+	</span><span class="kw">pub fn </span>take&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+	<span class="kw">where
+		</span>T: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove</span>(<span class="ident">x</span>)
+		<span class="self">self</span>.root.remove(x)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;T: Ord&gt; FromIterator&lt;T&gt; <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>from_iter&lt;I&gt;(iter: I) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span>I: IntoIterator&lt;Item = T&gt;
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-		<span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">iter</span> {
-			<span class="ident">set</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+		<span class="kw">let </span><span class="kw-2">mut </span>set = <span class="self">Self</span>::new();
+		<span class="kw">for </span>value <span class="kw">in </span>iter {
+			set.insert(value);
 		}
-		<span class="ident">set</span>
+		set
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">array</span>: [<span class="ident">T</span>; <span class="ident">N</span>]) -&gt; <span class="self">Self</span> {
-		<span class="ident">array</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+<span class="kw">impl</span>&lt;T: Ord, <span class="kw">const </span>N: usize&gt; From&lt;[T; N]&gt; <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>from(array: [T; N]) -&gt; <span class="self">Self </span>{
+		array.into_iter().collect()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+<span class="kw">impl</span>&lt;T: Ord&gt; From&lt;Vec&lt;T&gt;&gt; <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>from(vec: Vec&lt;T&gt;) -&gt; <span class="self">Self </span>{
+		vec.into_iter().collect()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-		<span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">iter</span> {
-			<span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+<span class="kw">impl</span>&lt;T: Ord&gt; Extend&lt;T&gt; <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+		<span class="kw">for </span>value <span class="kw">in </span>iter {
+			<span class="self">self</span>.insert(value);
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>) {
-		<span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>().<span class="ident">copied</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Ord + Copy + <span class="lifetime">&#39;a</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
+		<span class="self">self</span>.extend(iter.into_iter().copied())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T&gt; IntoIterator <span class="kw">for </span>AATreeSet&lt;T&gt; {
+	<span class="kw">type </span>Item = T;
+	<span class="kw">type </span>IntoIter = AAIntoIter&lt;T, T&gt;;
 
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="ident">AAIntoIter::new</span>(<span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">len</span>)
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		AAIntoIter::new(<span class="self">self</span>.root, <span class="self">self</span>.len)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AATreeSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AATreeSet&lt;T&gt; {
+	<span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
+	<span class="kw">type </span>IntoIter = AAIter&lt;<span class="lifetime">&#39;a</span>, T, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;;
 
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="ident">AAIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">len</span>)
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		AAIter::new(<span class="kw-2">&amp;</span><span class="self">self</span>.root, <span class="self">self</span>.len)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

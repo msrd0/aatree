@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../aatree/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -161,166 +161,166 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(missing_debug_implementations)]
 
-<span class="doccomment">//! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).</span>
+</span><span class="doccomment">//! Iterator implementations for [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::node</span>::{<span class="ident">AANode</span>, <span class="ident">Node</span>};
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">iter::FusedIterator</span>, <span class="ident">marker::PhantomData</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::node::{AANode, Node};
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::{iter::FusedIterator, marker::PhantomData};
 
-<span class="doccomment">/// This trait allows iterators to return elements other than that stored inside the tree. Useful</span>
-<span class="doccomment">/// for returning key-value-pairs from `AATreeMap`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">content</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
+<span class="doccomment">/// This trait allows iterators to return elements other than that stored inside the tree. Useful
+/// for returning key-value-pairs from `AATreeMap`.
+</span><span class="kw">pub trait </span>IterContent&lt;T&gt; {
+	<span class="kw">fn </span>content(<span class="self">self</span>) -&gt; T;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {
-	<span class="kw">fn</span> <span class="ident">content</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">self</span>
-	}
+<span class="kw">impl</span>&lt;T&gt; IterContent&lt;T&gt; <span class="kw">for </span>T {
+	<span class="kw">fn </span>content(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="self">self
+	</span>}
 }
 
-<span class="doccomment">/// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-	<span class="ident">len</span>: <span class="ident">usize</span>,
-	<span class="ident">_ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="doccomment">/// The iterator produces from an reference of an AATree-based data structure when turned into an iterator.
+</span><span class="kw">pub struct </span>AAIter&lt;<span class="lifetime">&#39;a</span>, C, T&gt; {
+	stack: Vec&lt;(bool, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AANode&lt;C&gt;)&gt;,
+	len: usize,
+	_ty: PhantomData&lt;T&gt;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">root</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="ident">stack</span>.<span class="ident">push</span>((<span class="bool-val">false</span>, <span class="ident">root</span>));
-		<span class="self">Self</span> {
-			<span class="ident">stack</span>,
-			<span class="ident">len</span>,
-			<span class="ident">_ty</span>: <span class="ident">PhantomData::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C, T&gt; AAIter&lt;<span class="lifetime">&#39;a</span>, C, T&gt; {
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(root: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AANode&lt;C&gt;, len: usize) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>stack = Vec::with_capacity(root.level() <span class="kw">as </span>usize * <span class="number">2 </span>+ <span class="number">1</span>);
+		stack.push((<span class="bool-val">false</span>, root));
+		<span class="self">Self </span>{
+			stack,
+			len,
+			_ty: PhantomData::default()
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C, T&gt; Iterator <span class="kw">for </span>AAIter&lt;<span class="lifetime">&#39;a</span>, C, T&gt;
+<span class="kw">where
+	</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>C: IterContent&lt;T&gt;
 {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+	<span class="kw">type </span>Item = T;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">loop</span> {
-			<span class="kw">let</span> (<span class="ident">visited_left</span>, <span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>;
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Node</span> { <span class="ident">left_child</span>, .. }) <span class="op">=</span> <span class="ident">last</span>.<span class="ident">as_ref</span>() {
-				<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>((<span class="bool-val">true</span>, <span class="ident">last</span>));
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">visited_left</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">left_child</span>.<span class="ident">is_nil</span>() {
-					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>((<span class="bool-val">false</span>, <span class="ident">left_child</span>));
-				} <span class="kw">else</span> {
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="kw">loop </span>{
+			<span class="kw">let </span>(visited_left, last) = <span class="self">self</span>.stack.pop()<span class="question-mark">?</span>;
+			<span class="kw">if let </span><span class="prelude-val">Some</span>(Node { left_child, .. }) = last.as_ref() {
+				<span class="self">self</span>.stack.push((<span class="bool-val">true</span>, last));
+				<span class="kw">if </span>!visited_left &amp;&amp; !left_child.is_nil() {
+					<span class="self">self</span>.stack.push((<span class="bool-val">false</span>, left_child));
+				} <span class="kw">else </span>{
 					<span class="kw">break</span>;
 				}
 			}
 		}
 
-		<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>;
-		<span class="kw">match</span> <span class="ident">last</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>,
-				<span class="ident">right_child</span>,
+		<span class="kw">let </span>(<span class="kw">_</span>, last) = <span class="self">self</span>.stack.pop()<span class="question-mark">?</span>;
+		<span class="kw">match </span>last.as_ref() {
+			<span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
+			<span class="prelude-val">Some</span>(Node {
+				content,
+				right_child,
 				..
 			}) =&gt; {
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>() {
-					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>((<span class="bool-val">false</span>, <span class="ident">right_child</span>));
+				<span class="kw">if </span>!right_child.is_nil() {
+					<span class="self">self</span>.stack.push((<span class="bool-val">false</span>, right_child));
 				}
-				<span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-				<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">content</span>())
+				<span class="self">self</span>.len -= <span class="number">1</span>;
+				<span class="prelude-val">Some</span>(content.content())
 			}
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-		(<span class="self">self</span>.<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">len</span>))
+	<span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+		(<span class="self">self</span>.len, <span class="prelude-val">Some</span>(<span class="self">self</span>.len))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C, T&gt; ExactSizeIterator <span class="kw">for </span>AAIter&lt;<span class="lifetime">&#39;a</span>, C, T&gt; <span class="kw">where </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>C: IterContent&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">AAIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C, T&gt; FusedIterator <span class="kw">for </span>AAIter&lt;<span class="lifetime">&#39;a</span>, C, T&gt; <span class="kw">where </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>C: IterContent&lt;T&gt; {}
 
-<span class="doccomment">/// The iterator produces from an AATree-based data structure when turned into an iterator.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">len</span>: <span class="ident">usize</span>,
-	<span class="ident">_ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="doccomment">/// The iterator produces from an AATree-based data structure when turned into an iterator.
+</span><span class="kw">pub struct </span>AAIntoIter&lt;C, T&gt; {
+	stack: Vec&lt;AANode&lt;C&gt;&gt;,
+	len: usize,
+	_ty: PhantomData&lt;T&gt;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">root</span>: <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">root</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>);
-		<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">root</span>);
-		<span class="self">Self</span> {
-			<span class="ident">stack</span>,
-			<span class="ident">len</span>,
-			<span class="ident">_ty</span>: <span class="ident">PhantomData::default</span>()
+<span class="kw">impl</span>&lt;C, T&gt; AAIntoIter&lt;C, T&gt; {
+	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(root: AANode&lt;C&gt;, len: usize) -&gt; <span class="self">Self </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>stack = Vec::with_capacity(root.level() <span class="kw">as </span>usize * <span class="number">2 </span>+ <span class="number">1</span>);
+		stack.push(root);
+		<span class="self">Self </span>{
+			stack,
+			len,
+			_ty: PhantomData::default()
 		}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;C, T&gt; Iterator <span class="kw">for </span>AAIntoIter&lt;C, T&gt;
+<span class="kw">where
+	</span>C: IterContent&lt;T&gt;
 {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+	<span class="kw">type </span>Item = T;
 
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">loop</span> {
-			<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>;
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">level</span>,
-				<span class="ident">content</span>,
-				<span class="ident">left_child</span>,
-				<span class="ident">right_child</span>
-			}) <span class="op">=</span> <span class="ident">last</span>.<span class="ident">unbox</span>()
+	<span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+		<span class="kw">loop </span>{
+			<span class="kw">let </span>last = <span class="self">self</span>.stack.pop()<span class="question-mark">?</span>;
+			<span class="kw">if let </span><span class="prelude-val">Some</span>(Node {
+				level,
+				content,
+				left_child,
+				right_child
+			}) = last.unbox()
 			{
-				<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(
-					<span class="ident">Node</span> {
-						<span class="ident">level</span>,
-						<span class="ident">content</span>,
-						<span class="ident">left_child</span>: <span class="ident">AANode::new</span>(),
-						<span class="ident">right_child</span>
+				<span class="self">self</span>.stack.push(
+					Node {
+						level,
+						content,
+						left_child: AANode::new(),
+						right_child
 					}
-					.<span class="ident">into</span>()
+					.into()
 				);
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">left_child</span>.<span class="ident">is_nil</span>() {
-					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">left_child</span>);
-				} <span class="kw">else</span> {
+				<span class="kw">if </span>!left_child.is_nil() {
+					<span class="self">self</span>.stack.push(left_child);
+				} <span class="kw">else </span>{
 					<span class="kw">break</span>;
 				}
 			}
 		}
 
-		<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>;
-		<span class="kw">match</span> <span class="ident">last</span>.<span class="ident">unbox</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>,
-				<span class="ident">right_child</span>,
+		<span class="kw">let </span>last = <span class="self">self</span>.stack.pop()<span class="question-mark">?</span>;
+		<span class="kw">match </span>last.unbox() {
+			<span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
+			<span class="prelude-val">Some</span>(Node {
+				content,
+				right_child,
 				..
 			}) =&gt; {
-				<span class="kw">if</span> <span class="op">!</span><span class="ident">right_child</span>.<span class="ident">is_nil</span>() {
-					<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">right_child</span>);
+				<span class="kw">if </span>!right_child.is_nil() {
+					<span class="self">self</span>.stack.push(right_child);
 				}
-				<span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-				<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">content</span>())
+				<span class="self">self</span>.len -= <span class="number">1</span>;
+				<span class="prelude-val">Some</span>(content.content())
 			}
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-		(<span class="self">self</span>.<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">len</span>))
+	<span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+		(<span class="self">self</span>.len, <span class="prelude-val">Some</span>(<span class="self">self</span>.len))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C, T&gt; ExactSizeIterator <span class="kw">for </span>AAIntoIter&lt;C, T&gt; <span class="kw">where </span>C: IterContent&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">AAIntoIter</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">IterContent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C, T&gt; FusedIterator <span class="kw">for </span>AAIntoIter&lt;C, T&gt; <span class="kw">where </span>C: IterContent&lt;T&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

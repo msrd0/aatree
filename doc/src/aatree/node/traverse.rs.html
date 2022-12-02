@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/node/traverse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traverse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/node/traverse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traverse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../aatree/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -143,143 +143,143 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AANode</span>, <span class="ident">Node</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{AANode, Node};
 
-<span class="doccomment">/// This type specifies the requested step for [`traverse`](AANode::traverse).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-	<span class="ident">Left</span>,
-	<span class="ident">Right</span>,
-	<span class="ident">Value</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)
+<span class="doccomment">/// This type specifies the requested step for [`traverse`](AANode::traverse).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TraverseStep&lt;R&gt; {
+	Left,
+	Right,
+	Value(<span class="prelude-ty">Option</span>&lt;R&gt;)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TraverseMutContext</span>(<span class="ident">bool</span>, <span class="ident">bool</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TraverseMutContext(bool, bool);
 
-<span class="kw">impl</span> <span class="ident">TraverseMutContext</span> {
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_left_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="number">0</span>
-	}
+<span class="kw">impl </span>TraverseMutContext {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_left_child(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.<span class="number">0
+	</span>}
 
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_right_child</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="number">1</span>
-	}
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_right_child(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.<span class="number">1
+	</span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">error_recursive</span>() {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;log&quot;</span>)]
+</span><span class="kw">fn </span>error_recursive() {
 	<span class="macro">log::error!</span>(<span class="string">&quot;Recursive traversal detected and prohibited&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">error_recursive</span>() {}
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;log&quot;</span>))]
+</span><span class="kw">fn </span>error_recursive() {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AANode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Traverse the tree looking for a specific value. The `callback` is called as follows:</span>
-	<span class="doccomment">///  1. While going down, with `(content, None)` as the input. The callback may return</span>
-	<span class="doccomment">///     either `Left` or `Right` to continue the traversal, or `Value` to stop the</span>
-	<span class="doccomment">///     traversal, for example because a value was found.</span>
-	<span class="doccomment">///  2. While going back up, with `(content, Some(res))`, where `res` is the result from</span>
-	<span class="doccomment">///     the fully traversed subgraph. The callback must produce a `Value` result, a</span>
-	<span class="doccomment">///     traversal (returning `Left` or `Right`) is a logic error and will be ignored.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">traverse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>
+<span class="kw">impl</span>&lt;T&gt; AANode&lt;T&gt; {
+	<span class="doccomment">/// Traverse the tree looking for a specific value. The `callback` is called as follows:
+	///  1. While going down, with `(content, None)` as the input. The callback may return
+	///     either `Left` or `Right` to continue the traversal, or `Value` to stop the
+	///     traversal, for example because a value was found.
+	///  2. While going back up, with `(content, Some(res))`, where `res` is the result from
+	///     the fully traversed subgraph. The callback must produce a `Value` result, a
+	///     traversal (returning `Left` or `Right`) is a logic error and will be ignored.
+	</span><span class="kw">pub fn </span>traverse&lt;<span class="lifetime">&#39;a</span>, F, R&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, callback: F) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, <span class="prelude-ty">Option</span>&lt;TraverseStep&lt;R&gt;&gt;) -&gt; TraverseStep&lt;R&gt; + Copy
 	{
-		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">traverse_impl</span>(<span class="ident">callback</span>);
-		<span class="kw">match</span> <span class="ident">res</span> {
-			<span class="ident">TraverseStep::Value</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-			<span class="kw">_</span> =&gt; {
-				<span class="ident">error_recursive</span>();
-				<span class="prelude-val">None</span>
-			}
+		<span class="kw">let </span>res = <span class="self">self</span>.traverse_impl(callback);
+		<span class="kw">match </span>res {
+			TraverseStep::Value(v) =&gt; v,
+			<span class="kw">_ </span>=&gt; {
+				error_recursive();
+				<span class="prelude-val">None
+			</span>}
 		}
 	}
 
-	<span class="doccomment">/// Traverse the current node, calling the callback with `(content, None)` while going down and</span>
-	<span class="doccomment">/// with `(content, Some(res))` when going up, where `res` is the result obtained from the lower</span>
-	<span class="doccomment">/// subtree.</span>
-	<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">traverse_impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">callback</span>: <span class="ident">F</span>) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>
+	<span class="doccomment">/// Traverse the current node, calling the callback with `(content, None)` while going down and
+	/// with `(content, Some(res))` when going up, where `res` is the result obtained from the lower
+	/// subtree.
+	</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>traverse_impl&lt;<span class="lifetime">&#39;a</span>, F, R&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, callback: F) -&gt; TraverseStep&lt;R&gt;
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, <span class="prelude-ty">Option</span>&lt;TraverseStep&lt;R&gt;&gt;) -&gt; TraverseStep&lt;R&gt; + Copy
 	{
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_ref</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>,
-				<span class="ident">left_child</span>,
-				<span class="ident">right_child</span>,
+		<span class="kw">match </span><span class="self">self</span>.as_ref() {
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Value(<span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(Node {
+				content,
+				left_child,
+				right_child,
 				..
 			}) =&gt; {
-				<span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="ident">callback</span>(<span class="ident">content</span>, <span class="prelude-val">None</span>);
-				<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">step</span> {
-					<span class="ident">TraverseStep::Left</span> =&gt; <span class="ident">left_child</span>.<span class="ident">traverse_impl</span>(<span class="ident">callback</span>),
-					<span class="ident">TraverseStep::Right</span> =&gt; <span class="ident">right_child</span>.<span class="ident">traverse_impl</span>(<span class="ident">callback</span>),
-					<span class="ident">TraverseStep::Value</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">step</span>
+				<span class="kw">let </span>step = callback(content, <span class="prelude-val">None</span>);
+				<span class="kw">let </span>res = <span class="kw">match </span>step {
+					TraverseStep::Left =&gt; left_child.traverse_impl(callback),
+					TraverseStep::Right =&gt; right_child.traverse_impl(callback),
+					TraverseStep::Value(<span class="kw">_</span>) =&gt; <span class="kw">return </span>step
 				};
-				<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">callback</span>(<span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="ident">res</span>));
-				<span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">res</span>, <span class="ident">TraverseStep::Left</span> <span class="op">|</span> <span class="ident">TraverseStep::Right</span>) {
-					<span class="ident">error_recursive</span>();
+				<span class="kw">let </span>res = callback(content, <span class="prelude-val">Some</span>(res));
+				<span class="kw">if </span><span class="macro">matches!</span>(res, TraverseStep::Left | TraverseStep::Right) {
+					error_recursive();
 				}
-				<span class="ident">res</span>
+				res
 			}
 		}
 	}
 
-	<span class="doccomment">/// Traverse the tree, allowing for mutation of the nodes that are being traversed.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// **It is a logic error to mutate the nodes in a way that changes their order with</span>
-	<span class="doccomment">/// respect to the other nodes in the tree.**</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">traverse_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">L</span>, <span class="ident">R</span><span class="op">&gt;</span>(
-		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">callback</span>: <span class="ident">F</span>,
-		<span class="ident">leaf_callback</span>: <span class="ident">L</span>
-	) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">TraverseMutContext</span>) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>,
-		<span class="ident">L</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="doccomment">/// Traverse the tree, allowing for mutation of the nodes that are being traversed.
+	///
+	/// **It is a logic error to mutate the nodes in a way that changes their order with
+	/// respect to the other nodes in the tree.**
+	</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>traverse_mut&lt;<span class="lifetime">&#39;a</span>, F, L, R&gt;(
+		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+		callback: F,
+		leaf_callback: L
+	) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T, TraverseMutContext) -&gt; TraverseStep&lt;R&gt; + Copy,
+		L: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
 	{
-		<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">traverse_mut_impl</span>(<span class="ident">callback</span>, <span class="ident">leaf_callback</span>);
-		<span class="kw">match</span> <span class="ident">res</span> {
-			<span class="ident">TraverseStep::Value</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-			<span class="kw">_</span> =&gt; {
-				<span class="ident">error_recursive</span>();
-				<span class="prelude-val">None</span>
-			}
+		<span class="kw">let </span>res = <span class="self">self</span>.traverse_mut_impl(callback, leaf_callback);
+		<span class="kw">match </span>res {
+			TraverseStep::Value(v) =&gt; v,
+			<span class="kw">_ </span>=&gt; {
+				error_recursive();
+				<span class="prelude-val">None
+			</span>}
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">traverse_mut_impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">L</span>, <span class="ident">R</span><span class="op">&gt;</span>(
-		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">callback</span>: <span class="ident">F</span>,
-		<span class="ident">leaf_callback</span>: <span class="ident">L</span>
-	) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">TraverseMutContext</span>) -&gt; <span class="ident">TraverseStep</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>,
-		<span class="ident">L</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">fn </span>traverse_mut_impl&lt;<span class="lifetime">&#39;a</span>, F, L, R&gt;(
+		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+		callback: F,
+		leaf_callback: L
+	) -&gt; TraverseStep&lt;R&gt;
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T, TraverseMutContext) -&gt; TraverseStep&lt;R&gt; + Copy,
+		L: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
 	{
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>),
-			<span class="prelude-val">Some</span>(<span class="ident">Node</span> {
-				<span class="ident">content</span>,
-				<span class="ident">left_child</span>,
-				<span class="ident">right_child</span>,
+		<span class="kw">match </span><span class="self">self</span>.as_mut() {
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Value(<span class="prelude-val">None</span>),
+			<span class="prelude-val">Some</span>(Node {
+				content,
+				left_child,
+				right_child,
 				..
 			}) =&gt; {
-				<span class="kw">if</span> <span class="ident">left_child</span>.<span class="ident">is_nil</span>() <span class="op">&amp;&amp;</span> <span class="ident">right_child</span>.<span class="ident">is_nil</span>() {
-					<span class="ident">TraverseStep::Value</span>(<span class="ident">leaf_callback</span>(<span class="ident">content</span>))
-				} <span class="kw">else</span> {
-					<span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="ident">callback</span>(
-						<span class="ident">content</span>,
-						<span class="ident">TraverseMutContext</span>(<span class="ident">left_child</span>.<span class="ident">is_nil</span>(), <span class="ident">right_child</span>.<span class="ident">is_nil</span>())
+				<span class="kw">if </span>left_child.is_nil() &amp;&amp; right_child.is_nil() {
+					TraverseStep::Value(leaf_callback(content))
+				} <span class="kw">else </span>{
+					<span class="kw">let </span>step = callback(
+						content,
+						TraverseMutContext(left_child.is_nil(), right_child.is_nil())
 					);
-					<span class="kw">match</span> <span class="ident">step</span> {
-						<span class="ident">TraverseStep::Left</span> =&gt; {
-							<span class="ident">left_child</span>.<span class="ident">traverse_mut_impl</span>(<span class="ident">callback</span>, <span class="ident">leaf_callback</span>)
+					<span class="kw">match </span>step {
+						TraverseStep::Left =&gt; {
+							left_child.traverse_mut_impl(callback, leaf_callback)
 						},
-						<span class="ident">TraverseStep::Right</span> =&gt; {
-							<span class="ident">right_child</span>.<span class="ident">traverse_mut_impl</span>(<span class="ident">callback</span>, <span class="ident">leaf_callback</span>)
+						TraverseStep::Right =&gt; {
+							right_child.traverse_mut_impl(callback, leaf_callback)
 						},
-						<span class="ident">TraverseStep::Value</span>(<span class="kw">_</span>) =&gt; <span class="ident">step</span>
+						TraverseStep::Value(<span class="kw">_</span>) =&gt; step
 					}
 				}
 			},
@@ -287,4 +287,4 @@
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

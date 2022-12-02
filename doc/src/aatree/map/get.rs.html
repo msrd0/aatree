@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/map/get.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/map/get.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
         data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../aatree/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -409,414 +409,414 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This method defines several access methods for [`AATreeMap`].</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This method defines several access methods for [`AATreeMap`].
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">entry::Entry</span>, <span class="ident">AATreeMap</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::node::TraverseStep</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">cmp::Ordering</span>};
+</span><span class="kw">use super</span>::{entry::Entry, AATreeMap};
+<span class="kw">use </span><span class="kw">crate</span>::node::TraverseStep;
+<span class="kw">use </span>core::{borrow::Borrow, cmp::Ordering};
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">AATreeMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Returns a reference to the value corresponding to the key.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// map.insert(1, &quot;a&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;a&quot;));</span>
-	<span class="doccomment">/// assert_eq!(map.get(&amp;2), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">V</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;K, V&gt; AATreeMap&lt;K, V&gt; {
+	<span class="doccomment">/// Returns a reference to the value corresponding to the key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, &quot;a&quot;);
+	/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;a&quot;));
+	/// assert_eq!(map.get(&amp;2), None);
+	/// ```
+	</span><span class="kw">pub fn </span>get&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>V&gt;
+	<span class="kw">where
+		</span>K: Ord + Borrow&lt;Q&gt;,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">cmp</span>(<span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>()) {
-				<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">value</span>)),
-				<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-				<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Right</span>
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(content.key.borrow()) {
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>content.value)),
+				Ordering::Less =&gt; TraverseStep::Left,
+				Ordering::Greater =&gt; TraverseStep::Right
 			}
 		})
 	}
 
-	<span class="doccomment">/// Returns a reference to the key and value corresponding to the key.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// map.insert(1, &quot;a&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.get_key_value(&amp;1), Some((&amp;1, &amp;&quot;a&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.get_key_value(&amp;2), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_key_value</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a reference to the key and value corresponding to the key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, &quot;a&quot;);
+	/// assert_eq!(map.get_key_value(&amp;1), Some((&amp;1, &amp;&quot;a&quot;)));
+	/// assert_eq!(map.get_key_value(&amp;2), None);
+	/// ```
+	</span><span class="kw">pub fn </span>get_key_value&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Ord + Borrow&lt;Q&gt;,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">cmp</span>(<span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>()) {
-				<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>())),
-				<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-				<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Right</span>
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(content.key.borrow()) {
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple())),
+				Ordering::Less =&gt; TraverseStep::Left,
+				Ordering::Greater =&gt; TraverseStep::Right
 			}
 		})
 	}
 
-	<span class="doccomment">/// Returns a mutable reference to the value corresponding to the key.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// map.insert(1, &quot;a&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;a&quot;));</span>
-	<span class="doccomment">/// *map.get_mut(&amp;1).unwrap() = &quot;b&quot;;</span>
-	<span class="doccomment">/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;b&quot;));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">V</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a mutable reference to the value corresponding to the key.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// map.insert(1, &quot;a&quot;);
+	/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;a&quot;));
+	/// *map.get_mut(&amp;1).unwrap() = &quot;b&quot;;
+	/// assert_eq!(map.get(&amp;1), Some(&amp;&quot;b&quot;));
+	/// ```
+	</span><span class="kw">pub fn </span>get_mut&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>V&gt;
+	<span class="kw">where
+		</span>K: Ord + Borrow&lt;Q&gt;,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse_mut</span>(
-			<span class="op">|</span><span class="ident">content</span>, <span class="kw">_</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>().<span class="ident">cmp</span>(<span class="ident">k</span>) {
-				<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-				<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-				<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>))
+		<span class="self">self</span>.root.traverse_mut(
+			|content, <span class="kw">_</span>| <span class="kw">match </span>content.key.borrow().cmp(k) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>content.value))
 			},
-			<span class="op">|</span><span class="ident">content</span><span class="op">|</span> {
-				<span class="kw">if</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>() <span class="op">==</span> <span class="ident">k</span> {
-					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>)
-				} <span class="kw">else</span> {
-					<span class="prelude-val">None</span>
-				}
+			|content| {
+				<span class="kw">if </span>content.key.borrow() == k {
+					<span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span>content.value)
+				} <span class="kw">else </span>{
+					<span class="prelude-val">None
+				</span>}
 			}
 		)
 	}
 
-	<span class="doccomment">/// Returns a reference to the first entry (that is, with the smallest key) in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value(), None);</span>
-	<span class="doccomment">/// map.insert(3, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(1, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(2, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value(), Some((&amp;1, &amp;&quot;b&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="doccomment">/// Returns a reference to the first entry (that is, with the smallest key) in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.first_key_value(), None);
+	/// map.insert(3, &quot;a&quot;);
+	/// map.insert(1, &quot;b&quot;);
+	/// map.insert(2, &quot;c&quot;);
+	/// assert_eq!(map.first_key_value(), Some((&amp;1, &amp;&quot;b&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>first_key_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) =&gt; {
-				<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; {
+				TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 			},
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Left</span>
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Left
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use first_key_value() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">smallest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_key_value() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>smallest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">first_key_value</span>()
+		<span class="self">self</span>.first_key_value()
 	}
 
-	<span class="doccomment">/// Returns and removes the first entry (that is, with the smallest key) in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.pop_first(), None);</span>
-	<span class="doccomment">/// map.insert(3, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(1, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(2, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.pop_first(), Some((1, &quot;b&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_first(), Some((2, &quot;c&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_first(), Some((3, &quot;a&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_first(), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="doccomment">/// Returns and removes the first entry (that is, with the smallest key) in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.pop_first(), None);
+	/// map.insert(3, &quot;a&quot;);
+	/// map.insert(1, &quot;b&quot;);
+	/// map.insert(2, &quot;c&quot;);
+	/// assert_eq!(map.pop_first(), Some((1, &quot;b&quot;)));
+	/// assert_eq!(map.pop_first(), Some((2, &quot;c&quot;)));
+	/// assert_eq!(map.pop_first(), Some((3, &quot;a&quot;)));
+	/// assert_eq!(map.pop_first(), None);
+	/// ```
+	</span><span class="kw">pub fn </span>pop_first(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(K, V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_successor</span>().<span class="ident">map</span>(<span class="ident">Entry::into_tuple</span>)
+		<span class="self">self</span>.root.remove_successor().map(Entry::into_tuple)
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use pop_first() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_smallest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use pop_first() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>pop_smallest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(K, V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">pop_first</span>()
+		<span class="self">self</span>.pop_first()
 	}
 
-	<span class="doccomment">/// Returns a reference to the last entry (that is, with the largest key) in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value(), None);</span>
-	<span class="doccomment">/// map.insert(1, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(3, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(2, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value(), Some((&amp;3, &amp;&quot;b&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_key_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="doccomment">/// Returns a reference to the last entry (that is, with the largest key) in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.last_key_value(), None);
+	/// map.insert(1, &quot;a&quot;);
+	/// map.insert(3, &quot;b&quot;);
+	/// map.insert(2, &quot;c&quot;);
+	/// assert_eq!(map.last_key_value(), Some((&amp;3, &amp;&quot;b&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>last_key_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sub</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) =&gt; {
-				<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
+			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; {
+				TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 			},
-			<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-			<span class="prelude-val">None</span> =&gt; <span class="ident">TraverseStep::Right</span>
+			<span class="prelude-val">Some</span>(sub) =&gt; sub,
+			<span class="prelude-val">None </span>=&gt; TraverseStep::Right
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use last_key_value() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">largest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_key_value() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>largest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">last_key_value</span>()
+		<span class="self">self</span>.last_key_value()
 	}
 
-	<span class="doccomment">/// Returns and removes the last entry (that is, with the largest key) in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.pop_last(), None);</span>
-	<span class="doccomment">/// map.insert(1, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(3, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(2, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.pop_last(), Some((3, &quot;b&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_last(), Some((2, &quot;c&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_last(), Some((1, &quot;a&quot;)));</span>
-	<span class="doccomment">/// assert_eq!(map.pop_last(), None);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="doccomment">/// Returns and removes the last entry (that is, with the largest key) in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.pop_last(), None);
+	/// map.insert(1, &quot;a&quot;);
+	/// map.insert(3, &quot;b&quot;);
+	/// map.insert(2, &quot;c&quot;);
+	/// assert_eq!(map.pop_last(), Some((3, &quot;b&quot;)));
+	/// assert_eq!(map.pop_last(), Some((2, &quot;c&quot;)));
+	/// assert_eq!(map.pop_last(), Some((1, &quot;a&quot;)));
+	/// assert_eq!(map.pop_last(), None);
+	/// ```
+	</span><span class="kw">pub fn </span>pop_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(K, V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">remove_predecessor</span>().<span class="ident">map</span>(<span class="ident">Entry::into_tuple</span>)
+		<span class="self">self</span>.root.remove_predecessor().map(Entry::into_tuple)
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_largest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Ord</span>
+	<span class="kw">pub fn </span>pop_largest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(K, V)&gt;
+	<span class="kw">where
+		</span>K: Ord
 	{
-		<span class="self">self</span>.<span class="ident">pop_last</span>()
+		<span class="self">self</span>.pop_last()
 	}
 
-	<span class="doccomment">/// Returns a reference to the first entry with a key greater than or equal to `k` in</span>
-	<span class="doccomment">/// the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value_at_or_after(&amp;15), None);</span>
-	<span class="doccomment">/// map.insert(10, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(30, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(20, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value_at_or_after(&amp;15), Some((&amp;20, &amp;&quot;c&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key_value_at_or_after</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a reference to the first entry with a key greater than or equal to `k` in
+	/// the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.first_key_value_at_or_after(&amp;15), None);
+	/// map.insert(10, &quot;a&quot;);
+	/// map.insert(30, &quot;b&quot;);
+	/// map.insert(20, &quot;c&quot;);
+	/// assert_eq!(map.first_key_value_at_or_after(&amp;15), Some((&amp;20, &amp;&quot;c&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>first_key_value_at_or_after&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>();
-			<span class="kw">match</span> <span class="ident">sub</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">key</span> <span class="op">&gt;</span> <span class="ident">k</span> =&gt; {
-					<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+		<span class="self">self</span>.root.traverse(|content, sub| {
+			<span class="kw">let </span>key = content.key.borrow();
+			<span class="kw">match </span>sub {
+				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>key &gt; k =&gt; {
+					TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 				},
-				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">cmp</span>(<span class="ident">k</span>) {
-					<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-					<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-					<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+				<span class="prelude-val">Some</span>(sub) =&gt; sub,
+				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(k) {
+					Ordering::Greater =&gt; TraverseStep::Left,
+					Ordering::Less =&gt; TraverseStep::Right,
+					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 				}
 			}
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use first_key_value_at_or_after() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">smallest_geq_than</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_key_value_at_or_after() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>smallest_geq_than&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">first_key_value_at_or_after</span>(<span class="ident">k</span>)
+		<span class="self">self</span>.first_key_value_at_or_after(k)
 	}
 
-	<span class="doccomment">/// Returns a mutable reference to the first entry with a key greater than or equal</span>
-	<span class="doccomment">/// to `k` in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value_mut_at_or_after(&amp;15), None);</span>
-	<span class="doccomment">/// map.insert(10, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(30, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(20, &quot;c&quot;);</span>
-	<span class="doccomment">/// let value: &amp;mut &amp;str = map.first_key_value_mut_at_or_after(&amp;15).unwrap().1;</span>
-	<span class="doccomment">/// assert_eq!(*value, &quot;c&quot;);</span>
-	<span class="doccomment">/// *value = &quot;d&quot;;</span>
-	<span class="doccomment">/// assert_eq!(map.first_key_value_at_or_after(&amp;15), Some((&amp;20, &amp;&quot;d&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key_value_mut_at_or_after</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a mutable reference to the first entry with a key greater than or equal
+	/// to `k` in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.first_key_value_mut_at_or_after(&amp;15), None);
+	/// map.insert(10, &quot;a&quot;);
+	/// map.insert(30, &quot;b&quot;);
+	/// map.insert(20, &quot;c&quot;);
+	/// let value: &amp;mut &amp;str = map.first_key_value_mut_at_or_after(&amp;15).unwrap().1;
+	/// assert_eq!(*value, &quot;c&quot;);
+	/// *value = &quot;d&quot;;
+	/// assert_eq!(map.first_key_value_at_or_after(&amp;15), Some((&amp;20, &amp;&quot;d&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>first_key_value_mut_at_or_after&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;mut </span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse_mut</span>(
-			<span class="op">|</span><span class="ident">content</span>, <span class="ident">ctx</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>().<span class="ident">cmp</span>(<span class="ident">k</span>) {
-				<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-				<span class="ident">Ordering::Greater</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_left_child</span>() =&gt; <span class="ident">TraverseStep::Left</span>,
-				<span class="kw">_</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>)))
+		<span class="self">self</span>.root.traverse_mut(
+			|content, ctx| <span class="kw">match </span>content.key.borrow().cmp(k) {
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Greater <span class="kw">if </span>ctx.has_left_child() =&gt; TraverseStep::Left,
+				<span class="kw">_ </span>=&gt; TraverseStep::Value(<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>content.key, <span class="kw-2">&amp;mut </span>content.value)))
 			},
-			<span class="op">|</span><span class="ident">content</span><span class="op">|</span> {
-				<span class="kw">if</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>() <span class="op">&gt;</span> <span class="ident">k</span> {
-					<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>))
-				} <span class="kw">else</span> {
-					<span class="prelude-val">None</span>
-				}
+			|content| {
+				<span class="kw">if </span>content.key.borrow() &gt; k {
+					<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>content.key, <span class="kw-2">&amp;mut </span>content.value))
+				} <span class="kw">else </span>{
+					<span class="prelude-val">None
+				</span>}
 			}
 		)
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(
-		<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>,
-		<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use first_key_value_mut_at_or_after() instead&quot;</span>
-	)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">smallest_geq_than_mut</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(
+		since = <span class="string">&quot;0.1.1&quot;</span>,
+		note = <span class="string">&quot;Use first_key_value_mut_at_or_after() instead&quot;
+	</span>)]
+	</span><span class="kw">pub fn </span>smallest_geq_than_mut&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;mut </span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">first_key_value_mut_at_or_after</span>(<span class="ident">k</span>)
+		<span class="self">self</span>.first_key_value_mut_at_or_after(k)
 	}
 
-	<span class="doccomment">/// Returns a reference to the last entry with a key smaller than or equal to `k` in</span>
-	<span class="doccomment">/// the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value_at_or_before(&amp;25), None);</span>
-	<span class="doccomment">/// map.insert(10, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(30, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(20, &quot;c&quot;);</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value_at_or_before(&amp;25), Some((&amp;20, &amp;&quot;c&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_key_value_at_or_before</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a reference to the last entry with a key smaller than or equal to `k` in
+	/// the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.last_key_value_at_or_before(&amp;25), None);
+	/// map.insert(10, &quot;a&quot;);
+	/// map.insert(30, &quot;b&quot;);
+	/// map.insert(20, &quot;c&quot;);
+	/// assert_eq!(map.last_key_value_at_or_before(&amp;25), Some((&amp;20, &amp;&quot;c&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>last_key_value_at_or_before&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse</span>(<span class="op">|</span><span class="ident">content</span>, <span class="ident">sub</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>();
-			<span class="kw">match</span> <span class="ident">sub</span> {
-				<span class="prelude-val">Some</span>(<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="ident">key</span> <span class="op">&lt;</span> <span class="ident">k</span> =&gt; {
-					<span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+		<span class="self">self</span>.root.traverse(|content, sub| {
+			<span class="kw">let </span>key = content.key.borrow();
+			<span class="kw">match </span>sub {
+				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>key &lt; k =&gt; {
+					TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 				},
-				<span class="prelude-val">Some</span>(<span class="ident">sub</span>) =&gt; <span class="ident">sub</span>,
-				<span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">cmp</span>(<span class="ident">k</span>) {
-					<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-					<span class="ident">Ordering::Less</span> =&gt; <span class="ident">TraverseStep::Right</span>,
-					<span class="ident">Ordering::Equal</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">as_tuple</span>()))
+				<span class="prelude-val">Some</span>(sub) =&gt; sub,
+				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(k) {
+					Ordering::Greater =&gt; TraverseStep::Left,
+					Ordering::Less =&gt; TraverseStep::Right,
+					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
 				}
 			}
 		})
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use last_key_value_at_or_before() instead&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">largest_leq_than</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_key_value_at_or_before() instead&quot;</span>)]
+	</span><span class="kw">pub fn </span>largest_leq_than&lt;Q&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">last_key_value_at_or_before</span>(<span class="ident">k</span>)
+		<span class="self">self</span>.last_key_value_at_or_before(k)
 	}
 
-	<span class="doccomment">/// Returns a mutable reference to the last entry with a key smaller than or equal to</span>
-	<span class="doccomment">/// `k` in the map.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Example</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # use aatree::AATreeMap;</span>
-	<span class="doccomment">/// let mut map = AATreeMap::new();</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value_mut_at_or_before(&amp;25), None);</span>
-	<span class="doccomment">/// map.insert(10, &quot;a&quot;);</span>
-	<span class="doccomment">/// map.insert(30, &quot;b&quot;);</span>
-	<span class="doccomment">/// map.insert(20, &quot;c&quot;);</span>
-	<span class="doccomment">/// let value: &amp;mut &amp;str = map.last_key_value_mut_at_or_before(&amp;25).unwrap().1;</span>
-	<span class="doccomment">/// assert_eq!(*value, &quot;c&quot;);</span>
-	<span class="doccomment">/// *value = &quot;d&quot;;</span>
-	<span class="doccomment">/// assert_eq!(map.last_key_value_at_or_before(&amp;25), Some((&amp;20, &amp;&quot;d&quot;)));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_key_value_mut_at_or_before</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="doccomment">/// Returns a mutable reference to the last entry with a key smaller than or equal to
+	/// `k` in the map.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::AATreeMap;
+	/// let mut map = AATreeMap::new();
+	/// assert_eq!(map.last_key_value_mut_at_or_before(&amp;25), None);
+	/// map.insert(10, &quot;a&quot;);
+	/// map.insert(30, &quot;b&quot;);
+	/// map.insert(20, &quot;c&quot;);
+	/// let value: &amp;mut &amp;str = map.last_key_value_mut_at_or_before(&amp;25).unwrap().1;
+	/// assert_eq!(*value, &quot;c&quot;);
+	/// *value = &quot;d&quot;;
+	/// assert_eq!(map.last_key_value_at_or_before(&amp;25), Some((&amp;20, &amp;&quot;d&quot;)));
+	/// ```
+	</span><span class="kw">pub fn </span>last_key_value_mut_at_or_before&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;mut </span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">root</span>.<span class="ident">traverse_mut</span>(
-			<span class="op">|</span><span class="ident">content</span>, <span class="ident">ctx</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>().<span class="ident">cmp</span>(<span class="ident">k</span>) {
-				<span class="ident">Ordering::Greater</span> =&gt; <span class="ident">TraverseStep::Left</span>,
-				<span class="ident">Ordering::Less</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_right_child</span>() =&gt; <span class="ident">TraverseStep::Right</span>,
-				<span class="kw">_</span> =&gt; <span class="ident">TraverseStep::Value</span>(<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>)))
+		<span class="self">self</span>.root.traverse_mut(
+			|content, ctx| <span class="kw">match </span>content.key.borrow().cmp(k) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less <span class="kw">if </span>ctx.has_right_child() =&gt; TraverseStep::Right,
+				<span class="kw">_ </span>=&gt; TraverseStep::Value(<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>content.key, <span class="kw-2">&amp;mut </span>content.value)))
 			},
-			<span class="op">|</span><span class="ident">content</span><span class="op">|</span> {
-				<span class="kw">if</span> <span class="ident">content</span>.<span class="ident">key</span>.<span class="ident">borrow</span>() <span class="op">&lt;</span> <span class="ident">k</span> {
-					<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>.<span class="ident">value</span>))
-				} <span class="kw">else</span> {
-					<span class="prelude-val">None</span>
-				}
+			|content| {
+				<span class="kw">if </span>content.key.borrow() &lt; k {
+					<span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>content.key, <span class="kw-2">&amp;mut </span>content.value))
+				} <span class="kw">else </span>{
+					<span class="prelude-val">None
+				</span>}
 			}
 		)
 	}
 
-	<span class="attribute">#[<span class="ident">deprecated</span>(
-		<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.1.1&quot;</span>,
-		<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use last_key_value_mut_at_or_before() instead&quot;</span>
-	)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">largest_leq_than_mut</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">K</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Ord</span>,
-		<span class="ident">Q</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+	<span class="attribute">#[deprecated(
+		since = <span class="string">&quot;0.1.1&quot;</span>,
+		note = <span class="string">&quot;Use last_key_value_mut_at_or_before() instead&quot;
+	</span>)]
+	</span><span class="kw">pub fn </span>largest_leq_than_mut&lt;Q&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>Q) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;mut </span>V)&gt;
+	<span class="kw">where
+		</span>K: Borrow&lt;Q&gt; + Ord,
+		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.<span class="ident">last_key_value_mut_at_or_before</span>(<span class="ident">k</span>)
+		<span class="self">self</span>.last_key_value_mut_at_or_before(k)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
