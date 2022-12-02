@@ -10,7 +10,7 @@ docker run \
 	-v "$(realpath "$(dirname "$0")")":/src \
 	-w /src \
 	$image \
-	/bin/ash -x -c \
+	/bin/ash -euxo pipefail -c \
 	'abuild-apk add --root $CBUILDROOT --arch $CTARGET libgcc musl-dev
 	 abuild-apk add cargo rust-stdlib-armhf
 	 cargo bench \
