@@ -23,3 +23,7 @@ default = ["log"]
 
 [dependencies]
 log = { version = "0.4.8", optional = true }
+
+[profile.bench]
+debug = true
+lto = true

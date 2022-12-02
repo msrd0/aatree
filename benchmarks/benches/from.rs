@@ -19,6 +19,18 @@ macro_rules! benchmark {
 			}
 		}
 	};
+	($ty:ty, $amount:expr, insert) => {
+		paste::item! {
+			fn [<$ty:lower _insert_ $amount>]() -> $ty<u64> {
+				let vec: Vec<_> = (0..$amount).collect();
+				let mut tree = $ty::new();
+				for value in vec {
+					tree.insert(value);
+				}
+				tree
+			}
+		}
+	};
 	($group:literal = [$(($name:literal: $ty:ty, $amount:expr, $fn:ident)),+]) => {
 		$(benchmark!($ty, $amount, $fn);)+
 		paste::item! {
@@ -39,10 +51,14 @@ benchmark!(
 	"From" = [
 		("AATree": AATreeSet, 10000, from),
 		("AATree": AATreeSet, 10000, collect),
+		("AATree": AATreeSet, 10000, insert),
 		("AATree": AATreeSet, 100000, from),
 		("AATree": AATreeSet, 100000, collect),
+		("AATree": AATreeSet, 100000, insert),
 		("BTree": BTreeSet, 10000, collect),
-		("BTree": BTreeSet, 100000, collect)
+		("BTree": BTreeSet, 10000, insert),
+		("BTree": BTreeSet, 100000, collect),
+		("BTree": BTreeSet, 100000, insert)
 	]
 );
 
