@@ -5,10 +5,9 @@ use alloc::boxed::Box;
 use core::mem;
 
 mod insert;
-
 mod remove;
-
 mod traverse;
+
 pub use traverse::*;
 
 #[derive(Clone, Debug, PartialEq)]
