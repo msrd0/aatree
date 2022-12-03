@@ -395,9 +395,6 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Low-level implementation of an AA tree. You shouldn&#39;t have to use this directly; instead, use
 //! the implementations in [`AATreeSet`](crate::AATreeSet) and [`AATreeMap`](crate::AATreeMap).
 
@@ -405,12 +402,9 @@
 <span class="kw">use </span>core::mem;
 
 <span class="kw">mod </span>insert;
-<span class="kw">pub use </span>insert::<span class="kw-2">*</span>;
-
 <span class="kw">mod </span>remove;
-<span class="kw">pub use </span>remove::<span class="kw-2">*</span>;
-
 <span class="kw">mod </span>traverse;
+
 <span class="kw">pub use </span>traverse::<span class="kw-2">*</span>;
 
 <span class="attribute">#[derive(Clone, Debug, PartialEq)]
