@@ -6,7 +6,7 @@
 >
 
 <title>Gnuplot</title>
-<desc>Produced by GNUPLOT 5.4 patchlevel 1 </desc>
+<desc>Produced by GNUPLOT 5.4 patchlevel 5 </desc>
 
 <g id="gnuplot_canvas">
 
@@ -219,14 +219,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(178,  34,  34)'  d='M1128.36,63.01 L1170.92,63.01 M72.53,660.51 L1103.19,643.52  '/></g>
+	<path stroke='rgb(178,  34,  34)'  d='M1128.36,63.01 L1170.92,63.01 M72.53,660.44 L1103.19,642.74  '/></g>
 	</g>
 	<g id="gnuplot_plot_2" ><title>gnuplot_plot_2</title>
 <g fill="none" color="white" stroke="rgb(178,  34,  34)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(72.53,660.51) scale(3.38)' color='rgb(178,  34,  34)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,643.52) scale(3.38)' color='rgb(178,  34,  34)'/>
+	<use xlink:href='#gpPt6' transform='translate(72.53,660.44) scale(3.38)' color='rgb(178,  34,  34)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,642.74) scale(3.38)' color='rgb(178,  34,  34)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_3" ><title>AATree_miss</title>
@@ -238,14 +238,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb( 46, 139,  87)'  d='M1128.36,81.01 L1170.92,81.01 M72.53,616.82 L1103.19,56.97  '/></g>
+	<path stroke='rgb( 46, 139,  87)'  d='M1128.36,81.01 L1170.92,81.01 M72.53,618.80 L1103.19,83.07  '/></g>
 	</g>
 	<g id="gnuplot_plot_4" ><title>gnuplot_plot_4</title>
 <g fill="none" color="white" stroke="rgb( 46, 139,  87)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(72.53,616.82) scale(3.38)' color='rgb( 46, 139,  87)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,56.97) scale(3.38)' color='rgb( 46, 139,  87)'/>
+	<use xlink:href='#gpPt6' transform='translate(72.53,618.80) scale(3.38)' color='rgb( 46, 139,  87)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,83.07) scale(3.38)' color='rgb( 46, 139,  87)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_5" ><title>BTree_hit</title>
@@ -257,14 +257,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(  0, 139, 139)'  d='M1128.36,99.01 L1170.92,99.01 M72.53,660.25 L1103.19,639.46  '/></g>
+	<path stroke='rgb(  0, 139, 139)'  d='M1128.36,99.01 L1170.92,99.01 M72.53,659.74 L1103.19,633.71  '/></g>
 	</g>
 	<g id="gnuplot_plot_6" ><title>gnuplot_plot_6</title>
 <g fill="none" color="white" stroke="rgb(  0, 139, 139)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(72.53,660.25) scale(3.38)' color='rgb(  0, 139, 139)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,639.46) scale(3.38)' color='rgb(  0, 139, 139)'/>
+	<use xlink:href='#gpPt6' transform='translate(72.53,659.74) scale(3.38)' color='rgb(  0, 139, 139)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,633.71) scale(3.38)' color='rgb(  0, 139, 139)'/>
 </g>
 	</g>
 	<g id="gnuplot_plot_7" ><title>BTree_miss</title>
@@ -276,14 +276,14 @@
 	</g>
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<path stroke='rgb(255, 215,   0)'  d='M1128.36,117.01 L1170.92,117.01 M72.53,633.98 L1103.19,287.46  '/></g>
+	<path stroke='rgb(255, 215,   0)'  d='M1128.36,117.01 L1170.92,117.01 M72.53,631.66 L1103.19,259.29  '/></g>
 	</g>
 	<g id="gnuplot_plot_8" ><title>gnuplot_plot_8</title>
 <g fill="none" color="white" stroke="rgb(255, 215,   0)" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
 </g>
 <g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="butt" stroke-linejoin="miter">
-	<use xlink:href='#gpPt6' transform='translate(72.53,633.98) scale(3.38)' color='rgb(255, 215,   0)'/>
-	<use xlink:href='#gpPt6' transform='translate(1103.19,287.46) scale(3.38)' color='rgb(255, 215,   0)'/>
+	<use xlink:href='#gpPt6' transform='translate(72.53,631.66) scale(3.38)' color='rgb(255, 215,   0)'/>
+	<use xlink:href='#gpPt6' transform='translate(1103.19,259.29) scale(3.38)' color='rgb(255, 215,   0)'/>
 </g>
 	</g>
 <g fill="none" color="white" stroke="rgb(255, 215,   0)" stroke-width="2.00" stroke-linecap="butt" stroke-linejoin="miter">
