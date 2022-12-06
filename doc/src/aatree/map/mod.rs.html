@@ -594,14 +594,14 @@
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
 		<span class="self">self</span>.root
-			.traverse(|content, sub| <span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>content.key.borrow().cmp(k) {
+			.traverse(
+				|content| <span class="kw">match </span>content.key.borrow().cmp(k) {
 					Ordering::Greater =&gt; TraverseStep::Left,
 					Ordering::Less =&gt; TraverseStep::Right,
 					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(()))
-				}
-			})
+				},
+				|<span class="kw">_</span>, sub| sub
+			)
 			.is_some()
 	}
 

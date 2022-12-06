@@ -91,58 +91,6 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{AANode, Node};
 
 <span class="doccomment">/// This type specifies the requested step for [`traverse`](AANode::traverse).
@@ -165,64 +113,37 @@
 	</span>}
 }
 
-<span class="attribute">#[cfg(feature = <span class="string">&quot;log&quot;</span>)]
-</span><span class="kw">fn </span>error_recursive() {
-	<span class="macro">log::error!</span>(<span class="string">&quot;Recursive traversal detected and prohibited&quot;</span>);
-}
-
-<span class="attribute">#[cfg(not(feature = <span class="string">&quot;log&quot;</span>))]
-</span><span class="kw">fn </span>error_recursive() {}
-
 <span class="kw">impl</span>&lt;T&gt; AANode&lt;T&gt; {
-	<span class="doccomment">/// Traverse the tree looking for a specific value. The `callback` is called as follows:
-	///  1. While going down, with `(content, None)` as the input. The callback may return
-	///     either `Left` or `Right` to continue the traversal, or `Value` to stop the
-	///     traversal, for example because a value was found.
-	///  2. While going back up, with `(content, Some(res))`, where `res` is the result from
-	///     the fully traversed subgraph. The callback must produce a `Value` result, a
-	///     traversal (returning `Left` or `Right`) is a logic error and will be ignored.
-	</span><span class="kw">pub fn </span>traverse&lt;<span class="lifetime">&#39;a</span>, F, R&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, callback: F) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
+	<span class="doccomment">/// Traverse the tree looking for a specific value.
+	///
+	/// `down_callback` is called for each node on the way down the tree. It is passed the
+	/// value contained in the current node and may return either `Left` or `Right` to
+	/// continue the traversal in that direction, or `Value` to stop the traversal, for
+	/// example because a value was found.
+	///
+	/// `up_callback` is called while going back up with the content of each node and the
+	/// result of traversing so far (i.e., `None` for the first call when the search hit a
+	/// leaf, or the return value of the last callback execution otherwise).
+	</span><span class="kw">pub fn </span>traverse&lt;<span class="lifetime">&#39;a</span>, F, G, R&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, down_callback: F, up_callback: G) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
 	<span class="kw">where
-		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, <span class="prelude-ty">Option</span>&lt;TraverseStep&lt;R&gt;&gt;) -&gt; TraverseStep&lt;R&gt; + Copy
+		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; TraverseStep&lt;R&gt; + Copy,
+		G: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, <span class="prelude-ty">Option</span>&lt;R&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt; + Copy
 	{
-		<span class="kw">let </span>res = <span class="self">self</span>.traverse_impl(callback);
-		<span class="kw">match </span>res {
-			TraverseStep::Value(v) =&gt; v,
-			<span class="kw">_ </span>=&gt; {
-				error_recursive();
-				<span class="prelude-val">None
-			</span>}
-		}
-	}
-
-	<span class="doccomment">/// Traverse the current node, calling the callback with `(content, None)` while going down and
-	/// with `(content, Some(res))` when going up, where `res` is the result obtained from the lower
-	/// subtree.
-	</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>traverse_impl&lt;<span class="lifetime">&#39;a</span>, F, R&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, callback: F) -&gt; TraverseStep&lt;R&gt;
-	<span class="kw">where
-		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, <span class="prelude-ty">Option</span>&lt;TraverseStep&lt;R&gt;&gt;) -&gt; TraverseStep&lt;R&gt; + Copy
-	{
-		<span class="kw">match </span><span class="self">self</span>.as_ref() {
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Value(<span class="prelude-val">None</span>),
-			<span class="prelude-val">Some</span>(Node {
-				content,
-				left_child,
-				right_child,
-				..
-			}) =&gt; {
-				<span class="kw">let </span>step = callback(content, <span class="prelude-val">None</span>);
-				<span class="kw">let </span>res = <span class="kw">match </span>step {
-					TraverseStep::Left =&gt; left_child.traverse_impl(callback),
-					TraverseStep::Right =&gt; right_child.traverse_impl(callback),
-					TraverseStep::Value(<span class="kw">_</span>) =&gt; <span class="kw">return </span>step
+		<span class="self">self</span>.as_ref().and_then(
+			|Node {
+			     content,
+			     left_child,
+			     right_child,
+			     ..
+			 }| {
+				<span class="kw">let </span>child = <span class="kw">match </span>down_callback(content) {
+					TraverseStep::Left =&gt; left_child,
+					TraverseStep::Right =&gt; right_child,
+					TraverseStep::Value(v) =&gt; <span class="kw">return </span>v
 				};
-				<span class="kw">let </span>res = callback(content, <span class="prelude-val">Some</span>(res));
-				<span class="kw">if </span><span class="macro">matches!</span>(res, TraverseStep::Left | TraverseStep::Right) {
-					error_recursive();
-				}
-				res
+				up_callback(content, child.traverse(down_callback, up_callback))
 			}
-		}
+		)
 	}
 
 	<span class="doccomment">/// Traverse the tree, allowing for mutation of the nodes that are being traversed.
@@ -238,52 +159,27 @@
 		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T, TraverseMutContext) -&gt; TraverseStep&lt;R&gt; + Copy,
 		L: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
 	{
-		<span class="kw">let </span>res = <span class="self">self</span>.traverse_mut_impl(callback, leaf_callback);
-		<span class="kw">match </span>res {
-			TraverseStep::Value(v) =&gt; v,
-			<span class="kw">_ </span>=&gt; {
-				error_recursive();
-				<span class="prelude-val">None
-			</span>}
-		}
-	}
-
-	<span class="kw">fn </span>traverse_mut_impl&lt;<span class="lifetime">&#39;a</span>, F, L, R&gt;(
-		<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
-		callback: F,
-		leaf_callback: L
-	) -&gt; TraverseStep&lt;R&gt;
-	<span class="kw">where
-		</span>F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T, TraverseMutContext) -&gt; TraverseStep&lt;R&gt; + Copy,
-		L: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T) -&gt; <span class="prelude-ty">Option</span>&lt;R&gt;
-	{
-		<span class="kw">match </span><span class="self">self</span>.as_mut() {
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Value(<span class="prelude-val">None</span>),
-			<span class="prelude-val">Some</span>(Node {
-				content,
-				left_child,
-				right_child,
-				..
-			}) =&gt; {
-				<span class="kw">if </span>left_child.is_nil() &amp;&amp; right_child.is_nil() {
-					TraverseStep::Value(leaf_callback(content))
-				} <span class="kw">else </span>{
-					<span class="kw">let </span>step = callback(
-						content,
-						TraverseMutContext(left_child.is_nil(), right_child.is_nil())
-					);
-					<span class="kw">match </span>step {
-						TraverseStep::Left =&gt; {
-							left_child.traverse_mut_impl(callback, leaf_callback)
-						},
-						TraverseStep::Right =&gt; {
-							right_child.traverse_mut_impl(callback, leaf_callback)
-						},
-						TraverseStep::Value(<span class="kw">_</span>) =&gt; step
+		<span class="self">self</span>.as_mut().and_then(
+			|Node {
+			     content,
+			     left_child,
+			     right_child,
+			     ..
+			 }| {
+				<span class="kw">match </span>(left_child.is_nil(), right_child.is_nil()) {
+					(<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; leaf_callback(content),
+					(left, right) =&gt; {
+						<span class="kw">let </span>child =
+							<span class="kw">match </span>callback(content, TraverseMutContext(left, right)) {
+								TraverseStep::Left =&gt; left_child,
+								TraverseStep::Right =&gt; right_child,
+								TraverseStep::Value(val) =&gt; <span class="kw">return </span>val
+							};
+						child.traverse_mut(callback, leaf_callback)
 					}
 				}
-			},
-		}
+			}
+		)
 	}
 }
 </code></pre></div>

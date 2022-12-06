@@ -470,16 +470,6 @@
 <span id="468">468</span>
 <span id="469">469</span>
 <span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
@@ -688,11 +678,8 @@
 	/// assert_eq!(set.first(), Some(&amp;40));
 	/// ```
 	</span><span class="kw">pub fn </span>first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content)),
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Left
-		})
+		<span class="self">self</span>.root
+			.traverse(|<span class="kw">_</span>| TraverseStep::Left, |content, sub| sub.or(<span class="prelude-val">Some</span>(content)))
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first() instead&quot;</span>)]
@@ -713,11 +700,10 @@
 	/// assert_eq!(set.last(), Some(&amp;44));
 	/// ```
 	</span><span class="kw">pub fn </span>last(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content)),
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Right
-		})
+		<span class="self">self</span>.root.traverse(
+			|<span class="kw">_</span>| TraverseStep::Right,
+			|content, sub| sub.or(<span class="prelude-val">Some</span>(content))
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last() instead&quot;</span>)]
@@ -790,14 +776,14 @@
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
 		<span class="self">self</span>.root
-			.traverse(|content, sub| <span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>content.borrow().cmp(value) {
+			.traverse(
+				|content| <span class="kw">match </span>content.borrow().cmp(value) {
 					Ordering::Greater =&gt; TraverseStep::Left,
 					Ordering::Less =&gt; TraverseStep::Right,
 					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(()))
-				}
-			})
+				},
+				|<span class="kw">_</span>, sub| sub
+			)
 			.is_some()
 	}
 
@@ -818,20 +804,17 @@
 		</span>T: Borrow&lt;Q&gt; + Ord,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| {
-			<span class="kw">let </span>c = content.borrow();
-			<span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>c &gt; value =&gt; {
-					TraverseStep::Value(<span class="prelude-val">Some</span>(content))
-				},
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>c.cmp(value) {
-					Ordering::Greater =&gt; TraverseStep::Left,
-					Ordering::Less =&gt; TraverseStep::Right,
-					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
-				}
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>content.borrow().cmp(value) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
+			},
+			|content, sub| <span class="kw">match </span>sub {
+				<span class="prelude-val">None </span><span class="kw">if </span>content.borrow() &gt; value =&gt; <span class="prelude-val">Some</span>(content),
+				sub =&gt; sub
 			}
-		})
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_at_or_after() instead&quot;</span>)]
@@ -860,20 +843,17 @@
 		</span>T: Borrow&lt;Q&gt; + Ord,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| {
-			<span class="kw">let </span>c = content.borrow();
-			<span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>c &lt; value =&gt; {
-					TraverseStep::Value(<span class="prelude-val">Some</span>(content))
-				},
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>c.cmp(value) {
-					Ordering::Greater =&gt; TraverseStep::Left,
-					Ordering::Less =&gt; TraverseStep::Right,
-					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
-				}
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>content.borrow().cmp(value) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content))
+			},
+			|content, sub| <span class="kw">match </span>sub {
+				<span class="prelude-val">None </span><span class="kw">if </span>content.borrow() &lt; value =&gt; <span class="prelude-val">Some</span>(content),
+				sub =&gt; sub
 			}
-		})
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_at_or_before() instead&quot;</span>)]

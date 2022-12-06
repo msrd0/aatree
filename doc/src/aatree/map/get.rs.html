@@ -397,18 +397,6 @@
 <span id="395">395</span>
 <span id="396">396</span>
 <span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This method defines several access methods for [`AATreeMap`].
 
 </span><span class="kw">use super</span>::{entry::Entry, AATreeMap};
@@ -432,14 +420,14 @@
 		</span>K: Ord + Borrow&lt;Q&gt;,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(content.key.borrow()) {
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>key.cmp(content.key.borrow()) {
 				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>content.value)),
 				Ordering::Less =&gt; TraverseStep::Left,
 				Ordering::Greater =&gt; TraverseStep::Right
-			}
-		})
+			},
+			|<span class="kw">_</span>, sub| sub
+		)
 	}
 
 	<span class="doccomment">/// Returns a reference to the key and value corresponding to the key.
@@ -458,14 +446,14 @@
 		</span>K: Ord + Borrow&lt;Q&gt;,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(content.key.borrow()) {
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>key.cmp(content.key.borrow()) {
 				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple())),
 				Ordering::Less =&gt; TraverseStep::Left,
 				Ordering::Greater =&gt; TraverseStep::Right
-			}
-		})
+			},
+			|<span class="kw">_</span>, sub| sub
+		)
 	}
 
 	<span class="doccomment">/// Returns a mutable reference to the value corresponding to the key.
@@ -518,13 +506,10 @@
 	<span class="kw">where
 		</span>K: Ord
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; {
-				TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-			},
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Left
-		})
+		<span class="self">self</span>.root.traverse(
+			|<span class="kw">_</span>| TraverseStep::Left,
+			|content, sub| sub.or_else(|| <span class="prelude-val">Some</span>(content.as_tuple()))
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_key_value() instead&quot;</span>)]
@@ -583,13 +568,10 @@
 	<span class="kw">where
 		</span>K: Ord
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| <span class="kw">match </span>sub {
-			<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) =&gt; {
-				TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-			},
-			<span class="prelude-val">Some</span>(sub) =&gt; sub,
-			<span class="prelude-val">None </span>=&gt; TraverseStep::Right
-		})
+		<span class="self">self</span>.root.traverse(
+			|<span class="kw">_</span>| TraverseStep::Right,
+			|content, sub| sub.or_else(|| <span class="prelude-val">Some</span>(content.as_tuple()))
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_key_value() instead&quot;</span>)]
@@ -649,20 +631,17 @@
 		</span>K: Borrow&lt;Q&gt; + Ord,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| {
-			<span class="kw">let </span>key = content.key.borrow();
-			<span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>key &gt; k =&gt; {
-					TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-				},
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(k) {
-					Ordering::Greater =&gt; TraverseStep::Left,
-					Ordering::Less =&gt; TraverseStep::Right,
-					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-				}
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>content.key.borrow().cmp(k) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
+			},
+			|content, sub| <span class="kw">match </span>sub {
+				<span class="prelude-val">None </span><span class="kw">if </span>content.key.borrow() &gt; k =&gt; <span class="prelude-val">Some</span>(content.as_tuple()),
+				sub =&gt; sub
 			}
-		})
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use first_key_value_at_or_after() instead&quot;</span>)]
@@ -743,20 +722,17 @@
 		</span>K: Borrow&lt;Q&gt; + Ord,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.traverse(|content, sub| {
-			<span class="kw">let </span>key = content.key.borrow();
-			<span class="kw">match </span>sub {
-				<span class="prelude-val">Some</span>(TraverseStep::Value(<span class="prelude-val">None</span>)) <span class="kw">if </span>key &lt; k =&gt; {
-					TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-				},
-				<span class="prelude-val">Some</span>(sub) =&gt; sub,
-				<span class="prelude-val">None </span>=&gt; <span class="kw">match </span>key.cmp(k) {
-					Ordering::Greater =&gt; TraverseStep::Left,
-					Ordering::Less =&gt; TraverseStep::Right,
-					Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
-				}
+		<span class="self">self</span>.root.traverse(
+			|content| <span class="kw">match </span>content.key.borrow().cmp(k) {
+				Ordering::Greater =&gt; TraverseStep::Left,
+				Ordering::Less =&gt; TraverseStep::Right,
+				Ordering::Equal =&gt; TraverseStep::Value(<span class="prelude-val">Some</span>(content.as_tuple()))
+			},
+			|content, sub| <span class="kw">match </span>sub {
+				<span class="prelude-val">None </span><span class="kw">if </span>content.key.borrow() &lt; k =&gt; <span class="prelude-val">Some</span>(content.as_tuple()),
+				sub =&gt; sub
 			}
-		})
+		)
 	}
 
 	<span class="attribute">#[deprecated(since = <span class="string">&quot;0.1.1&quot;</span>, note = <span class="string">&quot;Use last_key_value_at_or_before() instead&quot;</span>)]
