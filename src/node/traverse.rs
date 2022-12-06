@@ -20,64 +20,37 @@ impl TraverseMutContext {
 	}
 }
 
-#[cfg(feature = "log")]
-fn error_recursive() {
-	log::error!("Recursive traversal detected and prohibited");
-}
-
-#[cfg(not(feature = "log"))]
-fn error_recursive() {}
-
 impl<T> AANode<T> {
-	/// Traverse the tree looking for a specific value. The `callback` is called as follows:
-	///  1. While going down, with `(content, None)` as the input. The callback may return
-	///     either `Left` or `Right` to continue the traversal, or `Value` to stop the
-	///     traversal, for example because a value was found.
-	///  2. While going back up, with `(content, Some(res))`, where `res` is the result from
-	///     the fully traversed subgraph. The callback must produce a `Value` result, a
-	///     traversal (returning `Left` or `Right`) is a logic error and will be ignored.
-	pub fn traverse<'a, F, R>(&'a self, callback: F) -> Option<R>
+	/// Traverse the tree looking for a specific value.
+	///
+	/// `down_callback` is called for each node on the way down the tree. It is passed the
+	/// value contained in the current node and may return either `Left` or `Right` to
+	/// continue the traversal in that direction, or `Value` to stop the traversal, for
+	/// example because a value was found.
+	///
+	/// `up_callback` is called while going back up with the content of each node and the
+	/// result of traversing so far (i.e., `None` for the first call when the search hit a
+	/// leaf, or the return value of the last callback execution otherwise).
+	pub fn traverse<'a, F, G, R>(&'a self, down_callback: F, up_callback: G) -> Option<R>
 	where
-		F: Fn(&'a T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
+		F: Fn(&'a T) -> TraverseStep<R> + Copy,
+		G: Fn(&'a T, Option<R>) -> Option<R> + Copy
 	{
-		let res = self.traverse_impl(callback);
-		match res {
-			TraverseStep::Value(v) => v,
-			_ => {
-				error_recursive();
-				None
-			}
-		}
-	}
-
-	/// Traverse the current node, calling the callback with `(content, None)` while going down and
-	/// with `(content, Some(res))` when going up, where `res` is the result obtained from the lower
-	/// subtree.
-	pub(super) fn traverse_impl<'a, F, R>(&'a self, callback: F) -> TraverseStep<R>
-	where
-		F: Fn(&'a T, Option<TraverseStep<R>>) -> TraverseStep<R> + Copy
-	{
-		match self.as_ref() {
-			None => TraverseStep::Value(None),
-			Some(Node {
-				content,
-				left_child,
-				right_child,
-				..
-			}) => {
-				let step = callback(content, None);
-				let res = match step {
-					TraverseStep::Left => left_child.traverse_impl(callback),
-					TraverseStep::Right => right_child.traverse_impl(callback),
-					TraverseStep::Value(_) => return step
+		self.as_ref().and_then(
+			|Node {
+			     content,
+			     left_child,
+			     right_child,
+			     ..
+			 }| {
+				let child = match down_callback(content) {
+					TraverseStep::Left => left_child,
+					TraverseStep::Right => right_child,
+					TraverseStep::Value(v) => return v
 				};
-				let res = callback(content, Some(res));
-				if matches!(res, TraverseStep::Left | TraverseStep::Right) {
-					error_recursive();
-				}
-				res
+				up_callback(content, child.traverse(down_callback, up_callback))
 			}
-		}
+		)
 	}
 
 	/// Traverse the tree, allowing for mutation of the nodes that are being traversed.
@@ -93,51 +66,26 @@ impl<T> AANode<T> {
 		F: Fn(&'a mut T, TraverseMutContext) -> TraverseStep<R> + Copy,
 		L: Fn(&'a mut T) -> Option<R>
 	{
-		let res = self.traverse_mut_impl(callback, leaf_callback);
-		match res {
-			TraverseStep::Value(v) => v,
-			_ => {
-				error_recursive();
-				None
-			}
-		}
-	}
-
-	fn traverse_mut_impl<'a, F, L, R>(
-		&'a mut self,
-		callback: F,
-		leaf_callback: L
-	) -> TraverseStep<R>
-	where
-		F: Fn(&'a mut T, TraverseMutContext) -> TraverseStep<R> + Copy,
-		L: Fn(&'a mut T) -> Option<R>
-	{
-		match self.as_mut() {
-			None => TraverseStep::Value(None),
-			Some(Node {
-				content,
-				left_child,
-				right_child,
-				..
-			}) => {
-				if left_child.is_nil() && right_child.is_nil() {
-					TraverseStep::Value(leaf_callback(content))
-				} else {
-					let step = callback(
-						content,
-						TraverseMutContext(left_child.is_nil(), right_child.is_nil())
-					);
-					match step {
-						TraverseStep::Left => {
-							left_child.traverse_mut_impl(callback, leaf_callback)
-						},
-						TraverseStep::Right => {
-							right_child.traverse_mut_impl(callback, leaf_callback)
-						},
-						TraverseStep::Value(_) => step
+		self.as_mut().and_then(
+			|Node {
+			     content,
+			     left_child,
+			     right_child,
+			     ..
+			 }| {
+				match (left_child.is_nil(), right_child.is_nil()) {
+					(true, true) => leaf_callback(content),
+					(left, right) => {
+						let child =
+							match callback(content, TraverseMutContext(left, right)) {
+								TraverseStep::Left => left_child,
+								TraverseStep::Right => right_child,
+								TraverseStep::Value(val) => return val
+							};
+						child.traverse_mut(callback, leaf_callback)
 					}
 				}
-			},
-		}
+			}
+		)
 	}
 }

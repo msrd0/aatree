@@ -237,14 +237,14 @@ impl<K, V> AATreeMap<K, V> {
 		Q: Ord + ?Sized
 	{
 		self.root
-			.traverse(|content, sub| match sub {
-				Some(sub) => sub,
-				None => match content.key.borrow().cmp(k) {
+			.traverse(
+				|content| match content.key.borrow().cmp(k) {
 					Ordering::Greater => TraverseStep::Left,
 					Ordering::Less => TraverseStep::Right,
 					Ordering::Equal => TraverseStep::Value(Some(()))
-				}
-			})
+				},
+				|_, sub| sub
+			)
 			.is_some()
 	}
 
