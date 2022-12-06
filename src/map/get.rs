@@ -113,14 +113,6 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_key_value() instead")]
-	pub fn smallest(&self) -> Option<(&K, &V)>
-	where
-		K: Ord
-	{
-		self.first_key_value()
-	}
-
 	/// Returns and removes the first entry (that is, with the smallest key) in the map.
 	///
 	/// # Example
@@ -144,14 +136,6 @@ impl<K, V> AATreeMap<K, V> {
 		self.root.remove_successor().map(Entry::into_tuple)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use pop_first() instead")]
-	pub fn pop_smallest(&mut self) -> Option<(K, V)>
-	where
-		K: Ord
-	{
-		self.pop_first()
-	}
-
 	/// Returns a reference to the last entry (that is, with the largest key) in the map.
 	///
 	/// # Example
@@ -173,14 +157,6 @@ impl<K, V> AATreeMap<K, V> {
 			|_| TraverseStep::Right,
 			|content, sub| sub.or_else(|| Some(content.as_tuple()))
 		)
-	}
-
-	#[deprecated(since = "0.1.1", note = "Use last_key_value() instead")]
-	pub fn largest(&self) -> Option<(&K, &V)>
-	where
-		K: Ord
-	{
-		self.last_key_value()
 	}
 
 	/// Returns and removes the last entry (that is, with the largest key) in the map.
@@ -245,15 +221,6 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_key_value_at_or_after() instead")]
-	pub fn smallest_geq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
-	where
-		K: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.first_key_value_at_or_after(k)
-	}
-
 	/// Returns a mutable reference to the first entry with a key greater than or equal
 	/// to `k` in the map.
 	///
@@ -292,18 +259,6 @@ impl<K, V> AATreeMap<K, V> {
 		)
 	}
 
-	#[deprecated(
-		since = "0.1.1",
-		note = "Use first_key_value_mut_at_or_after() instead"
-	)]
-	pub fn smallest_geq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
-	where
-		K: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.first_key_value_mut_at_or_after(k)
-	}
-
 	/// Returns a reference to the last entry with a key smaller than or equal to `k` in
 	/// the map.
 	///
@@ -334,15 +289,6 @@ impl<K, V> AATreeMap<K, V> {
 				sub => sub
 			}
 		)
-	}
-
-	#[deprecated(since = "0.1.1", note = "Use last_key_value_at_or_before() instead")]
-	pub fn largest_leq_than<Q>(&self, k: &Q) -> Option<(&K, &V)>
-	where
-		K: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.last_key_value_at_or_before(k)
 	}
 
 	/// Returns a mutable reference to the last entry with a key smaller than or equal to
@@ -381,17 +327,5 @@ impl<K, V> AATreeMap<K, V> {
 				}
 			}
 		)
-	}
-
-	#[deprecated(
-		since = "0.1.1",
-		note = "Use last_key_value_mut_at_or_before() instead"
-	)]
-	pub fn largest_leq_than_mut<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
-	where
-		K: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.last_key_value_mut_at_or_before(k)
 	}
 }
