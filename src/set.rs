@@ -210,11 +210,6 @@ impl<T: Ord> AATreeSet<T> {
 			.traverse(|_| TraverseStep::Left, |content, sub| sub.or(Some(content)))
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first() instead")]
-	pub fn smallest(&self) -> Option<&T> {
-		self.first()
-	}
-
 	/// Returns the last/largest element of the set.
 	///
 	/// # Example
@@ -232,11 +227,6 @@ impl<T: Ord> AATreeSet<T> {
 			|_| TraverseStep::Right,
 			|content, sub| sub.or(Some(content))
 		)
-	}
-
-	#[deprecated(since = "0.1.1", note = "Use last() instead")]
-	pub fn largest(&self) -> Option<&T> {
-		self.last()
 	}
 
 	/// Remove and return the first/smallest element of the set.
@@ -258,11 +248,6 @@ impl<T: Ord> AATreeSet<T> {
 		self.root.remove_successor()
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use pop_first() instead")]
-	pub fn pop_smallest(&mut self) -> Option<T> {
-		self.pop_first()
-	}
-
 	/// Remove and return the last/largest element of the set.
 	///
 	/// # Example
@@ -280,11 +265,6 @@ impl<T: Ord> AATreeSet<T> {
 	/// ```
 	pub fn pop_last(&mut self) -> Option<T> {
 		self.root.remove_predecessor()
-	}
-
-	#[deprecated(since = "0.1.1", note = "Use pop_last() instead")]
-	pub fn pop_largest(&mut self) -> Option<T> {
-		self.pop_last()
 	}
 
 	/// Returns `true` if the set contains an element with the given value.
@@ -345,15 +325,6 @@ impl<T: Ord> AATreeSet<T> {
 		)
 	}
 
-	#[deprecated(since = "0.1.1", note = "Use first_at_or_after() instead")]
-	pub fn smallest_geq_than<Q>(&self, value: &Q) -> Option<&T>
-	where
-		T: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.first_at_or_after(value)
-	}
-
 	/// Returns the last/largest element of the set that is smaller or equal to `x`.
 	///
 	/// # Example
@@ -382,15 +353,6 @@ impl<T: Ord> AATreeSet<T> {
 				sub => sub
 			}
 		)
-	}
-
-	#[deprecated(since = "0.1.1", note = "Use last_at_or_before() instead")]
-	pub fn largest_leq_than<Q>(&self, value: &Q) -> Option<&T>
-	where
-		T: Borrow<Q> + Ord,
-		Q: Ord + ?Sized
-	{
-		self.last_at_or_before(value)
 	}
 
 	/// Removes a value from the set, and returns `true` if it was removed.
