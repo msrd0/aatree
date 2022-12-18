@@ -1,6 +1,6 @@
 //! This method defines several access methods for [`AATreeMap`].
 
-use super::{entry::Entry, AATreeMap};
+use super::{AATreeMap, KeyValue};
 use crate::node::TraverseStep;
 use core::{borrow::Borrow, cmp::Ordering};
 
@@ -133,7 +133,7 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.remove_successor().map(Entry::into_tuple)
+		self.root.remove_successor().map(KeyValue::into_tuple)
 	}
 
 	/// Returns a reference to the last entry (that is, with the largest key) in the map.
@@ -179,7 +179,7 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.remove_predecessor().map(Entry::into_tuple)
+		self.root.remove_predecessor().map(KeyValue::into_tuple)
 	}
 
 	pub fn pop_largest(&mut self) -> Option<(K, V)>

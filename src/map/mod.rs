@@ -11,14 +11,14 @@ use core::{
 	mem
 };
 
-mod entry;
-use entry::Entry;
-
 mod get;
+mod kv;
+
+use kv::KeyValue;
 
 #[derive(Clone)]
 pub struct AATreeMap<K, V> {
-	root: AANode<Entry<K, V>>,
+	root: AANode<KeyValue<K, V>>,
 	len: usize
 }
 
@@ -127,7 +127,7 @@ impl<K, V> AATreeMap<K, V> {
 	}
 
 	/// Creates an iterator over this map that visits all entries with the keys in ascending order.
-	pub fn iter(&self) -> AAIter<'_, Entry<K, V>, (&K, &V)> {
+	pub fn iter(&self) -> AAIter<'_, KeyValue<K, V>, (&K, &V)> {
 		self.into_iter()
 	}
 
@@ -175,7 +175,7 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		let inserted = self.root.insert_or_replace(Entry { key, value });
+		let inserted = self.root.insert_or_replace(KeyValue { key, value });
 		match inserted {
 			None => {
 				self.len += 1;
@@ -291,7 +291,7 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.remove::<Q, K>(k).map(Entry::into_tuple)
+		self.root.remove::<Q, K>(k).map(KeyValue::into_tuple)
 	}
 }
 
@@ -338,7 +338,7 @@ impl<'a, K: Ord + Copy + 'a, V: Ord + Copy + 'a> Extend<(&'a K, &'a V)>
 
 impl<K, V> IntoIterator for AATreeMap<K, V> {
 	type Item = (K, V);
-	type IntoIter = AAIntoIter<Entry<K, V>, (K, V)>;
+	type IntoIter = AAIntoIter<KeyValue<K, V>, (K, V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIntoIter::new(self.root, self.len)
@@ -347,7 +347,7 @@ impl<K, V> IntoIterator for AATreeMap<K, V> {
 
 impl<'a, K, V> IntoIterator for &'a AATreeMap<K, V> {
 	type Item = (&'a K, &'a V);
-	type IntoIter = AAIter<'a, Entry<K, V>, (&'a K, &'a V)>;
+	type IntoIter = AAIter<'a, KeyValue<K, V>, (&'a K, &'a V)>;
 
 	fn into_iter(self) -> Self::IntoIter {
 		AAIter::new(&self.root, self.len)
