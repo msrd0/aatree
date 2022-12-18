@@ -14,10 +14,9 @@
 extern crate alloc;
 
 pub mod iter;
+pub mod map;
 pub mod node;
+pub mod set;
 
-mod map;
 pub use map::AATreeMap;
-
-mod set;
 pub use set::AATreeSet;
