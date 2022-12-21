@@ -1,10 +1,25 @@
 //! This method defines several access methods for [`AATreeMap`].
 
-use super::{AATreeMap, KeyValue};
+use super::{AATreeMap, Entry, KeyValue, OccupiedEntry, VacantEntry};
 use crate::node::TraverseStep;
-use core::{borrow::Borrow, cmp::Ordering};
+use core::{borrow::Borrow, cmp::Ordering, fmt::Debug};
 
 impl<K, V> AATreeMap<K, V> {
+	fn kv<Q>(&self, key: &Q) -> Option<&KeyValue<K, V>>
+	where
+		K: Ord + Borrow<Q>,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse(
+			|content| match key.cmp(content.key.borrow()) {
+				Ordering::Equal => TraverseStep::Value(Some(content)),
+				Ordering::Less => TraverseStep::Left,
+				Ordering::Greater => TraverseStep::Right
+			},
+			|_, sub| sub
+		)
+	}
+
 	/// Returns a reference to the value corresponding to the key.
 	///
 	/// # Example
@@ -21,14 +36,7 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match key.cmp(content.key.borrow()) {
-				Ordering::Equal => TraverseStep::Value(Some(&content.value)),
-				Ordering::Less => TraverseStep::Left,
-				Ordering::Greater => TraverseStep::Right
-			},
-			|_, sub| sub
-		)
+		self.kv(key).map(|kv| &kv.value)
 	}
 
 	/// Returns a reference to the key and value corresponding to the key.
@@ -47,14 +55,59 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match key.cmp(content.key.borrow()) {
-				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple())),
-				Ordering::Less => TraverseStep::Left,
-				Ordering::Greater => TraverseStep::Right
+		self.kv(key).map(|kv| kv.as_tuple())
+	}
+
+	fn kv_mut<Q>(&mut self, key: &Q) -> Option<&mut KeyValue<K, V>>
+	where
+		K: Ord + Borrow<Q>,
+		Q: Ord + ?Sized
+	{
+		self.root.traverse_mut(
+			|content, _| match content.key.borrow().cmp(key) {
+				Ordering::Greater => TraverseStep::Left,
+				Ordering::Less => TraverseStep::Right,
+				Ordering::Equal => TraverseStep::Value(Some(content))
 			},
-			|_, sub| sub
+			|content| {
+				if content.key.borrow() == key {
+					Some(content)
+				} else {
+					None
+				}
+			}
 		)
+	}
+
+	/// Gets the given key's corresponding entry, allowing for in-place manipulation of
+	/// the entry as well as inserting an entry in that key if it does not exist yet.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::{AATreeMap, map::Entry};
+	/// let mut map = AATreeMap::new();
+	/// let entry = map.entry(1);
+	/// assert!(matches!(entry, Entry::Vacant(_)));
+	/// entry.or_insert('a');
+	/// assert_eq!(map.get(&1), Some(&'a'));
+	///
+	/// let entry = map.entry(1);
+	/// assert!(matches!(entry, Entry::Occupied(_)));
+	/// entry.and_modify(|value| *value = 'b');
+	/// assert_eq!(map.get(&1), Some(&'b'));
+	/// ```
+	#[allow(unsafe_code)]
+	pub fn entry(&mut self, key: K) -> Entry<'_, K, V>
+	where
+		K: Ord
+	{
+		// This is a known limitation of the borrow checker in Rust:
+		// https://blog.rust-lang.org/2022/08/05/nll-by-default.html#looking-forward-what-can-we-expect-for-the-borrow-checker-of-the-future
+		match unsafe { &mut *(self as *mut Self) }.kv_mut(&key) {
+			Some(kv) => Entry::Occupied(OccupiedEntry { entry: kv }),
+			None => Entry::Vacant(VacantEntry { key, map: self })
+		}
 	}
 
 	/// Returns a mutable reference to the value corresponding to the key.
@@ -69,24 +122,52 @@ impl<K, V> AATreeMap<K, V> {
 	/// *map.get_mut(&1).unwrap() = "b";
 	/// assert_eq!(map.get(&1), Some(&"b"));
 	/// ```
-	pub fn get_mut<Q>(&mut self, k: &Q) -> Option<&mut V>
+	pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut V>
 	where
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
+		self.kv_mut(key).map(|kv| &mut kv.value)
+	}
+
+	/// Gets the first entry (that is, with the smallest key) in the map, allowing for
+	/// in-place manipulation of the entry.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::{AATreeMap, map::Entry};
+	/// let mut map = AATreeMap::new();
+	/// let entry = map.first_entry();
+	/// assert!(entry.is_none());
+	///
+	/// map.insert(1, 'a');
+	/// map.insert(3, 'c');
+	/// println!("{map:?}");
+	///
+	/// let Some(mut entry) = map.first_entry() else { unreachable!() };
+	/// *entry.get_mut() = 'b';
+	/// assert_eq!(map.get(&1), Some(&'b'));
+	/// assert_eq!(map.get(&3), Some(&'c'));
+	/// ```
+	pub fn first_entry(&mut self) -> Option<OccupiedEntry<'_, K, V>>
+	where
+		K: Ord + Debug,
+		V: Debug
+	{
+		extern crate std;
+		std::eprintln!("first_entry()");
 		self.root.traverse_mut(
-			|content, _| match content.key.borrow().cmp(k) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(&mut content.value))
-			},
-			|content| {
-				if content.key.borrow() == k {
-					Some(&mut content.value)
-				} else {
-					None
+			|content, ctx| {
+				std::eprintln!(
+					"first_entry(): In traverse_mut() callback |{content:?}, {ctx:?}|"
+				);
+				match ctx.has_left_child() {
+					true => TraverseStep::Left,
+					false => TraverseStep::Value(Some(OccupiedEntry { entry: content }))
 				}
-			}
+			},
+			|content| Some(OccupiedEntry { entry: content })
 		)
 	}
 
@@ -134,6 +215,35 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord
 	{
 		self.root.remove_successor().map(KeyValue::into_tuple)
+	}
+
+	/// Gets the last entry (that is, with the largest key) in the map, allowing for
+	/// in-place manipulation of the entry.
+	///
+	/// # Example
+	///
+	/// ```rust
+	/// # use aatree::{AATreeMap, map::Entry};
+	/// let mut map = AATreeMap::new();
+	/// let entry = map.last_entry();
+	/// assert!(entry.is_none());
+	///
+	/// map.insert(1, 'a');
+	/// map.insert(3, 'c');
+	///
+	/// let Some(mut entry) = map.last_entry() else { unreachable!() };
+	/// *entry.get_mut() = 'b';
+	/// assert_eq!(map.get(&1), Some(&'a'));
+	/// assert_eq!(map.get(&3), Some(&'c'));
+	/// ```
+	pub fn last_entry(&mut self) -> Option<OccupiedEntry<'_, K, V>>
+	where
+		K: Ord
+	{
+		self.root.traverse_mut(
+			|_, _| TraverseStep::Left,
+			|content| Some(OccupiedEntry { entry: content })
+		)
 	}
 
 	/// Returns a reference to the last entry (that is, with the largest key) in the map.

@@ -1,4 +1,5 @@
 use super::{AANode, Node};
+use core::fmt::{self, Debug, Formatter};
 
 /// This type specifies the requested step for [`traverse`](AANode::traverse).
 #[derive(Debug)]
@@ -12,11 +13,20 @@ pub(crate) struct TraverseMutContext(bool, bool);
 
 impl TraverseMutContext {
 	pub(crate) fn has_left_child(&self) -> bool {
-		self.0
+		!self.0
 	}
 
 	pub(crate) fn has_right_child(&self) -> bool {
-		self.1
+		!self.1
+	}
+}
+
+impl Debug for TraverseMutContext {
+	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+		f.debug_struct("TraverseMutContext")
+			.field("has_left_child", &self.has_left_child())
+			.field("has_right_child", &self.has_right_child())
+			.finish()
 	}
 }
 
@@ -66,6 +76,13 @@ impl<T> AANode<T> {
 		F: Fn(&'a mut T, TraverseMutContext) -> TraverseStep<R> + Copy,
 		L: Fn(&'a mut T) -> Option<R>
 	{
+		extern crate std;
+		if self.is_nil() {
+			std::eprintln!("[DEBUG aatree] traverse_mut(): self is nil");
+		} else {
+			std::eprintln!("[DEBUG aatree] traverse_mut()");
+		}
+
 		self.as_mut().and_then(
 			|Node {
 			     content,
@@ -78,7 +95,13 @@ impl<T> AANode<T> {
 					(left, right) => {
 						let child =
 							match callback(content, TraverseMutContext(left, right)) {
-								TraverseStep::Left => left_child,
+								TraverseStep::Left => {
+									#[cfg(debug_assertions)]
+									if !left {
+										std::eprintln!("[WARN aatree] traverse_mut(): Trying to go left when there is no left child");
+									}
+									left_child
+								},
 								TraverseStep::Right => right_child,
 								TraverseStep::Value(val) => return val
 							};

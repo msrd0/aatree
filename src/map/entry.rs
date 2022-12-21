@@ -72,7 +72,7 @@ impl<'a, K, V> Entry<'a, K, V> {
 }
 
 pub struct OccupiedEntry<'a, K, V> {
-	entry: &'a mut KeyValue<K, V>
+	pub(crate) entry: &'a mut KeyValue<K, V>
 }
 
 impl<'a, K, V> OccupiedEntry<'a, K, V> {
@@ -107,8 +107,8 @@ impl<K: Debug, V: Debug> Debug for OccupiedEntry<'_, K, V> {
 }
 
 pub struct VacantEntry<'a, K, V> {
-	key: K,
-	map: &'a mut AATreeMap<K, V>
+	pub(crate) key: K,
+	pub(crate) map: &'a mut AATreeMap<K, V>
 }
 
 impl<'a, K, V> VacantEntry<'a, K, V> {
