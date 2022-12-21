@@ -8,16 +8,10 @@ pub enum TraverseStep<R> {
 	Value(Option<R>)
 }
 
-pub(crate) struct TraverseMutContext(bool, bool);
-
-impl TraverseMutContext {
-	pub(crate) fn has_left_child(&self) -> bool {
-		self.0
-	}
-
-	pub(crate) fn has_right_child(&self) -> bool {
-		self.1
-	}
+#[derive(Debug)]
+pub(crate) struct TraverseMutContext {
+	pub(crate) has_left_child: bool,
+	pub(crate) has_right_child: bool
 }
 
 impl<T> AANode<T> {
@@ -75,13 +69,16 @@ impl<T> AANode<T> {
 			 }| {
 				match (left_child.is_nil(), right_child.is_nil()) {
 					(true, true) => leaf_callback(content),
-					(left, right) => {
-						let child =
-							match callback(content, TraverseMutContext(left, right)) {
-								TraverseStep::Left => left_child,
-								TraverseStep::Right => right_child,
-								TraverseStep::Value(val) => return val
-							};
+					(left_is_nil, right_is_nil) => {
+						let ctx = TraverseMutContext {
+							has_left_child: !left_is_nil,
+							has_right_child: !right_is_nil
+						};
+						let child = match callback(content, ctx) {
+							TraverseStep::Left => left_child,
+							TraverseStep::Right => right_child,
+							TraverseStep::Value(val) => return val
+						};
 						child.traverse_mut(callback, leaf_callback)
 					}
 				}
