@@ -17,6 +17,10 @@ impl<K, V> KeyValue<K, V> {
 		(&self.key, &self.value)
 	}
 
+	pub(super) fn as_tuple_mut(&mut self) -> (&K, &mut V) {
+		(&self.key, &mut self.value)
+	}
+
 	pub(super) fn into_tuple(self) -> (K, V) {
 		(self.key, self.value)
 	}

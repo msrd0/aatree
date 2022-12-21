@@ -74,20 +74,15 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse_mut(
-			|content, _| match content.key.borrow().cmp(k) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(&mut content.value))
-			},
-			|content| {
-				if content.key.borrow() == k {
-					Some(&mut content.value)
-				} else {
-					None
-				}
+		let mut traverse = self.root.traverse_mut()?;
+		loop {
+			let cmp: Ordering = traverse.peek().key.borrow().cmp(k);
+			match cmp {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return Some(&mut traverse.into_content().value)
 			}
-		)
+		}
 	}
 
 	/// Returns a reference to the first entry (that is, with the smallest key) in the map.
@@ -243,20 +238,14 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse_mut(
-			|content, ctx| match content.key.borrow().cmp(k) {
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Greater if !ctx.has_left_child => TraverseStep::Left,
-				_ => TraverseStep::Value(Some((&content.key, &mut content.value)))
-			},
-			|content| {
-				if content.key.borrow() > k {
-					Some((&content.key, &mut content.value))
-				} else {
-					None
-				}
+		let mut traverse = self.root.traverse_mut()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return Some(traverse.into_content().as_tuple_mut())
 			}
-		)
+		}
 	}
 
 	/// Returns a reference to the last entry with a key smaller than or equal to `k` in
@@ -313,20 +302,14 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse_mut(
-			|content, ctx| match content.key.borrow().cmp(k) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less if !ctx.has_right_child => TraverseStep::Right,
-				_ => TraverseStep::Value(Some((&content.key, &mut content.value)))
-			},
-			|content| {
-				if content.key.borrow() < k {
-					Some((&content.key, &mut content.value))
-				} else {
-					None
-				}
+		let mut traverse = self.root.traverse_mut()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return Some(traverse.into_content().as_tuple_mut())
 			}
-		)
+		}
 	}
 }
 
