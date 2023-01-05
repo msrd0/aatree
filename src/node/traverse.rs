@@ -108,7 +108,7 @@ impl<'a, T> TraverseMut<'a, T> {
 				.node
 				.as_mut()
 				.and_then(|node| {
-					(!node.left_child.is_nil()).then_some(&mut node.left_child)
+					(!node.left_child.is_nil()).then(|| &mut node.left_child)
 				})
 				.ok_or(TraverseMutError("left"))?
 		})
@@ -136,7 +136,7 @@ impl<'a, T> TraverseMut<'a, T> {
 				.node
 				.as_mut()
 				.and_then(|node| {
-					(!node.right_child.is_nil()).then_some(&mut node.right_child)
+					(!node.right_child.is_nil()).then(|| &mut node.right_child)
 				})
 				.ok_or(TraverseMutError("right"))?
 		})
