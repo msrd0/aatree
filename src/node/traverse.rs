@@ -1,5 +1,5 @@
 use super::{AANode, Node};
-use core::fmt::{self, Display, Formatter};
+use core::fmt::{self, Debug, Display, Formatter};
 
 /// This type specifies the requested step for [`traverse`](AANode::traverse).
 #[derive(Debug)]
@@ -48,6 +48,12 @@ pub(crate) struct TraverseMutError(&'static str);
 impl Display for TraverseMutError {
 	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
 		write!(f, "Attempt to turn {} but there is no such child", self.0)
+	}
+}
+
+impl Debug for TraverseMutError {
+	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+		Display::fmt(self, f)
 	}
 }
 

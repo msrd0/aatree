@@ -2,7 +2,7 @@
 
 use super::{AATreeMap, KeyValue};
 use crate::node::TraverseStep;
-use core::{borrow::Borrow, cmp::Ordering};
+use core::{borrow::Borrow, cmp::Ordering, fmt::Debug};
 
 impl<K, V> AATreeMap<K, V> {
 	/// Returns a reference to the value corresponding to the key.
@@ -241,9 +241,18 @@ impl<K, V> AATreeMap<K, V> {
 		let mut traverse = self.root.traverse_mut()?;
 		loop {
 			match traverse.peek().key.borrow().cmp(k) {
-				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Greater
+					if traverse
+						.peek_left_child()
+						.map(|left| left.key.borrow() >= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_left().unwrap()
+				},
+
 				Ordering::Less => traverse = traverse.turn_right().ok()?,
-				Ordering::Equal => return Some(traverse.into_content().as_tuple_mut())
+
+				_ => return Some(traverse.into_content().as_tuple_mut())
 			}
 		}
 	}
@@ -299,15 +308,25 @@ impl<K, V> AATreeMap<K, V> {
 	/// ```
 	pub fn last_key_value_mut_at_or_before<Q>(&mut self, k: &Q) -> Option<(&K, &mut V)>
 	where
-		K: Borrow<Q> + Ord,
+		K: Borrow<Q> + Ord + Debug,
+		V: Debug,
 		Q: Ord + ?Sized
 	{
 		let mut traverse = self.root.traverse_mut()?;
 		loop {
 			match traverse.peek().key.borrow().cmp(k) {
 				Ordering::Greater => traverse = traverse.turn_left().ok()?,
-				Ordering::Less => traverse = traverse.turn_right().ok()?,
-				Ordering::Equal => return Some(traverse.into_content().as_tuple_mut())
+
+				Ordering::Less
+					if traverse
+						.peek_right_child()
+						.map(|right| right.key.borrow() <= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_right().unwrap()
+				},
+
+				_ => return Some(traverse.into_content().as_tuple_mut())
 			}
 		}
 	}
