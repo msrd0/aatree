@@ -11,9 +11,11 @@ use core::{
 	mem
 };
 
+mod entry;
 mod get;
 mod kv;
 
+pub use entry::{Entry, OccupiedEntry, VacantEntry};
 use kv::KeyValue;
 
 #[derive(Clone)]
