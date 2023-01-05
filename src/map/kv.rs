@@ -1,4 +1,4 @@
-//! This file defines the [`Entry`] type that is used by [`AATreeMap`](crate::AATreeMap).
+//! This file defines the [`KeyValue`] type that is used by [`AATreeMap`](crate::AATreeMap).
 
 use crate::iter::IterContent;
 use core::{borrow::Borrow, cmp::Ordering};
