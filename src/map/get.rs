@@ -63,20 +63,15 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse_mut(
-			|content, _| match content.key.borrow().cmp(key) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(content))
-			},
-			|content| {
-				if content.key.borrow() == key {
-					Some(content)
-				} else {
-					None
-				}
+		let mut traverse = self.root.traverse_mut()?;
+		loop {
+			let cmp: Ordering = traverse.peek().key.borrow().cmp(key);
+			match cmp {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return Some(traverse.into_content())
 			}
-		)
+		}
 	}
 
 	/// Gets the given key's corresponding entry, allowing for in-place manipulation of
@@ -155,19 +150,13 @@ impl<K, V> AATreeMap<K, V> {
 		K: Ord + Debug,
 		V: Debug
 	{
-		extern crate std;
-		std::eprintln!("first_entry()");
-		self.root.traverse_mut(
-			|content, ctx| {
-				std::eprintln!(
-					"first_entry(): In traverse_mut() callback |{content:?}, {ctx:?}|"
-				);
-				match ctx.has_left_child() {
-					true => TraverseStep::Left,
-					false => TraverseStep::Value(Some(OccupiedEntry { entry: content }))
-				}
-			},
-			|content| Some(OccupiedEntry { entry: content })
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_left_child() {
+			traverse = traverse.turn_left().unwrap();
+		}
+		Some(OccupiedEntry {
+			entry: traverse.into_content()
+		})
 	}
 
 	/// Returns a reference to the first entry (that is, with the smallest key) in the map.
@@ -233,16 +222,19 @@ impl<K, V> AATreeMap<K, V> {
 	/// let Some(mut entry) = map.last_entry() else { unreachable!() };
 	/// *entry.get_mut() = 'b';
 	/// assert_eq!(map.get(&1), Some(&'a'));
-	/// assert_eq!(map.get(&3), Some(&'c'));
+	/// assert_eq!(map.get(&3), Some(&'b'));
 	/// ```
 	pub fn last_entry(&mut self) -> Option<OccupiedEntry<'_, K, V>>
 	where
 		K: Ord
 	{
-		self.root.traverse_mut(
-			|_, _| TraverseStep::Left,
-			|content| Some(OccupiedEntry { entry: content })
-		)
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_right_child() {
+			traverse = traverse.turn_right().unwrap();
+		}
+		Some(OccupiedEntry {
+			entry: traverse.into_content()
+		})
 	}
 
 	/// Returns a reference to the last entry (that is, with the largest key) in the map.

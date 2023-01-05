@@ -9,15 +9,6 @@ pub enum TraverseStep<R> {
 	Value(Option<R>)
 }
 
-	}
-}
-
-impl Debug for TraverseMutContext {
-	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-		f.debug_struct("TraverseMutContext")
-			.field("has_left_child", &self.has_left_child())
-			.field("has_right_child", &self.has_right_child())
-			.finish()
 impl<T> AANode<T> {
 	/// Traverse the tree looking for a specific value.
 	///
@@ -159,18 +150,5 @@ impl<T> AANode<T> {
 	/// respect to the other nodes in the tree.**
 	pub(crate) fn traverse_mut(&mut self) -> Option<TraverseMut<'_, T>> {
 		(!self.is_nil()).then(|| TraverseMut { node: self })
-		extern crate std;
-		if self.is_nil() {
-			std::eprintln!("[DEBUG aatree] traverse_mut(): self is nil");
-		} else {
-			std::eprintln!("[DEBUG aatree] traverse_mut()");
-		}
-
-									#[cfg(debug_assertions)]
-									if !left {
-										std::eprintln!("[WARN aatree] traverse_mut(): Trying to go left when there is no left child");
-									}
-									left_child
-								},
 	}
 }
