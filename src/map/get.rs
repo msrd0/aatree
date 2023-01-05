@@ -337,7 +337,7 @@ mod tests {
 	use crate::AATreeMap;
 
 	#[test]
-	fn test_first_key_value_mut_at_or_after() {
+	fn test_first_key_value() {
 		let mut map = AATreeMap::new();
 		map.insert(10, "a");
 		map.insert(20, "b");
@@ -355,13 +355,16 @@ mod tests {
 		// 10  30  50  70
 
 		// To return the correct value for 15, we need to go left once but not twice
+		let (key, value) = map.first_key_value_at_or_after(&15).unwrap();
+		assert_eq!(*key, 20);
+		assert_eq!(*value, "b");
 		let (key, value) = map.first_key_value_mut_at_or_after(&15).unwrap();
 		assert_eq!(*key, 20);
 		assert_eq!(*value, "b");
 	}
 
 	#[test]
-	fn test_last_key_value_mut_at_or_before() {
+	fn test_last_key_value() {
 		let mut map = AATreeMap::new();
 		map.insert(10, "a");
 		map.insert(20, "b");
@@ -374,6 +377,9 @@ mod tests {
 		// 10         40
 
 		// To return the correct value for 35, we need to go right once but not twice
+		let (key, value) = map.last_key_value_at_or_before(&35).unwrap();
+		assert_eq!(*key, 30);
+		assert_eq!(*value, "c");
 		let (key, value) = map.last_key_value_mut_at_or_before(&35).unwrap();
 		assert_eq!(*key, 30);
 		assert_eq!(*value, "c");
