@@ -1,5 +1,3 @@
-#![allow(missing_debug_implementations)]
-
 use super::{AATreeMap, KeyValue};
 use core::{
 	fmt::{self, Debug, Formatter},
@@ -9,6 +7,15 @@ use core::{
 pub enum Entry<'a, K, V> {
 	Vacant(VacantEntry<'a, K, V>),
 	Occupied(OccupiedEntry<'a, K, V>)
+}
+
+impl<K: Debug, V: Debug> Debug for Entry<'_, K, V> {
+	fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+		match self {
+			Self::Vacant(v) => f.debug_tuple("Entry").field(v).finish(),
+			Self::Occupied(o) => f.debug_tuple("Entry").field(o).finish()
+		}
+	}
 }
 
 impl<'a, K, V> Entry<'a, K, V> {
