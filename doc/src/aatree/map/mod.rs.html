@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/map/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" 
         data-theme="ayu"
-        data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../aatree/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../aatree/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        data-use_system_theme="false"></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../aatree/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -355,6 +355,8 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
 	iter::{AAIntoIter, AAIter},
 	node::{AANode, TraverseStep}
@@ -369,13 +371,15 @@
 };
 
 <span class="kw">mod </span>entry;
-<span class="kw">use </span>entry::Entry;
-
 <span class="kw">mod </span>get;
+<span class="kw">mod </span>kv;
+
+<span class="kw">pub use </span>entry::{Entry, OccupiedEntry, VacantEntry};
+<span class="kw">use </span>kv::KeyValue;
 
 <span class="attribute">#[derive(Clone)]
 </span><span class="kw">pub struct </span>AATreeMap&lt;K, V&gt; {
-	root: AANode&lt;Entry&lt;K, V&gt;&gt;,
+	root: AANode&lt;KeyValue&lt;K, V&gt;&gt;,
 	len: usize
 }
 
@@ -484,7 +488,7 @@
 	}
 
 	<span class="doccomment">/// Creates an iterator over this map that visits all entries with the keys in ascending order.
-	</span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AAIter&lt;<span class="lifetime">&#39;_</span>, Entry&lt;K, V&gt;, (<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt; {
+	</span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AAIter&lt;<span class="lifetime">&#39;_</span>, KeyValue&lt;K, V&gt;, (<span class="kw-2">&amp;</span>K, <span class="kw-2">&amp;</span>V)&gt; {
 		<span class="self">self</span>.into_iter()
 	}
 
@@ -532,7 +536,7 @@
 	<span class="kw">where
 		</span>K: Ord
 	{
-		<span class="kw">let </span>inserted = <span class="self">self</span>.root.insert_or_replace(Entry { key, value });
+		<span class="kw">let </span>inserted = <span class="self">self</span>.root.insert_or_replace(KeyValue { key, value });
 		<span class="kw">match </span>inserted {
 			<span class="prelude-val">None </span>=&gt; {
 				<span class="self">self</span>.len += <span class="number">1</span>;
@@ -648,7 +652,7 @@
 		</span>K: Borrow&lt;Q&gt; + Ord,
 		Q: Ord + <span class="question-mark">?</span>Sized
 	{
-		<span class="self">self</span>.root.remove::&lt;Q, K&gt;(k).map(Entry::into_tuple)
+		<span class="self">self</span>.root.remove::&lt;Q, K&gt;(k).map(KeyValue::into_tuple)
 	}
 }
 
@@ -695,7 +699,7 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; IntoIterator <span class="kw">for </span>AATreeMap&lt;K, V&gt; {
 	<span class="kw">type </span>Item = (K, V);
-	<span class="kw">type </span>IntoIter = AAIntoIter&lt;Entry&lt;K, V&gt;, (K, V)&gt;;
+	<span class="kw">type </span>IntoIter = AAIntoIter&lt;KeyValue&lt;K, V&gt;, (K, V)&gt;;
 
 	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
 		AAIntoIter::new(<span class="self">self</span>.root, <span class="self">self</span>.len)
@@ -704,11 +708,11 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K, V&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AATreeMap&lt;K, V&gt; {
 	<span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>K, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>V);
-	<span class="kw">type </span>IntoIter = AAIter&lt;<span class="lifetime">&#39;a</span>, Entry&lt;K, V&gt;, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>K, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>V)&gt;;
+	<span class="kw">type </span>IntoIter = AAIter&lt;<span class="lifetime">&#39;a</span>, KeyValue&lt;K, V&gt;, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>K, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>V)&gt;;
 
 	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
 		AAIter::new(<span class="kw-2">&amp;</span><span class="self">self</span>.root, <span class="self">self</span>.len)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>
