@@ -75,7 +75,7 @@ impl<K, V> AATreeMap<K, V> {
 	}
 
 	/// Gets the given key's corresponding entry, allowing for in-place manipulation of
-	/// the entry as well as inserting an entry in that key if it does not exist yet.
+	/// the entry as well as inserting an entry with that key if it does not exist yet.
 	///
 	/// # Example
 	///
