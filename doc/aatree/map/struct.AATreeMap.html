@@ -13,7 +13,7 @@ map.insert(<span class="number">1</span>, <span class="string">&quot;a&quot;</sp
 <span class="macro">assert_eq!</span>(map.get_key_value(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="number">1</span>, <span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>)));
 <span class="macro">assert_eq!</span>(map.get_key_value(<span class="kw-2">&amp;</span><span class="number">2</span>), <span class="prelude-val">None</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.entry" class="method has-srclink"><a class="srclink rightside" href="../../src/aatree/map/get.rs.html#96-106">source</a><h4 class="code-header">pub fn <a href="#method.entry" class="fnname">entry</a>(&amp;mut self, key: K) -&gt; <a class="enum" href="enum.Entry.html" title="enum aatree::map::Entry">Entry</a>&lt;'_, K, V&gt;<span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;K: <a class="trait" href="https://doc.rust-lang.org/1.66.0/core/cmp/trait.Ord.html" title="trait core::cmp::Ord">Ord</a>,</span></h4></section></summary><div class="docblock"><p>Gets the given key’s corresponding entry, allowing for in-place manipulation of
-the entry as well as inserting an entry in that key if it does not exist yet.</p>
+the entry as well as inserting an entry with that key if it does not exist yet.</p>
 <h5 id="example-2"><a href="#example-2">Example</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span><span class="kw-2">mut </span>map = AATreeMap::new();
 <span class="kw">let </span>entry = map.entry(<span class="number">1</span>);
