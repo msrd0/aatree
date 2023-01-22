@@ -21,6 +21,14 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class="rust"><code><span class="attribute">#![cfg_attr(not(any(doc, test)), no_std)]
 #![cfg_attr(doc, deny(rustdoc::broken_intra_doc_links))]
 #![warn(missing_debug_implementations, rust_2018_idioms)]
@@ -32,15 +40,23 @@
 //!
 //! An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
 //! with a simplified self-balancing logic that should benefit performance.
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;document-features&quot;</span>, doc = <span class="macro">concat!</span>(
+	<span class="string">&quot;\n\n## Features\n&quot;</span>,
+	<span class="macro">document_features::document_features!</span>()
+))]
 
 </span><span class="kw">extern crate </span>alloc;
 
 <span class="kw">pub mod </span>iter;
 <span class="kw">pub mod </span>map;
 <span class="kw">pub mod </span>node;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;openapi&quot;</span>)]
+</span><span class="kw">mod </span>openapi;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">mod </span>serde;
 <span class="kw">pub mod </span>set;
 
 <span class="kw">pub use </span>map::AATreeMap;
 <span class="kw">pub use </span>set::AATreeSet;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="aatree" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.1 (90743e729 2023-01-10)" ></div></body></html>
