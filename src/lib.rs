@@ -9,12 +9,20 @@
 //!
 //! An AA-Tree is a self-balancing binary search tree based on a RedBlack-Tree
 //! with a simplified self-balancing logic that should benefit performance.
+#![cfg_attr(feature = "document-features", doc = concat!(
+	"\n\n## Features\n",
+	document_features::document_features!()
+))]
 
 extern crate alloc;
 
 pub mod iter;
 pub mod map;
 pub mod node;
+#[cfg(feature = "openapi")]
+mod openapi;
+#[cfg(feature = "serde")]
+mod serde;
 pub mod set;
 
 pub use map::AATreeMap;
