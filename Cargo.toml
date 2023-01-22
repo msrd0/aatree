@@ -16,4 +16,22 @@ keywords = ["data-structures", "tree", "collections", "set", "map"]
 categories = ["data-structures"]
 
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
+
+[dependencies]
+document-features = { version = "0.2", optional = true }
+openapi_type = { version = "0.4", optional = true }
+serde = { version = "1", default-features = false, optional = true }
+
+[dev-dependencies]
+serde_json = "1"
+
+[features]
+## Add `OpenapiType` implementations for `AATreeSet` and `AATreeMap`.
+openapi = ["dep:openapi_type"]
+
+## Add `(De)Serialize` implementations for `AATreeSet` and `AATreeMap`.
+serde = ["dep:serde"]
+
+[package.metadata.docs.rs]
+all-features = true
