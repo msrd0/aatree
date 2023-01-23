@@ -1,9 +1,9 @@
 use aatree::AATreeSet;
 use criterion::{
 	criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup,
-	BenchmarkId, Criterion
+	BenchmarkId, Criterion, BatchSize
 };
-use std::{collections::BTreeSet, rc::Rc, sync::Mutex, time::Duration};
+use std::{collections::BTreeSet, time::Duration};
 
 macro_rules! benchmark {
 	($ty:ty, $amount:expr, hit) => {
@@ -14,8 +14,7 @@ macro_rules! benchmark {
 	};
 	(@internal, $ty:ty, $amount:expr, $iter_fill:expr, $iter_test:expr, $success:ident) => {
 		paste::item! {
-			fn [<$ty:lower _remove_ $amount _ $success>](container: &Rc<Mutex<$ty<u64>>>, test: &[u64]) {
-				let mut container = container.lock().unwrap();
+			fn [<$ty:lower _remove_ $amount _ $success>](container: &mut $ty<u64>, test: &[u64]) {
 				for i in test {
 					container.remove(i);
 				}
@@ -23,8 +22,14 @@ macro_rules! benchmark {
 			fn [<bench_ $ty:lower _remove_ $amount _ $success>]<M: Measurement>(g: &mut BenchmarkGroup<M>, id: BenchmarkId) {
 				let container: $ty<u64> = $iter_fill.collect();
 				let test: Vec<u64> = $iter_test.collect();
-				let container = Rc::new(Mutex::new(container));
-				g.bench_with_input(id, &(container, test), |b, (c, t)| b.iter(|| [<$ty:lower _remove_ $amount _ $success>](c, t)));
+				let container = container;
+				g.bench_with_input(id, &(container, test), |b, (c, t)| {
+					b.iter_batched_ref(
+						|| (c.clone(), t),
+						|(c, t)| [<$ty:lower _remove_ $amount _ $success>](c, t),
+						BatchSize::SmallInput
+					)
+				});
 			}
 		}
 	};
