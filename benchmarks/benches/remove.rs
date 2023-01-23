@@ -1,7 +1,7 @@
 use aatree::AATreeSet;
 use criterion::{
-	criterion_group, criterion_main, measurement::Measurement, BenchmarkGroup,
-	BenchmarkId, Criterion, BatchSize
+	criterion_group, criterion_main, measurement::Measurement, BatchSize, BenchmarkGroup,
+	BenchmarkId, Criterion
 };
 use std::{collections::BTreeSet, time::Duration};
 
@@ -22,7 +22,6 @@ macro_rules! benchmark {
 			fn [<bench_ $ty:lower _remove_ $amount _ $success>]<M: Measurement>(g: &mut BenchmarkGroup<M>, id: BenchmarkId) {
 				let container: $ty<u64> = $iter_fill.collect();
 				let test: Vec<u64> = $iter_test.collect();
-				let container = container;
 				g.bench_with_input(id, &(container, test), |b, (c, t)| {
 					b.iter_batched_ref(
 						|| (c.clone(), t),
