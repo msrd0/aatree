@@ -1,7 +1,7 @@
 //! This method defines several access methods for [`AATreeMap`].
 
 use super::{AATreeMap, Entry, KeyValue, OccupiedEntry, VacantEntry};
-use crate::node::TraverseStep;
+use crate::node::{TraverseIface as _, TraverseStep};
 use core::{borrow::Borrow, cmp::Ordering, fmt::Debug};
 
 impl<K, V> AATreeMap<K, V> {
@@ -140,7 +140,9 @@ impl<K, V> AATreeMap<K, V> {
 	/// map.insert(3, 'c');
 	/// println!("{map:?}");
 	///
-	/// let Some(mut entry) = map.first_entry() else { unreachable!() };
+	/// let Some(mut entry) = map.first_entry() else {
+	/// 	unreachable!()
+	/// };
 	/// *entry.get_mut() = 'b';
 	/// assert_eq!(map.get(&1), Some(&'b'));
 	/// assert_eq!(map.get(&3), Some(&'c'));
@@ -219,7 +221,9 @@ impl<K, V> AATreeMap<K, V> {
 	/// map.insert(1, 'a');
 	/// map.insert(3, 'c');
 	///
-	/// let Some(mut entry) = map.last_entry() else { unreachable!() };
+	/// let Some(mut entry) = map.last_entry() else {
+	/// 	unreachable!()
+	/// };
 	/// *entry.get_mut() = 'b';
 	/// assert_eq!(map.get(&1), Some(&'a'));
 	/// assert_eq!(map.get(&3), Some(&'b'));
