@@ -1,23 +1,24 @@
 //! This method defines several access methods for [`AATreeMap`].
 
 use super::{AATreeMap, Entry, KeyValue, OccupiedEntry, VacantEntry};
-use crate::node::{TraverseIface as _, TraverseStep};
+use crate::node::TraverseIface as _;
 use core::{borrow::Borrow, cmp::Ordering, fmt::Debug};
 
 impl<K, V> AATreeMap<K, V> {
-	fn kv<Q>(&self, key: &Q) -> Option<&KeyValue<K, V>>
+	pub(super) fn kv<Q>(&self, key: &Q) -> Option<&KeyValue<K, V>>
 	where
 		K: Ord + Borrow<Q>,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match key.cmp(content.key.borrow()) {
-				Ordering::Equal => TraverseStep::Value(Some(content)),
-				Ordering::Less => TraverseStep::Left,
-				Ordering::Greater => TraverseStep::Right
-			},
-			|_, sub| sub
-		)
+		let mut traverse = self.root.traverse()?;
+		loop {
+			let cmp: Ordering = traverse.peek().key.borrow().cmp(key);
+			match cmp {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return Some(traverse.into_content())
+			}
+		}
 	}
 
 	/// Returns a reference to the value corresponding to the key.
@@ -178,10 +179,11 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.traverse(
-			|_| TraverseStep::Left,
-			|content, sub| sub.or_else(|| Some(content.as_tuple()))
-		)
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_left_child() {
+			traverse = traverse.turn_left().unwrap();
+		}
+		Some(traverse.into_content().as_tuple())
 	}
 
 	/// Returns and removes the first entry (that is, with the smallest key) in the map.
@@ -258,10 +260,11 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.traverse(
-			|_| TraverseStep::Right,
-			|content, sub| sub.or_else(|| Some(content.as_tuple()))
-		)
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_right_child() {
+			traverse = traverse.turn_right().unwrap();
+		}
+		Some(traverse.into_content().as_tuple())
 	}
 
 	/// Returns and removes the last entry (that is, with the largest key) in the map.
@@ -313,17 +316,23 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match content.key.borrow().cmp(k) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
-			},
-			|content, sub| match sub {
-				None if content.key.borrow() > k => Some(content.as_tuple()),
-				sub => sub
+		let mut traverse = self.root.traverse()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater
+					if traverse
+						.peek_left_child()
+						.map(|left| left.key.borrow() >= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_left().unwrap()
+				},
+
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+
+				_ => return Some(traverse.into_content().as_tuple())
 			}
-		)
+		}
 	}
 
 	/// Returns a mutable reference to the first entry with a key greater than or equal
@@ -386,17 +395,23 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match content.key.borrow().cmp(k) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(content.as_tuple()))
-			},
-			|content, sub| match sub {
-				None if content.key.borrow() < k => Some(content.as_tuple()),
-				sub => sub
+		let mut traverse = self.root.traverse()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+
+				Ordering::Less
+					if traverse
+						.peek_right_child()
+						.map(|right| right.key.borrow() <= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_right().unwrap()
+				},
+
+				_ => return Some(traverse.into_content().as_tuple())
 			}
-		)
+		}
 	}
 
 	/// Returns a mutable reference to the last entry with a key smaller than or equal to

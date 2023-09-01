@@ -74,48 +74,52 @@ pub trait TraverseIface<T>: TraverseIfaceCommon<T> {
 
 impl<T, I: TraverseIfaceCommon<T>> TraverseIface<T> for I {}
 
-/// This type specifies the requested step for [`traverse`](AANode::traverse).
-#[derive(Debug)]
-pub enum TraverseStep<R> {
-	Left,
-	Right,
-	Value(Option<R>)
+/// A struct to guide traversel with immutable access.
+#[allow(missing_debug_implementations)]
+pub struct Traverse<'a, T> {
+	node: &'a AANode<T>
 }
 
-impl<T> AANode<T> {
-	/// Traverse the tree looking for a specific value.
-	///
-	/// `down_callback` is called for each node on the way down the tree. It is passed the
-	/// value contained in the current node and may return either `Left` or `Right` to
-	/// continue the traversal in that direction, or `Value` to stop the traversal, for
-	/// example because a value was found.
-	///
-	/// `up_callback` is called while going back up with the content of each node and the
-	/// result of traversing so far (i.e., `None` for the first call when the search hit a
-	/// leaf, or the return value of the last callback execution otherwise).
-	pub fn traverse<'a, F, G, R>(&'a self, down_callback: F, up_callback: G) -> Option<R>
-	where
-		F: Fn(&'a T) -> TraverseStep<R> + Copy,
-		G: Fn(&'a T, Option<R>) -> Option<R> + Copy
-	{
-		self.as_ref().and_then(
-			|Node {
-			     content,
-			     left_child,
-			     right_child,
-			     ..
-			 }| {
-				let child = match down_callback(content) {
-					TraverseStep::Left => left_child,
-					TraverseStep::Right => right_child,
-					TraverseStep::Value(v) => return v
-				};
-				up_callback(content, child.traverse(down_callback, up_callback))
-			}
-		)
+impl<T> TraverseIfaceCommon<T> for Traverse<'_, T> {
+	fn node(&self) -> &AANode<T> {
+		self.node
 	}
 }
 
+impl<'a, T> Traverse<'a, T> {
+	/// Return the content of this node (unless it is nil).
+	pub fn into_content(self) -> &'a T {
+		&self
+			.node
+			.as_ref()
+			.expect("This node should not be nil")
+			.content
+	}
+
+	/// Continue traversing the tree with the left child of the current node.
+	pub fn turn_left(self) -> Result<Self, TraverseError> {
+		Ok(Self {
+			node: self
+				.node
+				.as_ref()
+				.and_then(|node| (!node.left_child.is_nil()).then(|| &node.left_child))
+				.ok_or(TraverseError("left"))?
+		})
+	}
+
+	/// Continue traversing the tree with the left child of the current node.
+	pub fn turn_right(self) -> Result<Self, TraverseError> {
+		Ok(Self {
+			node: self
+				.node
+				.as_ref()
+				.and_then(|node| (!node.right_child.is_nil()).then(|| &node.right_child))
+				.ok_or(TraverseError("right"))?
+		})
+	}
+}
+
+/// A struct to guide traversal with mutable access.
 pub(crate) struct TraverseMut<'a, T> {
 	node: &'a mut AANode<T>
 }
@@ -126,7 +130,6 @@ impl<T> TraverseIfaceCommon<T> for TraverseMut<'_, T> {
 	}
 }
 
-#[allow(dead_code)] // I might need that in the future
 impl<'a, T> TraverseMut<'a, T> {
 	/// Return the content of this node (unless it is nil).
 	pub(crate) fn into_content(self) -> &'a mut T {
@@ -165,6 +168,12 @@ impl<'a, T> TraverseMut<'a, T> {
 }
 
 impl<T> AANode<T> {
+	/// Traverse the tree. You can call `turn_left` and `turn_right` to guide the
+	/// traversal into the direction you like.
+	pub(crate) fn traverse(&self) -> Option<Traverse<'_, T>> {
+		(!self.is_nil()).then(|| Traverse { node: self })
+	}
+
 	/// Traverse the tree, allowing for mutation of the nodes that are being traversed.
 	///
 	/// **It is a logic error to mutate the nodes in a way that changes their order with

@@ -1,6 +1,6 @@
 use crate::{
 	iter::{AAIntoIter, AAIter},
-	node::{AANode, TraverseStep}
+	node::AANode
 };
 use alloc::vec::Vec;
 use core::{
@@ -238,16 +238,7 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root
-			.traverse(
-				|content| match content.key.borrow().cmp(k) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(()))
-				},
-				|_, sub| sub
-			)
-			.is_some()
+		self.kv(k).is_some()
 	}
 
 	/// Remove a key from the map if it exists, and return the value that was previously stored

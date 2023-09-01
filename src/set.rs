@@ -1,6 +1,6 @@
 use crate::{
 	iter::{AAIntoIter, AAIter},
-	node::{AANode, TraverseStep}
+	node::AANode
 };
 use alloc::vec::Vec;
 use core::{
@@ -206,8 +206,11 @@ impl<T: Ord> AATreeSet<T> {
 	/// assert_eq!(set.first(), Some(&40));
 	/// ```
 	pub fn first(&self) -> Option<&T> {
-		self.root
-			.traverse(|_| TraverseStep::Left, |content, sub| sub.or(Some(content)))
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_left_child() {
+			traverse = traverse.turn_left().unwrap();
+		}
+		Some(traverse.into_content())
 	}
 
 	/// Returns the last/largest element of the set.
@@ -223,10 +226,11 @@ impl<T: Ord> AATreeSet<T> {
 	/// assert_eq!(set.last(), Some(&44));
 	/// ```
 	pub fn last(&self) -> Option<&T> {
-		self.root.traverse(
-			|_| TraverseStep::Right,
-			|content, sub| sub.or(Some(content))
-		)
+		let mut traverse = self.root.traverse_mut()?;
+		while traverse.has_right_child() {
+			traverse = traverse.turn_right().unwrap();
+		}
+		Some(traverse.into_content())
 	}
 
 	/// Remove and return the first/smallest element of the set.
@@ -283,16 +287,16 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root
-			.traverse(
-				|content| match content.borrow().cmp(value) {
-					Ordering::Greater => TraverseStep::Left,
-					Ordering::Less => TraverseStep::Right,
-					Ordering::Equal => TraverseStep::Value(Some(()))
-				},
-				|_, sub| sub
-			)
-			.is_some()
+		let mut traverse = self.root.traverse()?;
+		loop {
+			let cmp: Ordering = traverse.peek().key.borrow().cmp(key);
+			match cmp {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+				Ordering::Equal => return true
+			}
+		}
+		false
 	}
 
 	/// Returns the first/smallest element of the set that is greater or equal to `x`.
@@ -312,17 +316,23 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match content.borrow().cmp(value) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(content))
-			},
-			|content, sub| match sub {
-				None if content.borrow() > value => Some(content),
-				sub => sub
+		let mut traverse = self.root.traverse()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater
+					if traverse
+						.peek_left_child()
+						.map(|left| left.key.borrow() >= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_left().unwrap()
+				},
+
+				Ordering::Less => traverse = traverse.turn_right().ok()?,
+
+				_ => return Some(traverse.into_content())
 			}
-		)
+		}
 	}
 
 	/// Returns the last/largest element of the set that is smaller or equal to `x`.
@@ -342,17 +352,23 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.traverse(
-			|content| match content.borrow().cmp(value) {
-				Ordering::Greater => TraverseStep::Left,
-				Ordering::Less => TraverseStep::Right,
-				Ordering::Equal => TraverseStep::Value(Some(content))
-			},
-			|content, sub| match sub {
-				None if content.borrow() < value => Some(content),
-				sub => sub
+		let mut traverse = self.root.traverse()?;
+		loop {
+			match traverse.peek().key.borrow().cmp(k) {
+				Ordering::Greater => traverse = traverse.turn_left().ok()?,
+
+				Ordering::Less
+					if traverse
+						.peek_right_child()
+						.map(|right| right.key.borrow() <= k)
+						.unwrap_or(false) =>
+				{
+					traverse = traverse.turn_right().unwrap()
+				},
+
+				_ => return Some(traverse.into_content())
 			}
-		)
+		}
 	}
 
 	/// Removes a value from the set, and returns `true` if it was removed.
