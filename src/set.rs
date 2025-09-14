@@ -239,13 +239,15 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
+	/// assert_eq!(set.len(), 3);
 	/// assert_eq!(set.pop_first(), Some(40));
 	/// assert_eq!(set.pop_first(), Some(42));
 	/// assert_eq!(set.pop_first(), Some(44));
 	/// assert_eq!(set.pop_first(), None);
+	/// assert!(set.is_empty());
 	/// ```
 	pub fn pop_first(&mut self) -> Option<T> {
-		self.root.remove_successor()
+		self.root.remove_successor().inspect(|_| self.len -= 1)
 	}
 
 	/// Remove and return the last/largest element of the set.
@@ -258,13 +260,15 @@ impl<T: Ord> AATreeSet<T> {
 	/// set.insert(42);
 	/// set.insert(44);
 	/// set.insert(40);
+	/// assert_eq!(set.len(), 3);
 	/// assert_eq!(set.pop_last(), Some(44));
 	/// assert_eq!(set.pop_last(), Some(42));
 	/// assert_eq!(set.pop_last(), Some(40));
 	/// assert_eq!(set.pop_last(), None);
+	/// assert!(set.is_empty());
 	/// ```
 	pub fn pop_last(&mut self) -> Option<T> {
-		self.root.remove_predecessor()
+		self.root.remove_predecessor().inspect(|_| self.len -= 1)
 	}
 
 	/// Returns `true` if the set contains an element with the given value.
@@ -361,7 +365,7 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.remove(x).is_some()
+		self.root.remove(x).inspect(|_| self.len -= 1).is_some()
 	}
 
 	/// Removes a value from the set, and returns the value that was removed.
@@ -370,7 +374,7 @@ impl<T: Ord> AATreeSet<T> {
 		T: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.remove(x)
+		self.root.remove(x).inspect(|_| self.len -= 1)
 	}
 }
 
