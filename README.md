@@ -1,3 +1,5 @@
+# This repository has moved to <https://codeberg.org/msrd0/aatree>
+
 # AA Tree
 
 [![Build Status](https://github.com/msrd0/aatree/actions/workflows/rust.yml/badge.svg)](https://github.com/msrd0/aatree/actions/workflows/rust.yml)
