@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["iter","Iterator implementations for `AATreeSet` and `AATreeMap`."],["map",""],["node","Low-level implementation of an AA tree. You shouldn’t have to use this directly; instead, use the implementations in `AATreeSet` and `AATreeMap`."],["set",""]]};
+window.SIDEBAR_ITEMS = {"mod":["iter","map","node","set"]};

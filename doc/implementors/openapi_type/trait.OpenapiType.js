@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"aatree":[["impl&lt;T&gt; OpenapiType for <a class=\"struct\" href=\"aatree/set/struct.AATreeSet.html\" title=\"struct aatree::set::AATreeSet\">AATreeSet</a>&lt;T&gt;<span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: OpenapiType,</span>"],["impl&lt;K, T&gt; OpenapiType for <a class=\"struct\" href=\"aatree/map/struct.AATreeMap.html\" title=\"struct aatree::map::AATreeMap\">AATreeMap</a>&lt;K, T&gt;<span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: OpenapiType,</span>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

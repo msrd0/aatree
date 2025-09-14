@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["TraverseStep","This type specifies the requested step for `traverse`."]],"struct":[["AANode",""]]};
+window.SIDEBAR_ITEMS = {"enum":["TraverseStep"],"struct":["AANode"]};

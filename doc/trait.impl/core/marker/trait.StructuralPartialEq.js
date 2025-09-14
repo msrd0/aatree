@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["aatree",[["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/1.89.0/core/marker/trait.StructuralPartialEq.html\" title=\"trait core::marker::StructuralPartialEq\">StructuralPartialEq</a> for <a class=\"struct\" href=\"aatree/node/struct.AANode.html\" title=\"struct aatree::node::AANode\">AANode</a>&lt;T&gt;"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[330]}
