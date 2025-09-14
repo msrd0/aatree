@@ -260,9 +260,11 @@ impl<K, V> AATreeMap<K, V> {
 	/// let mut map = AATreeMap::new();
 	/// map.insert(1, "a");
 	/// map.insert(2, "b");
+	/// assert_eq!(map.len(), 2);
 	/// assert_eq!(map.get(&1), Some(&"a"));
 	/// let value = map.remove(&1);
 	/// assert_eq!(value, Some("a"));
+	/// assert_eq!(map.len(), 1);
 	/// assert_eq!(map.get(&1), None);
 	/// ```
 	pub fn remove<Q>(&mut self, k: &Q) -> Option<V>
@@ -270,7 +272,10 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.remove::<Q, K>(k).map(|entry| entry.value)
+		self.root.remove::<Q, K>(k).map(|entry| {
+			self.len -= 1;
+			entry.value
+		})
 	}
 
 	/// Remove a key from the map if it exists, and return the key and the value that was
@@ -283,9 +288,11 @@ impl<K, V> AATreeMap<K, V> {
 	/// let mut map = AATreeMap::new();
 	/// map.insert(1, "a");
 	/// map.insert(2, "b");
+	/// assert_eq!(map.len(), 2);
 	/// assert_eq!(map.get(&1), Some(&"a"));
 	/// let value = map.remove(&1);
 	/// assert_eq!(value, Some("a"));
+	/// assert_eq!(map.len(), 1);
 	/// assert_eq!(map.get(&1), None);
 	/// ```
 	pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
@@ -293,7 +300,10 @@ impl<K, V> AATreeMap<K, V> {
 		K: Borrow<Q> + Ord,
 		Q: Ord + ?Sized
 	{
-		self.root.remove::<Q, K>(k).map(KeyValue::into_tuple)
+		self.root.remove::<Q, K>(k).map(|kv| {
+			self.len -= 1;
+			kv.into_tuple()
+		})
 	}
 }
 

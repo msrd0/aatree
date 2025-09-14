@@ -140,7 +140,9 @@ impl<K, V> AATreeMap<K, V> {
 	/// map.insert(3, 'c');
 	/// println!("{map:?}");
 	///
-	/// let Some(mut entry) = map.first_entry() else { unreachable!() };
+	/// let Some(mut entry) = map.first_entry() else {
+	/// 	unreachable!()
+	/// };
 	/// *entry.get_mut() = 'b';
 	/// assert_eq!(map.get(&1), Some(&'b'));
 	/// assert_eq!(map.get(&3), Some(&'c'));
@@ -193,16 +195,21 @@ impl<K, V> AATreeMap<K, V> {
 	/// map.insert(3, "a");
 	/// map.insert(1, "b");
 	/// map.insert(2, "c");
+	/// assert_eq!(map.len(), 3);
 	/// assert_eq!(map.pop_first(), Some((1, "b")));
 	/// assert_eq!(map.pop_first(), Some((2, "c")));
 	/// assert_eq!(map.pop_first(), Some((3, "a")));
 	/// assert_eq!(map.pop_first(), None);
+	/// assert!(map.is_empty());
 	/// ```
 	pub fn pop_first(&mut self) -> Option<(K, V)>
 	where
 		K: Ord
 	{
-		self.root.remove_successor().map(KeyValue::into_tuple)
+		self.root.remove_successor().map(|kv| {
+			self.len -= 1;
+			kv.into_tuple()
+		})
 	}
 
 	/// Gets the last entry (that is, with the largest key) in the map, allowing for
@@ -219,7 +226,9 @@ impl<K, V> AATreeMap<K, V> {
 	/// map.insert(1, 'a');
 	/// map.insert(3, 'c');
 	///
-	/// let Some(mut entry) = map.last_entry() else { unreachable!() };
+	/// let Some(mut entry) = map.last_entry() else {
+	/// 	unreachable!()
+	/// };
 	/// *entry.get_mut() = 'b';
 	/// assert_eq!(map.get(&1), Some(&'a'));
 	/// assert_eq!(map.get(&3), Some(&'b'));
@@ -280,9 +289,16 @@ impl<K, V> AATreeMap<K, V> {
 	where
 		K: Ord
 	{
-		self.root.remove_predecessor().map(KeyValue::into_tuple)
+		self.root.remove_predecessor().map(|kv| {
+			self.len -= 1;
+			kv.into_tuple()
+		})
 	}
 
+	#[deprecated(
+		since = "0.2.3",
+		note = "Use pop_last instead (Issue: https://github.com/msrd0/aatree/issues/32)"
+	)]
 	pub fn pop_largest(&mut self) -> Option<(K, V)>
 	where
 		K: Ord
