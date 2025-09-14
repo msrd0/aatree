@@ -16,7 +16,7 @@ keywords = ["data-structures", "tree", "collections", "set", "map"]
 categories = ["data-structures"]
 
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.76"
 
 [dependencies]
 document-features = { version = "0.2", optional = true }
